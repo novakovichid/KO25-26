@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E%F0%9F%A7%91%E2%80%8D%F0%9F%94%AC%3C/text%3E%3C/svg%3E">
   <title>Matrix Puzzle</title>
   <script src="../section-auth.js"></script>
   <script>window.SectionAuth && window.SectionAuth.guardPage("MORSE");</script>
@@ -20,11 +21,7 @@
     .status.ok { color:var(--ok); background:var(--ok-bg); border:1px solid #86efac; }
     .status.progress { color:var(--warn); background:var(--warn-bg); border:1px solid #fcd34d; }
     .codeword { border:1px dashed #86efac; border-radius:10px; padding:9px 12px; background:#f0fdf4; color:#166534; font-weight:700; }
-    .auth { border:1px solid var(--border); border-radius:12px; background:#fcfcfd; padding:14px; display:grid; gap:10px; }
-    .auth-row { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
-    input[type=password] { border:1px solid var(--border); border-radius:10px; padding:8px 10px; font:inherit; min-width:220px; }
-    .auth-error { min-height:20px; font-size:13px; color:#b91c1c; font-weight:600; }
-    .grid-wrap { overflow:auto; border:1px solid var(--border); border-radius:12px; background:#fafafa; padding:12px; min-height:300px; }
+    .auth { border:1px solid var(--border); border-radius:12px; background:#fcfcfd; padding:14px; display:grid; gap:10px; }    .grid-wrap { overflow:auto; border:1px solid var(--border); border-radius:12px; background:#fafafa; padding:12px; min-height:300px; }
     .grid { display:grid; gap:var(--gap); width:max-content; margin:0 auto; }
     .cell { width:var(--cell-size); height:var(--cell-size); border-radius:9px; border:1px solid #9ca3af; background:#fff; color:#111827; display:grid; place-items:center; font-weight:700; cursor:pointer; user-select:none; }
     .cell.one { background:#111827; color:#fff; border-color:#111827; }
@@ -32,13 +29,7 @@
   </style>
 </head>
 <body>
-  <main class="app" id="app">
-    <section id="authGate" class="auth" hidden>
-      <div><b>Задача защищена паролем.</b> Введите пароль.</div>
-      <div class="auth-row"><input id="passwordInput" type="password" placeholder="Пароль"><button id="unlock" class="primary">Открыть задачу</button></div>
-      <div id="authError" class="auth-error"></div>
-    </section>
-    <div id="gameArea" hidden>
+  <main class="app" id="app">    <div id="gameArea" hidden>
       <section class="toolbar"><button id="restart" class="primary">Заново</button><button id="undo">Отменить</button><button id="redo">Повторить</button><div class="counter" id="stepCounter">Шаги: 0</div></section>
       <div id="status" class="status progress">В процессе</div>
       <div id="codeWordBox" class="codeword" hidden></div>
@@ -48,7 +39,7 @@
   <script>
     const EMBEDDED_TOKEN = "aHtgKR9vL-l0UHLeqraQ7HhIpT7GRzP0gia5M5F0zC28O9TrX48wW17-5w";
     const URL_CIPHER_KEY = "matrix-1-0-lite-key";
-    const appEl=document.getElementById("app"),authGateEl=document.getElementById("authGate"),gameAreaEl=document.getElementById("gameArea"),passwordInputEl=document.getElementById("passwordInput"),unlockBtn=document.getElementById("unlock"),authErrorEl=document.getElementById("authError"),restartBtn=document.getElementById("restart"),undoBtn=document.getElementById("undo"),redoBtn=document.getElementById("redo"),stepCounterEl=document.getElementById("stepCounter"),statusEl=document.getElementById("status"),codeWordBoxEl=document.getElementById("codeWordBox"),gridEl=document.getElementById("grid");
+    const appEl=document.getElementById("app"),gameAreaEl=document.getElementById("gameArea"),restartBtn=document.getElementById("restart"),undoBtn=document.getElementById("undo"),redoBtn=document.getElementById("redo"),stepCounterEl=document.getElementById("stepCounter"),statusEl=document.getElementById("status"),codeWordBoxEl=document.getElementById("codeWordBox"),gridEl=document.getElementById("grid");
     let n=0,initialBoard=[],board=[],history=[],historyIndex=0,requiresPassword=false,authSalt=0,authHash=0,revealCodeWord="",codeWordCipher=null,codeWordCipherSalt=0,codeWordCipherCheck=0,codeWordKey32=0,codeWordKeyReady=false;
     function decodeBase64Url(str){const padded=str.replace(/-/g,'+').replace(/_/g,'/')+'==='.slice((str.length+3)%4);const bin=atob(padded);const out=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)out[i]=bin.charCodeAt(i);return out;}
     function obfuscateBytes(bytes,keyText){const key=new TextEncoder().encode(keyText);const out=new Uint8Array(bytes.length);for(let i=0;i<bytes.length;i++)out[i]=bytes[i]^key[i%key.length]^((i*31)&255);return out;}
@@ -70,9 +61,7 @@
     restartBtn.addEventListener('click',()=>{board=copyBoard(initialBoard);history=[];historyIndex=0;render();});
     undoBtn.addEventListener('click',()=>{if(historyIndex<=0)return;const m=history[historyIndex-1];applyMove(m.r,m.c);historyIndex--;render();});
     redoBtn.addEventListener('click',()=>{if(historyIndex>=history.length)return;const m=history[historyIndex];applyMove(m.r,m.c);historyIndex++;render();});
-    unlockBtn.addEventListener('click',()=>{const entered=passwordInputEl.value;const got=passwordHash32(entered,authSalt);if(got!==authHash){authErrorEl.textContent='Неверный пароль.';passwordInputEl.select();return;}codeWordKey32=passwordHash32(entered+'|cw',codeWordCipherSalt);codeWordKeyReady=true;authErrorEl.textContent='';passwordInputEl.value='';authGateEl.remove();gameAreaEl.hidden=false;render();});
-    passwordInputEl.addEventListener('keydown',e=>{if(e.key==='Enter')unlockBtn.click();});
-    try{loadFromEmbedded();authGateEl.hidden=true;gameAreaEl.hidden=false;render();}catch(err){appEl.innerHTML='<div class="error">Ошибка загрузки задачи: '+String(err.message||err)+'</div>';}
+    try{loadFromEmbedded();gameAreaEl.hidden=false;render();}catch(err){appEl.innerHTML='<div class="error">Ошибка загрузки задачи: '+String(err.message||err)+'</div>';}
   </script>
 </body>
 </html>
