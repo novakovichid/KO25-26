@@ -54,7 +54,7 @@
   </main>
 
   <script>
-    const EMBEDDED_TOKEN = "aHtgKR9vL-l0UHLeqraQ7HhIpT7GRzP0gia5M5F0zC28O9TrX48wW17-5w";
+    const EMBEDDED_TOKEN = "aHtgKSolb-mbgNpW49malfKlJ9OqQ7iPkA";
     const URL_CIPHER_KEY = "matrix-1-0-lite-key";
     const MAX_EXACT_FREE_VARS = 20;
     const MAX_STORED_SHORTEST = 256;
@@ -321,10 +321,10 @@
     }
 
     function updateSolverPanel() {
-      const toZero = solveForTarget(0);
-      const shortest = enumerateShortestPlansForTarget(toZero);
+      const toOne = solveForTarget(1);
+      const shortest = enumerateShortestPlansForTarget(toOne);
       if (!shortest) {
-        solveInfoEl.textContent = "Для цели 'все нули' решение не найдено.";
+        solveInfoEl.textContent = "Для цели 'все единицы' решение не найдено.";
         movesDumpEl.textContent = "-";
         return;
       }

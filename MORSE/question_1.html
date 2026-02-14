@@ -8,7 +8,7 @@
   <script src="../section-auth.js"></script>
   <script>window.SectionAuth && window.SectionAuth.guardPage("MORSE");</script>
   <style>
-    :root { --bg:#f3f4f6; --panel:#fff; --text:#111827; --muted:#6b7280; --border:#d1d5db; --accent:#0f766e; --ok:#166534; --ok-bg:#dcfce7; --warn:#92400e; --warn-bg:#fef3c7; --cell-size:42px; --gap:6px; }
+    :root { --bg:#f3f4f6; --panel:#fff; --text:#111827; --muted:#6b7280; --border:#d1d5db; --accent:#0f766e; --cell-size:42px; --gap:6px; }
     * { box-sizing:border-box; }
     body { margin:0; min-height:100vh; font-family:"Segoe UI","Noto Sans",sans-serif; background:radial-gradient(circle at 20% 0%,#fff,var(--bg)); color:var(--text); display:grid; place-items:center; padding:20px; }
     .app { width:min(1280px,100%); background:var(--panel); border:1px solid var(--border); border-radius:16px; box-shadow:0 14px 30px rgba(17,24,39,.09); padding:16px; display:grid; gap:12px; }
@@ -17,51 +17,435 @@
     button.primary { background:var(--accent); color:#fff; border-color:var(--accent); }
     button:disabled { opacity:.55; cursor:not-allowed; }
     .counter { margin-left:auto; font-weight:700; padding:8px 12px; border:1px solid var(--border); border-radius:10px; }
-    .status { border-radius:10px; padding:9px 12px; font-weight:600; }
-    .status.ok { color:var(--ok); background:var(--ok-bg); border:1px solid #86efac; }
-    .status.progress { color:var(--warn); background:var(--warn-bg); border:1px solid #fcd34d; }
-    .codeword { border:1px dashed #86efac; border-radius:10px; padding:9px 12px; background:#f0fdf4; color:#166534; font-weight:700; }
-    .auth { border:1px solid var(--border); border-radius:12px; background:#fcfcfd; padding:14px; display:grid; gap:10px; }    .grid-wrap { overflow:auto; border:1px solid var(--border); border-radius:12px; background:#fafafa; padding:12px; min-height:300px; }
+    .goal { border:1px solid #c7d2fe; background:#eef2ff; color:#3730a3; border-radius:10px; padding:9px 12px; font-weight:700; }
+    .layout { display:grid; gap:12px; grid-template-columns: 1fr 360px; align-items:start; }
+    .grid-wrap { overflow:auto; border:1px solid var(--border); border-radius:12px; background:#fafafa; padding:12px; min-height:300px; }
     .grid { display:grid; gap:var(--gap); width:max-content; margin:0 auto; }
     .cell { width:var(--cell-size); height:var(--cell-size); border-radius:9px; border:1px solid #9ca3af; background:#fff; color:#111827; display:grid; place-items:center; font-weight:700; cursor:pointer; user-select:none; }
     .cell.one { background:#111827; color:#fff; border-color:#111827; }
+    .panel { border:1px solid var(--border); border-radius:12px; background:#fcfcfd; padding:10px; display:grid; gap:8px; align-content:start; }
+    .panel h3 { margin:0; font-size:16px; }
+    .hint { color:var(--muted); font-size:14px; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; font-size:12px; background:#f3f4f6; border:1px solid #e5e7eb; border-radius:8px; padding:8px; white-space:pre-wrap; word-break:break-word; max-height:340px; overflow:auto; }
     .error { background:#fee2e2; color:#991b1b; border:1px solid #fca5a5; border-radius:10px; padding:10px 12px; font-weight:600; }
+    @media (max-width: 980px) { .layout { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
-  <main class="app" id="app">    <div id="gameArea" hidden>
-      <section class="toolbar"><button id="restart" class="primary">Заново</button><button id="undo">Отменить</button><button id="redo">Повторить</button><div class="counter" id="stepCounter">Шаги: 0</div></section>
-      <div id="status" class="status progress">В процессе</div>
-      <div id="codeWordBox" class="codeword" hidden></div>
-      <section class="grid-wrap"><div id="grid" class="grid" aria-label="Поле задачи"></div></section>
+  <main class="app" id="app">
+    <div id="gameArea" hidden>
+      <section class="toolbar">
+        <button id="back">Назад</button>
+        <button id="restart" class="primary">Заново</button>
+        <button id="undo">Отменить</button>
+        <button id="redo">Повторить</button>
+        <div class="counter" id="stepCounter">Шаги: 0</div>
+      </section>
+
+      <section class="layout">
+        <div class="grid-wrap"><div id="grid" class="grid" aria-label="Поле задачи"></div></div>
+        <aside class="panel">
+          <h3>Алгоритм решения</h3>
+          <div id="solveInfo" class="hint"></div>
+          <div id="movesDump" class="mono">-</div>
+        </aside>
+      </section>
     </div>
   </main>
+
   <script>
     const EMBEDDED_TOKEN = "aHtgKa1FX-miAGQrBC2ZQc-IjUnkiYn0kA";
     const URL_CIPHER_KEY = "matrix-1-0-lite-key";
-    const appEl=document.getElementById("app"),gameAreaEl=document.getElementById("gameArea"),restartBtn=document.getElementById("restart"),undoBtn=document.getElementById("undo"),redoBtn=document.getElementById("redo"),stepCounterEl=document.getElementById("stepCounter"),statusEl=document.getElementById("status"),codeWordBoxEl=document.getElementById("codeWordBox"),gridEl=document.getElementById("grid");
-    let n=0,initialBoard=[],board=[],history=[],historyIndex=0,requiresPassword=false,authSalt=0,authHash=0,revealCodeWord="",codeWordCipher=null,codeWordCipherSalt=0,codeWordCipherCheck=0,codeWordKey32=0,codeWordKeyReady=false;
-    function decodeBase64Url(str){const padded=str.replace(/-/g,'+').replace(/_/g,'/')+'==='.slice((str.length+3)%4);const bin=atob(padded);const out=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)out[i]=bin.charCodeAt(i);return out;}
-    function obfuscateBytes(bytes,keyText){const key=new TextEncoder().encode(keyText);const out=new Uint8Array(bytes.length);for(let i=0;i<bytes.length;i++)out[i]=bytes[i]^key[i%key.length]^((i*31)&255);return out;}
-    function readUint32LE(bytes,o){return((bytes[o])|(bytes[o+1]<<8)|(bytes[o+2]<<16)|(bytes[o+3]<<24))>>>0;}
-    function passwordHash32(password,salt32){const data=new TextEncoder().encode(password);let h=(0x811c9dc5^salt32)>>>0;for(let i=0;i<data.length;i++){h^=data[i];h=Math.imul(h,0x01000193)>>>0;h^=h>>>13;}h^=data.length>>>0;h=Math.imul(h,0x85ebca6b)>>>0;h^=h>>>16;return h>>>0;}
-    function hashBytes32(bytes,salt32){let h=(0x811c9dc5^salt32)>>>0;for(let i=0;i<bytes.length;i++){h^=bytes[i];h=Math.imul(h,0x01000193)>>>0;h^=h>>>13;}h^=bytes.length>>>0;h=Math.imul(h,0x85ebca6b)>>>0;h^=h>>>16;return h>>>0;}
-    function xorWithStream(bytes,seed32){let s=(seed32^0x9e3779b9)>>>0;const out=new Uint8Array(bytes.length);for(let i=0;i<bytes.length;i++){s^=(s<<13)>>>0;s^=s>>>17;s^=(s<<5)>>>0;out[i]=bytes[i]^(s&255);}return out;}
-    function tryDecryptCodeWord(){if(!codeWordCipher||!codeWordKeyReady)return"";const plain=xorWithStream(codeWordCipher,codeWordKey32);const check=hashBytes32(plain,(codeWordCipherSalt^0x9e3779b9)>>>0);if(check!==codeWordCipherCheck)return"";try{return new TextDecoder().decode(plain);}catch(_){return"";}}
-    function copyBoard(src){return src.map(r=>r.slice());}
-    function isUniform(src){const b=src[0][0];for(let r=0;r<src.length;r++)for(let c=0;c<src.length;c++)if(src[r][c]!==b)return false;return true;}
-    function targetBit(src){return src[0][0];}
-    function toggleCell(r,c){if(r<0||r>=n||c<0||c>=n)return;board[r][c]^=1;}
-    function applyMove(r,c){for(let dr=-1;dr<=1;dr++)for(let dc=-1;dc<=1;dc++)toggleCell(r+dr,c+dc);}
-    function updateStatus(){const solved=isUniform(board);if(solved&&!revealCodeWord&&codeWordCipher)revealCodeWord=tryDecryptCodeWord();statusEl.className='status '+(solved?'ok':'progress');statusEl.textContent=solved?('Решено: все '+targetBit(board)):'В процессе';if(solved&&revealCodeWord){codeWordBoxEl.hidden=false;codeWordBoxEl.textContent='Кодовое слово: '+revealCodeWord;}else{codeWordBoxEl.hidden=true;codeWordBoxEl.textContent='';}stepCounterEl.textContent='Шаги: '+historyIndex;undoBtn.disabled=historyIndex===0;redoBtn.disabled=historyIndex>=history.length;}
-    function renderGrid(){gridEl.style.gridTemplateColumns='repeat('+n+', var(--cell-size))';gridEl.innerHTML='';for(let r=0;r<n;r++)for(let c=0;c<n;c++){const b=document.createElement('button');b.type='button';b.className='cell '+(board[r][c]?'one':'');b.textContent=String(board[r][c]);b.addEventListener('click',()=>{if(historyIndex<history.length)history=history.slice(0,historyIndex);applyMove(r,c);history.push({r:r,c:c});historyIndex++;render();});gridEl.appendChild(b);}}
-    function render(){renderGrid();updateStatus();}
-    function parseCompactPayload(raw){if(raw.length<4)throw new Error('Слишком короткий payload.');const version=raw[0];if(version!==2&&version!==3&&version!==4&&version!==5)throw new Error('Не compact payload.');const parsedN=raw[1];if(!Number.isInteger(parsedN)||parsedN<2||parsedN>20)throw new Error('Некорректный размер поля.');const total=parsedN*parsedN,bitsBytes=Math.ceil(total/8),need=4+bitsBytes+(version>=3?8:0);if(raw.length<need)throw new Error('Неполный payload.');const parsedBoard=[];let k=0;for(let r=0;r<parsedN;r++){const row=[];for(let c=0;c<parsedN;c++){row.push((raw[4+(k>>>3)]>>>(k&7))&1);k++;}parsedBoard.push(row);}if(isUniform(parsedBoard))throw new Error('Задача уже решена.');n=parsedN;initialBoard=copyBoard(parsedBoard);board=copyBoard(parsedBoard);history=[];historyIndex=0;requiresPassword=false;authSalt=0;authHash=0;revealCodeWord='';codeWordCipher=null;codeWordCipherSalt=0;codeWordCipherCheck=0;codeWordKey32=0;codeWordKeyReady=false;if(version>=3){let tail=4+bitsBytes;authSalt=readUint32LE(raw,tail);authHash=readUint32LE(raw,tail+4);requiresPassword=true;tail+=8;if(version===4){const wl=raw[tail];revealCodeWord=new TextDecoder().decode(raw.subarray(tail+1,tail+1+wl));}else if(version===5){codeWordCipherSalt=readUint32LE(raw,tail);codeWordCipherCheck=readUint32LE(raw,tail+4);const wl=raw[tail+8];codeWordCipher=raw.slice(tail+9,tail+9+wl);}}}
-    function loadFromEmbedded(){if(!EMBEDDED_TOKEN)throw new Error('Нет зашитой задачи.');const mixed=decodeBase64Url(EMBEDDED_TOKEN);const raw=obfuscateBytes(mixed,URL_CIPHER_KEY);parseCompactPayload(raw);}
-    restartBtn.addEventListener('click',()=>{board=copyBoard(initialBoard);history=[];historyIndex=0;render();});
-    undoBtn.addEventListener('click',()=>{if(historyIndex<=0)return;const m=history[historyIndex-1];applyMove(m.r,m.c);historyIndex--;render();});
-    redoBtn.addEventListener('click',()=>{if(historyIndex>=history.length)return;const m=history[historyIndex];applyMove(m.r,m.c);historyIndex++;render();});
-    try{loadFromEmbedded();gameAreaEl.hidden=false;render();}catch(err){appEl.innerHTML='<div class="error">Ошибка загрузки задачи: '+String(err.message||err)+'</div>';}
+    const MAX_EXACT_FREE_VARS = 20;
+    const MAX_STORED_SHORTEST = 256;
+
+    const appEl = document.getElementById("app");
+    const gameAreaEl = document.getElementById("gameArea");
+    const backBtn = document.getElementById("back");
+    const restartBtn = document.getElementById("restart");
+    const undoBtn = document.getElementById("undo");
+    const redoBtn = document.getElementById("redo");
+    const stepCounterEl = document.getElementById("stepCounter");
+    const gridEl = document.getElementById("grid");
+    const solveInfoEl = document.getElementById("solveInfo");
+    const movesDumpEl = document.getElementById("movesDump");
+
+    let n = 0;
+    let initialBoard = [];
+    let board = [];
+    let history = [];
+    let historyIndex = 0;
+    const matrixCache = new Map();
+
+    function decodeBase64Url(str) {
+      const padded = str.replace(/-/g, "+").replace(/_/g, "/") + "===".slice((str.length + 3) % 4);
+      const bin = atob(padded);
+      const out = new Uint8Array(bin.length);
+      for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+      return out;
+    }
+
+    function obfuscateBytes(bytes, keyText) {
+      const key = new TextEncoder().encode(keyText);
+      const out = new Uint8Array(bytes.length);
+      for (let i = 0; i < bytes.length; i++) out[i] = bytes[i] ^ key[i % key.length] ^ ((i * 31) & 255);
+      return out;
+    }
+
+    function copyBoard(src) {
+      return src.map((row) => row.slice());
+    }
+
+    function toggleCell(r, c) {
+      if (r < 0 || r >= n || c < 0 || c >= n) return;
+      board[r][c] ^= 1;
+    }
+
+    function applyMove(r, c) {
+      for (let dr = -1; dr <= 1; dr++) {
+        for (let dc = -1; dc <= 1; dc++) toggleCell(r + dr, c + dc);
+      }
+    }
+
+    function bin3(v) {
+      return v.toString(2).padStart(3, "0").slice(-3);
+    }
+
+    function moveCode6(move) {
+      return `${bin3(move.r)}${bin3(move.c)}`;
+    }
+
+    function movesToStrictCode(moves) {
+      return moves.map(moveCode6).join("-");
+    }
+
+    function idxOf(r, c, nn) {
+      return r * nn + c;
+    }
+
+    function bitGet(rowBits, col) {
+      return (rowBits[col >>> 5] >>> (col & 31)) & 1;
+    }
+
+    function bitFlip(rowBits, col) {
+      rowBits[col >>> 5] ^= (1 << (col & 31));
+    }
+
+    function xorRows(dst, src) {
+      for (let i = 0; i < dst.length; i++) dst[i] ^= src[i];
+    }
+
+    function boardToVector(srcBoard) {
+      const out = new Uint8Array(n * n);
+      let k = 0;
+      for (let r = 0; r < n; r++) {
+        for (let c = 0; c < n; c++) out[k++] = srcBoard[r][c];
+      }
+      return out;
+    }
+
+    function getMatrixForSize(nn) {
+      if (matrixCache.has(nn)) return matrixCache.get(nn);
+      const vars = nn * nn;
+      const words = Math.ceil(vars / 32);
+      const rows = Array.from({ length: vars }, () => new Uint32Array(words));
+      for (let r = 0; r < nn; r++) {
+        for (let c = 0; c < nn; c++) {
+          const varCol = idxOf(r, c, nn);
+          for (let dr = -1; dr <= 1; dr++) {
+            for (let dc = -1; dc <= 1; dc++) {
+              const rr = r + dr;
+              const cc = c + dc;
+              if (rr < 0 || rr >= nn || cc < 0 || cc >= nn) continue;
+              const eqRow = idxOf(rr, cc, nn);
+              bitFlip(rows[eqRow], varCol);
+            }
+          }
+        }
+      }
+      const packed = { nn, vars, words, rows };
+      matrixCache.set(nn, packed);
+      return packed;
+    }
+
+    function solveForTarget(targetBit) {
+      const { vars, words, rows: baseRows } = getMatrixForSize(n);
+      const rows = baseRows.map((row) => new Uint32Array(row));
+      const rhs = new Uint8Array(vars);
+      const bVec = boardToVector(board);
+      for (let i = 0; i < vars; i++) rhs[i] = bVec[i] ^ targetBit;
+
+      let pivotRow = 0;
+      const pivotCols = [];
+      for (let col = 0; col < vars && pivotRow < vars; col++) {
+        let found = -1;
+        for (let r = pivotRow; r < vars; r++) {
+          if (bitGet(rows[r], col)) { found = r; break; }
+        }
+        if (found === -1) continue;
+        if (found !== pivotRow) {
+          const tmpRow = rows[pivotRow]; rows[pivotRow] = rows[found]; rows[found] = tmpRow;
+          const t = rhs[pivotRow]; rhs[pivotRow] = rhs[found]; rhs[found] = t;
+        }
+        for (let r = 0; r < vars; r++) {
+          if (r !== pivotRow && bitGet(rows[r], col)) {
+            xorRows(rows[r], rows[pivotRow]);
+            rhs[r] ^= rhs[pivotRow];
+          }
+        }
+        pivotCols.push(col);
+        pivotRow++;
+      }
+
+      for (let r = pivotRow; r < vars; r++) {
+        let hasAny = false;
+        for (let w = 0; w < words; w++) {
+          if (rows[r][w] !== 0) { hasAny = true; break; }
+        }
+        if (!hasAny && rhs[r] === 1) {
+          return { consistent: false, rank: pivotCols.length, freeVars: vars - pivotCols.length, x: null, freeCols: [], basis: [] };
+        }
+      }
+
+      const x = new Uint8Array(vars);
+      for (let r = 0; r < pivotCols.length; r++) x[pivotCols[r]] = rhs[r];
+
+      const pivotMask = new Uint8Array(vars);
+      for (let i = 0; i < pivotCols.length; i++) pivotMask[pivotCols[i]] = 1;
+      const freeCols = [];
+      for (let col = 0; col < vars; col++) if (!pivotMask[col]) freeCols.push(col);
+      const basis = freeCols.map((freeCol) => {
+        const v = new Uint8Array(vars);
+        v[freeCol] = 1;
+        for (let r = 0; r < pivotCols.length; r++) if (bitGet(rows[r], freeCol)) v[pivotCols[r]] = 1;
+        return v;
+      });
+
+      return { consistent: true, rank: pivotCols.length, freeVars: vars - pivotCols.length, x, freeCols, basis };
+    }
+
+    function vectorToMoves(x) {
+      const out = [];
+      for (let i = 0; i < x.length; i++) {
+        if (x[i] === 1) out.push({ index: i, r: Math.floor(i / n), c: i % n });
+      }
+      return out;
+    }
+
+    function popcount32(x) {
+      x -= (x >>> 1) & 0x55555555;
+      x = (x & 0x33333333) + ((x >>> 2) & 0x33333333);
+      x = (x + (x >>> 4)) & 0x0f0f0f0f;
+      x += x >>> 8;
+      x += x >>> 16;
+      return x & 0x3f;
+    }
+
+    function vectorToWords(vec) {
+      const words = new Uint32Array(Math.ceil(vec.length / 32));
+      for (let i = 0; i < vec.length; i++) if (vec[i]) words[i >>> 5] |= (1 << (i & 31));
+      return words;
+    }
+
+    function xorWordsInPlace(dst, src) {
+      for (let i = 0; i < dst.length; i++) dst[i] ^= src[i];
+    }
+
+    function wordsWeight(words) {
+      let sum = 0;
+      for (let i = 0; i < words.length; i++) sum += popcount32(words[i] >>> 0);
+      return sum;
+    }
+
+    function wordsToMoves(words, nn) {
+      const vars = nn * nn;
+      const out = [];
+      for (let i = 0; i < vars; i++) {
+        if ((words[i >>> 5] >>> (i & 31)) & 1) out.push({ index: i, r: Math.floor(i / nn), c: i % nn });
+      }
+      return out;
+    }
+
+    function enumerateShortestPlansForTarget(solveRes, options = {}) {
+      if (!solveRes || !solveRes.consistent) return null;
+      const maxFreeVars = options.maxFreeVars ?? MAX_EXACT_FREE_VARS;
+      const maxStored = options.maxStored ?? MAX_STORED_SHORTEST;
+      const defaultPlan = vectorToMoves(solveRes.x);
+      const freeVars = solveRes.freeVars || 0;
+
+      if (freeVars === 0) {
+        return { exact: true, minLen: defaultPlan.length, plans: [defaultPlan], totalShortest: 1, truncated: false, note: "" };
+      }
+      if (freeVars > maxFreeVars) {
+        return { exact: false, minLen: defaultPlan.length, plans: [defaultPlan], totalShortest: 1, truncated: false, note: `Свободных переменных: ${freeVars}. Перебор ограничен.` };
+      }
+
+      const basis = solveRes.basis || [];
+      const k = basis.length;
+      const combos = 1 << k;
+      const x0Words = vectorToWords(solveRes.x);
+      const basisWords = basis.map(vectorToWords);
+      const currentWords = new Uint32Array(x0Words);
+
+      let minWeight = wordsWeight(currentWords);
+      let prevGray = 0;
+      let totalShortest = 1;
+      const minMasks = [0];
+
+      for (let i = 1; i < combos; i++) {
+        const gray = i ^ (i >>> 1);
+        const diff = gray ^ prevGray;
+        const toggled = 31 - Math.clz32(diff);
+        xorWordsInPlace(currentWords, basisWords[toggled]);
+        const w = wordsWeight(currentWords);
+
+        if (w < minWeight) {
+          minWeight = w;
+          totalShortest = 1;
+          minMasks.length = 0;
+          minMasks.push(gray);
+        } else if (w === minWeight) {
+          totalShortest++;
+          if (minMasks.length < maxStored) minMasks.push(gray);
+        }
+        prevGray = gray;
+      }
+
+      const plans = minMasks.map((mask) => {
+        const words = new Uint32Array(x0Words);
+        for (let bit = 0; bit < k; bit++) if ((mask >>> bit) & 1) xorWordsInPlace(words, basisWords[bit]);
+        return wordsToMoves(words, n);
+      });
+
+      return { exact: true, minLen: minWeight, plans, totalShortest, truncated: totalShortest > plans.length, note: totalShortest > plans.length ? `Кратчайших: ${totalShortest}, показано: ${plans.length}.` : "" };
+    }
+
+    function updateSolverPanel() {
+      const toOne = solveForTarget(1);
+      const shortest = enumerateShortestPlansForTarget(toOne);
+      if (!shortest) {
+        solveInfoEl.textContent = "Для цели 'все единицы' решение не найдено.";
+        movesDumpEl.textContent = "-";
+        return;
+      }
+
+      solveInfoEl.innerHTML = [
+        `Кратчайшая длина: <b>${shortest.minLen}</b>.`,
+        `Кратчайших алгоритмов: <b>${shortest.totalShortest}</b>${shortest.truncated ? ` (показано ${shortest.plans.length})` : ""}.`,
+        shortest.note || ""
+      ].filter(Boolean).join("<br>");
+
+      const blocks = shortest.plans.map((moves, idx) => {
+        const head = shortest.plans.length > 1 ? `План ${idx + 1}:` : "План:";
+        if (moves.length === 0) return `${head}\n(без ходов)`;
+        const strictCode = movesToStrictCode(moves);
+        const lines = moves.map((m, i) => `${String(i + 1).padStart(3, " ")}. ${moveCode6(m)}`).join("\n");
+        return `${head}\n${strictCode}\n${lines}`;
+      });
+      movesDumpEl.textContent = blocks.join("\n\n");
+    }
+
+    function updatePanel() {
+      stepCounterEl.textContent = `Шаги: ${historyIndex}`;
+      undoBtn.disabled = historyIndex === 0;
+      redoBtn.disabled = historyIndex >= history.length;
+      updateSolverPanel();
+    }
+
+    function renderGrid() {
+      gridEl.style.gridTemplateColumns = `repeat(${n}, var(--cell-size))`;
+      gridEl.innerHTML = "";
+      for (let r = 0; r < n; r++) {
+        for (let c = 0; c < n; c++) {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = `cell ${board[r][c] ? "one" : ""}`;
+          btn.textContent = String(board[r][c]);
+          btn.addEventListener("click", () => {
+            if (historyIndex < history.length) history = history.slice(0, historyIndex);
+            applyMove(r, c);
+            history.push({ r, c });
+            historyIndex++;
+            render();
+          });
+          gridEl.appendChild(btn);
+        }
+      }
+    }
+
+    function render() {
+      renderGrid();
+      updatePanel();
+    }
+
+    function parseCompactPayload(raw) {
+      if (raw.length < 4) throw new Error("Слишком короткий payload.");
+      const version = raw[0];
+      if (version !== 2 && version !== 3 && version !== 4 && version !== 5) throw new Error("Не compact payload.");
+      const parsedN = raw[1];
+      if (!Number.isInteger(parsedN) || parsedN < 2 || parsedN > 20) throw new Error("Некорректный размер поля.");
+
+      const total = parsedN * parsedN;
+      const bitsBytes = Math.ceil(total / 8);
+      const need = 4 + bitsBytes + (version >= 3 ? 8 : 0);
+      if (raw.length < need) throw new Error("Неполный payload.");
+
+      const parsedBoard = [];
+      let k = 0;
+      for (let r = 0; r < parsedN; r++) {
+        const row = [];
+        for (let c = 0; c < parsedN; c++) {
+          row.push((raw[4 + (k >>> 3)] >>> (k & 7)) & 1);
+          k++;
+        }
+        parsedBoard.push(row);
+      }
+
+      n = parsedN;
+      initialBoard = copyBoard(parsedBoard);
+      board = copyBoard(parsedBoard);
+      history = [];
+      historyIndex = 0;
+    }
+
+    function loadFromEmbedded() {
+      if (!EMBEDDED_TOKEN) throw new Error("Нет зашитой задачи.");
+      const mixed = decodeBase64Url(EMBEDDED_TOKEN);
+      const raw = obfuscateBytes(mixed, URL_CIPHER_KEY);
+      parseCompactPayload(raw);
+    }
+
+    backBtn.addEventListener("click", () => {
+      window.location.href = "./index.html";
+    });
+    restartBtn.addEventListener("click", () => {
+      board = copyBoard(initialBoard);
+      history = [];
+      historyIndex = 0;
+      render();
+    });
+    undoBtn.addEventListener("click", () => {
+      if (historyIndex <= 0) return;
+      const m = history[historyIndex - 1];
+      applyMove(m.r, m.c);
+      historyIndex--;
+      render();
+    });
+    redoBtn.addEventListener("click", () => {
+      if (historyIndex >= history.length) return;
+      const m = history[historyIndex];
+      applyMove(m.r, m.c);
+      historyIndex++;
+      render();
+    });
+
+    try {
+      loadFromEmbedded();
+      gameAreaEl.hidden = false;
+      render();
+    } catch (err) {
+      appEl.innerHTML = `<div class="error">Ошибка загрузки задачи: ${String(err.message || err)}</div>`;
+    }
   </script>
 </body>
 </html>

@@ -7,7 +7,8 @@
     LOVELACE: { salt: "s_lovelace_v1", hash: "6375620c7aa743a0f9e78b0beecfc64f40c0ba424e673e0fbdb1a90fdffb8b28" },
     MORSE: { salt: "s_morse_v1", hash: "48491298da3291e183403580846f4861cc05153b65fbb00c8a587710484cd91c" },
     VIGENERE: { salt: "s_vigenere_v1", hash: "865719a5abd4ac87e373304730f98f330c4efc480dfd5a1574b41083d41a6555" },
-    DA_VINCI: { salt: "s_da_vinci_v1", hash: "c087c747e9dede340e6f924f013187417fb912fee8597ad1c154f491ef3978e6" }
+    DA_VINCI: { salt: "s_da_vinci_v1", hash: "c087c747e9dede340e6f924f013187417fb912fee8597ad1c154f491ef3978e6" },
+    DEV: { salt: "s_dev_v1", hash: "9f89e4d87530a6650e8a17c98d06221dba9b5170515cf436249d2ea9c7744849" }
   };
 
   function storageKey(sectionId) {
