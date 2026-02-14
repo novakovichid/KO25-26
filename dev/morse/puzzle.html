@@ -775,15 +775,9 @@
 
     try {
       loadPayloadFromUrl();
-      if (requiresPassword) {
-        authGateEl.hidden = false;
-        gameAreaEl.hidden = true;
-        passwordInputEl.focus();
-      } else {
-        authGateEl.hidden = true;
-        gameAreaEl.hidden = false;
-        render();
-      }
+      authGateEl.hidden = true;
+      gameAreaEl.hidden = false;
+      render();
     } catch (err) {
       appEl.innerHTML = `<div class="error">Ошибка загрузки задачи: ${String(err.message || err)}</div>`;
     }

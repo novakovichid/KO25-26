@@ -310,6 +310,10 @@
     </div>
 
     <section class="row">
+      <label class="check">
+        <input id="disablePassword" type="checkbox">
+        Без пароля
+      </label>
       <label for="attemptPassword">Пароль:</label>
       <input id="attemptPassword" class="password-field" type="text" aria-label="Пароль задачи">
       <label for="codeWord">Кодовое слово:</label>
@@ -374,6 +378,7 @@
     const stopBtn = document.getElementById("stop");
     const resetStepsBtn = document.getElementById("resetSteps");
     const exitSolveBtn = document.getElementById("exitSolve");
+    const disablePasswordCheckbox = document.getElementById("disablePassword");
     const attemptPasswordInput = document.getElementById("attemptPassword");
     const codeWordInput = document.getElementById("codeWord");
     const regenPasswordBtn = document.getElementById("regenPassword");
@@ -579,8 +584,44 @@
       return generated;
     }
 
+    function isPasswordDisabled() {
+      return !!disablePasswordCheckbox.checked;
+    }
+
+    function syncPasswordUi() {
+      const disabled = isPasswordDisabled();
+      attemptPasswordInput.disabled = disabled;
+      regenPasswordBtn.disabled = disabled;
+      copyPasswordBtn.disabled = disabled;
+      if (disabled) {
+        attemptPasswordInput.value = "";
+        codeWordInput.value = "";
+      }
+    }
+
     function normalizeCodeWord(value) {
       return String(value || "").trim().replace(/\s+/g, " ").slice(0, 80);
+    }
+
+    function packPuzzleBytesNoPassword(srcBoard, n, cellSize, gap) {
+      const total = n * n;
+      const bitsBytes = Math.ceil(total / 8);
+      const bytes = new Uint8Array(4 + bitsBytes);
+      bytes[0] = 2; // format version 2: compact binary, no password/no code word
+      bytes[1] = n;
+      bytes[2] = cellSize;
+      bytes[3] = gap;
+
+      let k = 0;
+      for (let r = 0; r < n; r++) {
+        for (let c = 0; c < n; c++) {
+          if (srcBoard[r][c]) {
+            bytes[4 + (k >>> 3)] |= (1 << (k & 7));
+          }
+          k++;
+        }
+      }
+      return bytes;
     }
 
     function packPuzzleBytes(srcBoard, n, cellSize, gap, password, codeWord) {
@@ -620,21 +661,25 @@
       return bytes;
     }
 
-    function buildPuzzleBytes(password, codeWord) {
+    function buildPuzzleBytes(password, codeWord, withPassword = true) {
       const snapshot = copyBoard(board);
       if (isUniformBoard(snapshot)) {
         const rr = Math.floor(size / 2);
         const cc = Math.floor(size / 2);
         applyMoveToBoard(snapshot, rr, cc);
       }
+      if (!withPassword) {
+        return packPuzzleBytesNoPassword(snapshot, size, 42, 6);
+      }
       return packPuzzleBytes(snapshot, size, 42, 6, password, codeWord);
     }
 
     function buildAttemptUrl() {
-      const password = ensureAttemptPassword();
-      const codeWord = normalizeCodeWord(codeWordInput.value);
-      codeWordInput.value = codeWord;
-      const raw = buildPuzzleBytes(password, codeWord);
+      const withPassword = !isPasswordDisabled();
+      const password = withPassword ? ensureAttemptPassword() : "";
+      const codeWord = withPassword ? normalizeCodeWord(codeWordInput.value) : "";
+      if (withPassword) codeWordInput.value = codeWord;
+      const raw = buildPuzzleBytes(password, codeWord, withPassword);
       const mixed = obfuscateBytes(raw, URL_CIPHER_KEY);
       const token = encodeBase64Url(mixed);
       const url = new URL("puzzle.html", window.location.href);
@@ -643,10 +688,11 @@
     }
 
     function buildAttemptToken() {
-      const password = ensureAttemptPassword();
-      const codeWord = normalizeCodeWord(codeWordInput.value);
-      codeWordInput.value = codeWord;
-      const raw = buildPuzzleBytes(password, codeWord);
+      const withPassword = !isPasswordDisabled();
+      const password = withPassword ? ensureAttemptPassword() : "";
+      const codeWord = withPassword ? normalizeCodeWord(codeWordInput.value) : "";
+      if (withPassword) codeWordInput.value = codeWord;
+      const raw = buildPuzzleBytes(password, codeWord, withPassword);
       const mixed = obfuscateBytes(raw, URL_CIPHER_KEY);
       return encodeBase64Url(mixed);
     }
@@ -668,9 +714,10 @@
     }
 
     function buildEditorTemplate() {
-      const password = ensureAttemptPassword();
-      const codeWord = normalizeCodeWord(codeWordInput.value);
-      codeWordInput.value = codeWord;
+      const passwordDisabled = isPasswordDisabled();
+      const password = passwordDisabled ? "" : ensureAttemptPassword();
+      const codeWord = passwordDisabled ? "" : normalizeCodeWord(codeWordInput.value);
+      if (!passwordDisabled) codeWordInput.value = codeWord;
       return {
         type: "matrix-1-0-editor-template",
         version: 1,
@@ -679,6 +726,7 @@
         board: copyBoard(board),
         password,
         codeWord,
+        passwordDisabled,
         mixMoves: clampInt(mixMovesInput.value, 1, 1000, Math.max(1, size * size)),
         desiredSteps: clampInt(desiredStepsInput.value, 0, 400, 0),
         seedMode: seedModeSelect.value,
@@ -714,8 +762,10 @@
       targetModeSelect.value = ["auto", "zero", "one"].includes(mode) ? mode : "auto";
       showBothCheckbox.checked = !!data.showBoth;
 
-      attemptPasswordInput.value = String(data.password || "").trim();
-      codeWordInput.value = normalizeCodeWord(data.codeWord || "");
+      disablePasswordCheckbox.checked = !!data.passwordDisabled;
+      attemptPasswordInput.value = disablePasswordCheckbox.checked ? "" : String(data.password || "").trim();
+      codeWordInput.value = disablePasswordCheckbox.checked ? "" : normalizeCodeWord(data.codeWord || "");
+      syncPasswordUi();
 
       generationMeta = String(data.generationMeta || "Импортировано из JSON-шаблона.");
       clearSolverMode();
@@ -1514,11 +1564,13 @@
     });
 
     regenPasswordBtn.addEventListener("click", () => {
+      if (isPasswordDisabled()) return;
       attemptPasswordInput.value = randomPassword(8);
       refreshAttemptUrl();
     });
 
     copyPasswordBtn.addEventListener("click", async () => {
+      if (isPasswordDisabled()) return;
       const pwd = ensureAttemptPassword();
       try {
         await navigator.clipboard.writeText(pwd);
@@ -1612,16 +1664,24 @@
     });
 
     attemptPasswordInput.addEventListener("keydown", (e) => {
+      if (isPasswordDisabled()) return;
       if (e.key === "Enter") refreshAttemptUrl();
     });
 
     codeWordInput.addEventListener("keydown", (e) => {
+      if (isPasswordDisabled()) return;
       if (e.key === "Enter") refreshAttemptUrl();
     });
 
-    if (!attemptPasswordInput.value.trim()) {
+    disablePasswordCheckbox.addEventListener("change", () => {
+      syncPasswordUi();
+      refreshAttemptUrl();
+    });
+
+    if (!attemptPasswordInput.value.trim() && !isPasswordDisabled()) {
       attemptPasswordInput.value = randomPassword(8);
     }
+    syncPasswordUi();
 
     // TODO: add alternative solving strategies for educational mode (step-by-step Gaussian elimination visualization).
     // TODO: add generator presets with difficulty grading (minimal moves, ambiguity, and branching factors).
