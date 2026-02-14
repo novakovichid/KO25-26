@@ -1,0 +1,1632 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Матрица 1-0</title>
+  <style>
+    :root {
+      --ui-scale: 1.35;
+      --bg: #f3f4f6;
+      --panel: #ffffff;
+      --text: #111827;
+      --muted: #6b7280;
+      --border: #d1d5db;
+      --accent: #0f766e;
+      --accent-strong: #115e59;
+      --cell-size: calc(42px * var(--ui-scale));
+      --gap: calc(6px * var(--ui-scale));
+      --zero: #ffffff;
+      --one: #111827;
+      --next: #fde68a;
+      --coord-size: calc(var(--cell-size) + 4px);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Segoe UI", "Noto Sans", sans-serif;
+      font-size: calc(16px * var(--ui-scale));
+      color: var(--text);
+      background: radial-gradient(circle at 20% 0%, #ffffff, var(--bg));
+      display: grid;
+      place-items: center;
+      padding: 20px;
+    }
+
+    .app {
+      width: min(1280px, 100%);
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: 0 14px 30px rgba(17, 24, 39, 0.09);
+      padding: 16px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    label { font-weight: 600; }
+
+    input[type="number"] {
+      width: 90px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 7px 10px;
+      font: inherit;
+    }
+    .url-field {
+      min-width: 320px;
+      flex: 1 1 320px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 7px 10px;
+      font: inherit;
+      background: #fff;
+    }
+    .password-field {
+      width: 150px;
+      min-width: 150px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 7px 10px;
+      font: inherit;
+      background: #fff;
+    }
+    .codeword-field {
+      width: 180px;
+      min-width: 180px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 7px 10px;
+      font: inherit;
+      background: #fff;
+    }
+    select {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 7px 10px;
+      font: inherit;
+      background: #fff;
+    }
+    .check {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 14px;
+    }
+
+    button {
+      border: 1px solid var(--border);
+      background: #fff;
+      color: var(--text);
+      border-radius: 10px;
+      padding: 8px 12px;
+      font: inherit;
+      cursor: pointer;
+      transition: 120ms ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      border-color: #9ca3af;
+    }
+
+    button.primary {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    button.primary:hover {
+      background: var(--accent-strong);
+      border-color: var(--accent-strong);
+    }
+
+    button:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .layout {
+      display: grid;
+      gap: 14px;
+      grid-template-columns: 1fr 340px;
+    }
+
+    .grid-wrap {
+      overflow: auto;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: #fafafa;
+      padding: 12px;
+      min-height: 300px;
+    }
+
+    .board {
+      width: max-content;
+      margin: 0 auto;
+      display: grid;
+      gap: var(--gap);
+    }
+
+    .coords-top {
+      display: grid;
+      gap: var(--gap);
+      margin-left: calc(var(--coord-size) + var(--gap));
+    }
+
+    .board-main {
+      display: grid;
+      grid-template-columns: var(--coord-size) auto;
+      gap: var(--gap);
+      align-items: start;
+    }
+
+    .coords-left {
+      display: grid;
+      gap: var(--gap);
+      width: var(--coord-size);
+    }
+
+    .coord {
+      width: var(--cell-size);
+      height: var(--cell-size);
+      color: #374151;
+      display: grid;
+      place-items: center;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+      font-size: calc(12px * var(--ui-scale));
+      font-weight: 700;
+      user-select: none;
+    }
+
+    .coords-left .coord {
+      width: var(--coord-size);
+    }
+
+    .grid {
+      display: grid;
+      gap: var(--gap);
+      width: max-content;
+      margin: 0;
+    }
+
+    .cell {
+      width: var(--cell-size);
+      height: var(--cell-size);
+      border-radius: 9px;
+      border: 1px solid #9ca3af;
+      background: var(--zero);
+      color: #111827;
+      display: grid;
+      place-items: center;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 100ms ease;
+      user-select: none;
+    }
+
+    .cell:hover {
+      transform: scale(1.03);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    }
+
+    .cell.one {
+      background: var(--one);
+      color: #fff;
+      border-color: #111827;
+    }
+
+    .cell.next {
+      outline: 3px solid var(--next);
+      outline-offset: 1px;
+    }
+
+    .panel {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px;
+      background: #fcfcfd;
+      display: grid;
+      gap: 8px;
+      align-content: start;
+      font-size: 14px;
+    }
+
+    .panel h3 {
+      margin: 0;
+      font-size: 15px;
+    }
+
+    .mono {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+      font-size: 12px;
+      background: #f3f4f6;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 8px;
+      white-space: pre-wrap;
+      word-break: break-word;
+      max-height: 180px;
+      overflow: auto;
+    }
+
+    @media (max-width: 940px) {
+      .layout { grid-template-columns: 1fr; }
+      :root {
+        --cell-size: calc(36px * var(--ui-scale));
+        --gap: calc(5px * var(--ui-scale));
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <section class="row">
+      <label for="size">Размер n:</label>
+      <input id="size" type="number" min="2" max="20" value="5">
+      <label for="mixMoves">Случайных ходов:</label>
+      <input id="mixMoves" type="number" min="1" max="1000" value="20">
+      <label for="desiredSteps">Желаемых шагов:</label>
+      <input id="desiredSteps" type="number" min="0" max="400" value="0">
+      <label for="seedMode">Старт поля:</label>
+      <select id="seedMode">
+        <option value="auto">Авто (0 или 1)</option>
+        <option value="zero">Все 0</option>
+        <option value="one">Все 1</option>
+      </select>
+      <label for="targetMode">Цель решателя:</label>
+      <select id="targetMode">
+        <option value="auto">Авто</option>
+        <option value="zero">Привести к всем 0</option>
+        <option value="one">Привести к всем 1</option>
+      </select>
+      <label class="check">
+        <input id="showBoth" type="checkbox">
+        Показать оба плана
+      </label>
+      <button id="build" class="primary">Построить пустое поле</button>
+      <button id="generate">Сгенерировать решаемое</button>
+      <button id="solve" class="primary">Решить пошагово</button>
+    </section>
+
+    <div class="hint" id="hint">
+      Клик по ячейке переключает её и все 8 соседей. Генерация всегда создаёт решаемые поля.
+    </div>
+
+    <section class="row">
+      <label for="attemptPassword">Пароль:</label>
+      <input id="attemptPassword" class="password-field" type="text" aria-label="Пароль задачи">
+      <label for="codeWord">Кодовое слово:</label>
+      <input id="codeWord" class="codeword-field" type="text" aria-label="Кодовое слово">
+      <button id="regenPassword">Новый пароль</button>
+      <button id="copyPassword">Копировать пароль</button>
+      <button id="buildAttemptLink">Собрать URL задачи</button>
+      <button id="openAttempt">Открыть страницу попытки</button>
+      <button id="copyAttempt">Копировать URL</button>
+      <button id="downloadStandalone">Скачать автономный HTML</button>
+      <button id="exportTemplate">Скачать JSON-шаблон</button>
+      <button id="importTemplate">Импорт JSON</button>
+      <input id="templateFile" type="file" accept="application/json,.json" hidden>
+      <input id="attemptUrl" class="url-field" type="text" readonly aria-label="URL страницы попытки">
+    </section>
+
+    <section class="layout">
+      <div class="grid-wrap">
+        <div class="board" aria-label="Игровое поле">
+          <div id="colCoords" class="coords-top"></div>
+          <div class="board-main">
+            <div id="rowCoords" class="coords-left"></div>
+            <div id="grid" class="grid"></div>
+          </div>
+        </div>
+      </div>
+
+      <aside class="panel">
+        <h3>Информация</h3>
+        <div id="stats"></div>
+
+        <h3>Алгоритм решения</h3>
+        <div id="solveInfo" class="hint">Решение пока не запрошено.</div>
+
+        <div class="row">
+          <button id="prev" disabled>Шаг назад</button>
+          <button id="next" disabled>Шаг вперёд</button>
+          <button id="play" disabled>Авто</button>
+          <button id="stop" disabled>Стоп</button>
+          <button id="resetSteps" disabled>Сброс шагов</button>
+          <button id="exitSolve" disabled>Выход</button>
+        </div>
+
+        <div id="movesDump" class="mono">-</div>
+      </aside>
+    </section>
+  </main>
+
+  <script>
+    const sizeInput = document.getElementById("size");
+    const mixMovesInput = document.getElementById("mixMoves");
+    const desiredStepsInput = document.getElementById("desiredSteps");
+    const seedModeSelect = document.getElementById("seedMode");
+    const targetModeSelect = document.getElementById("targetMode");
+    const showBothCheckbox = document.getElementById("showBoth");
+    const buildBtn = document.getElementById("build");
+    const generateBtn = document.getElementById("generate");
+    const solveBtn = document.getElementById("solve");
+    const prevBtn = document.getElementById("prev");
+    const nextBtn = document.getElementById("next");
+    const playBtn = document.getElementById("play");
+    const stopBtn = document.getElementById("stop");
+    const resetStepsBtn = document.getElementById("resetSteps");
+    const exitSolveBtn = document.getElementById("exitSolve");
+    const attemptPasswordInput = document.getElementById("attemptPassword");
+    const codeWordInput = document.getElementById("codeWord");
+    const regenPasswordBtn = document.getElementById("regenPassword");
+    const copyPasswordBtn = document.getElementById("copyPassword");
+    const buildAttemptLinkBtn = document.getElementById("buildAttemptLink");
+    const openAttemptBtn = document.getElementById("openAttempt");
+    const copyAttemptBtn = document.getElementById("copyAttempt");
+    const downloadStandaloneBtn = document.getElementById("downloadStandalone");
+    const exportTemplateBtn = document.getElementById("exportTemplate");
+    const importTemplateBtn = document.getElementById("importTemplate");
+    const templateFileInput = document.getElementById("templateFile");
+    const attemptUrlInput = document.getElementById("attemptUrl");
+
+    const colCoordsEl = document.getElementById("colCoords");
+    const rowCoordsEl = document.getElementById("rowCoords");
+    const gridEl = document.getElementById("grid");
+    const statsEl = document.getElementById("stats");
+    const solveInfoEl = document.getElementById("solveInfo");
+    const movesDumpEl = document.getElementById("movesDump");
+    const hintEl = document.getElementById("hint");
+
+    let size = clampInt(sizeInput.value, 2, 20, 5);
+    let board = makeBoard(size, 0);
+    let generationMeta = "Пустое поле (все 0).";
+    const URL_CIPHER_KEY = "matrix-1-0-lite-key";
+
+    const matrixCache = new Map();
+
+    const solverState = {
+      active: false,
+      initialBoard: null,
+      targetBit: 0,
+      steps: [],
+      stepIndex: 0,
+      analysis: null,
+      timer: null,
+      requestedMode: "auto",
+      showBoth: false,
+      modeNote: "",
+    };
+    const MAX_EXACT_FREE_VARS = 20;
+    const MAX_STORED_SHORTEST = 512;
+
+    function clampInt(raw, min, max, fallback) {
+      const n = Number(raw);
+      if (!Number.isFinite(n)) return fallback;
+      return Math.min(max, Math.max(min, Math.floor(n)));
+    }
+
+    function makeBoard(n, fillBit = 0) {
+      return Array.from({ length: n }, () => Array.from({ length: n }, () => fillBit));
+    }
+
+    function copyBoard(src) {
+      return src.map((row) => row.slice());
+    }
+
+    function isUniformBoard(srcBoard) {
+      const bit = srcBoard[0][0];
+      for (let r = 0; r < srcBoard.length; r++) {
+        for (let c = 0; c < srcBoard.length; c++) {
+          if (srcBoard[r][c] !== bit) return false;
+        }
+      }
+      return true;
+    }
+
+    function applyMoveToBoard(srcBoard, r, c) {
+      const n = srcBoard.length;
+      for (let dr = -1; dr <= 1; dr++) {
+        for (let dc = -1; dc <= 1; dc++) {
+          const rr = r + dr;
+          const cc = c + dc;
+          if (rr < 0 || rr >= n || cc < 0 || cc >= n) continue;
+          srcBoard[rr][cc] = srcBoard[rr][cc] ^ 1;
+        }
+      }
+    }
+
+    function bin3(n) {
+      return n.toString(2).padStart(3, "0").slice(-3);
+    }
+
+    function moveToStrictCode(move) {
+      return `${bin3(move.r)}${bin3(move.c)}`;
+    }
+
+    function movesToStrictCode(moves) {
+      return moves.map(moveToStrictCode).join("-");
+    }
+
+    function renderCoords() {
+      colCoordsEl.style.gridTemplateColumns = `repeat(${size}, var(--cell-size))`;
+      rowCoordsEl.style.gridTemplateRows = `repeat(${size}, var(--cell-size))`;
+      colCoordsEl.innerHTML = "";
+      rowCoordsEl.innerHTML = "";
+
+      for (let c = 0; c < size; c++) {
+        const el = document.createElement("div");
+        el.className = "coord";
+        el.textContent = bin3(c);
+        el.title = `Столбец ${c}`;
+        colCoordsEl.appendChild(el);
+      }
+
+      for (let r = 0; r < size; r++) {
+        const el = document.createElement("div");
+        el.className = "coord";
+        el.textContent = bin3(r);
+        el.title = `Строка ${r}`;
+        rowCoordsEl.appendChild(el);
+      }
+    }
+
+    function encodeBase64Url(bytes) {
+      let bin = "";
+      for (let i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+      return btoa(bin).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+    }
+
+    function obfuscateBytes(bytes, keyText) {
+      const key = new TextEncoder().encode(keyText);
+      const out = new Uint8Array(bytes.length);
+      for (let i = 0; i < bytes.length; i++) {
+        out[i] = bytes[i] ^ key[i % key.length] ^ ((i * 31) & 255);
+      }
+      return out;
+    }
+
+    function randomPassword(length = 8) {
+      const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789";
+      const out = [];
+      const rand = new Uint8Array(length);
+      if (window.crypto && window.crypto.getRandomValues) {
+        window.crypto.getRandomValues(rand);
+      } else {
+        for (let i = 0; i < length; i++) rand[i] = Math.floor(Math.random() * 256);
+      }
+      for (let i = 0; i < length; i++) out.push(chars[rand[i] % chars.length]);
+      return out.join("");
+    }
+
+    function randomUint32() {
+      if (window.crypto && window.crypto.getRandomValues) {
+        const arr = new Uint32Array(1);
+        window.crypto.getRandomValues(arr);
+        return arr[0] >>> 0;
+      }
+      return ((Math.random() * 0x100000000) >>> 0);
+    }
+
+    function writeUint32LE(bytes, offset, value) {
+      bytes[offset] = value & 255;
+      bytes[offset + 1] = (value >>> 8) & 255;
+      bytes[offset + 2] = (value >>> 16) & 255;
+      bytes[offset + 3] = (value >>> 24) & 255;
+    }
+
+    function passwordHash32(password, salt32) {
+      const data = new TextEncoder().encode(password);
+      let h = (0x811c9dc5 ^ salt32) >>> 0;
+      for (let i = 0; i < data.length; i++) {
+        h ^= data[i];
+        h = Math.imul(h, 0x01000193) >>> 0;
+        h ^= h >>> 13;
+      }
+      h ^= data.length >>> 0;
+      h = Math.imul(h, 0x85ebca6b) >>> 0;
+      h ^= h >>> 16;
+      return h >>> 0;
+    }
+
+    function hashBytes32(bytes, salt32) {
+      let h = (0x811c9dc5 ^ salt32) >>> 0;
+      for (let i = 0; i < bytes.length; i++) {
+        h ^= bytes[i];
+        h = Math.imul(h, 0x01000193) >>> 0;
+        h ^= h >>> 13;
+      }
+      h ^= bytes.length >>> 0;
+      h = Math.imul(h, 0x85ebca6b) >>> 0;
+      h ^= h >>> 16;
+      return h >>> 0;
+    }
+
+    function xorWithStream(bytes, seed32) {
+      let s = (seed32 ^ 0x9e3779b9) >>> 0;
+      const out = new Uint8Array(bytes.length);
+      for (let i = 0; i < bytes.length; i++) {
+        s ^= (s << 13) >>> 0;
+        s ^= s >>> 17;
+        s ^= (s << 5) >>> 0;
+        out[i] = bytes[i] ^ (s & 255);
+      }
+      return out;
+    }
+
+    function ensureAttemptPassword() {
+      const current = (attemptPasswordInput.value || "").trim();
+      if (current) return current;
+      const generated = randomPassword(8);
+      attemptPasswordInput.value = generated;
+      return generated;
+    }
+
+    function normalizeCodeWord(value) {
+      return String(value || "").trim().replace(/\s+/g, " ").slice(0, 80);
+    }
+
+    function packPuzzleBytes(srcBoard, n, cellSize, gap, password, codeWord) {
+      const total = n * n;
+      const bitsBytes = Math.ceil(total / 8);
+      const codeWordBytesFull = new TextEncoder().encode(codeWord);
+      const codeWordBytes = codeWordBytesFull.subarray(0, Math.min(255, codeWordBytesFull.length));
+      const cwSalt32 = randomUint32();
+      const cwKey32 = passwordHash32(`${password}|cw`, cwSalt32);
+      const codeWordCipher = xorWithStream(codeWordBytes, cwKey32);
+      const cwCheck32 = hashBytes32(codeWordBytes, (cwSalt32 ^ 0x9e3779b9) >>> 0);
+      const bytes = new Uint8Array(4 + bitsBytes + 8 + 4 + 4 + 1 + codeWordCipher.length);
+      bytes[0] = 5; // format version 5: compact binary + password hash + encrypted code word
+      bytes[1] = n;
+      bytes[2] = cellSize;
+      bytes[3] = gap;
+
+      let k = 0;
+      for (let r = 0; r < n; r++) {
+        for (let c = 0; c < n; c++) {
+          if (srcBoard[r][c]) {
+            bytes[4 + (k >>> 3)] |= (1 << (k & 7));
+          }
+          k++;
+        }
+      }
+
+      const tailOffset = 4 + bitsBytes;
+      const salt32 = randomUint32();
+      const hash32 = passwordHash32(password, salt32);
+      writeUint32LE(bytes, tailOffset, salt32);
+      writeUint32LE(bytes, tailOffset + 4, hash32);
+      writeUint32LE(bytes, tailOffset + 8, cwSalt32);
+      writeUint32LE(bytes, tailOffset + 12, cwCheck32);
+      bytes[tailOffset + 16] = codeWordCipher.length;
+      bytes.set(codeWordCipher, tailOffset + 17);
+      return bytes;
+    }
+
+    function buildPuzzleBytes(password, codeWord) {
+      const snapshot = copyBoard(board);
+      if (isUniformBoard(snapshot)) {
+        const rr = Math.floor(size / 2);
+        const cc = Math.floor(size / 2);
+        applyMoveToBoard(snapshot, rr, cc);
+      }
+      return packPuzzleBytes(snapshot, size, 42, 6, password, codeWord);
+    }
+
+    function buildAttemptUrl() {
+      const password = ensureAttemptPassword();
+      const codeWord = normalizeCodeWord(codeWordInput.value);
+      codeWordInput.value = codeWord;
+      const raw = buildPuzzleBytes(password, codeWord);
+      const mixed = obfuscateBytes(raw, URL_CIPHER_KEY);
+      const token = encodeBase64Url(mixed);
+      const url = new URL("puzzle.html", window.location.href);
+      url.searchParams.set("h", token);
+      return url.toString();
+    }
+
+    function buildAttemptToken() {
+      const password = ensureAttemptPassword();
+      const codeWord = normalizeCodeWord(codeWordInput.value);
+      codeWordInput.value = codeWord;
+      const raw = buildPuzzleBytes(password, codeWord);
+      const mixed = obfuscateBytes(raw, URL_CIPHER_KEY);
+      return encodeBase64Url(mixed);
+    }
+
+    function sanitizeBoardForImport(rawBoard, n) {
+      if (!Array.isArray(rawBoard) || rawBoard.length !== n) return null;
+      const out = [];
+      for (let r = 0; r < n; r++) {
+        const row = rawBoard[r];
+        if (!Array.isArray(row) || row.length !== n) return null;
+        const outRow = [];
+        for (let c = 0; c < n; c++) {
+          const bit = Number(row[c]) ? 1 : 0;
+          outRow.push(bit);
+        }
+        out.push(outRow);
+      }
+      return out;
+    }
+
+    function buildEditorTemplate() {
+      const password = ensureAttemptPassword();
+      const codeWord = normalizeCodeWord(codeWordInput.value);
+      codeWordInput.value = codeWord;
+      return {
+        type: "matrix-1-0-editor-template",
+        version: 1,
+        exportedAt: new Date().toISOString(),
+        size,
+        board: copyBoard(board),
+        password,
+        codeWord,
+        mixMoves: clampInt(mixMovesInput.value, 1, 1000, Math.max(1, size * size)),
+        desiredSteps: clampInt(desiredStepsInput.value, 0, 400, 0),
+        seedMode: seedModeSelect.value,
+        targetMode: targetModeSelect.value,
+        showBoth: !!showBothCheckbox.checked,
+        generationMeta,
+      };
+    }
+
+    function applyEditorTemplate(data) {
+      if (!data || typeof data !== "object") {
+        throw new Error("Некорректный JSON-шаблон.");
+      }
+      if (data.type !== "matrix-1-0-editor-template") {
+        throw new Error("Неизвестный тип шаблона.");
+      }
+      const nextSize = clampInt(data.size, 2, 20, size);
+      const nextBoard = sanitizeBoardForImport(data.board, nextSize);
+      if (!nextBoard) {
+        throw new Error("Некорректная матрица в шаблоне.");
+      }
+
+      size = nextSize;
+      board = nextBoard;
+      sizeInput.value = String(size);
+      mixMovesInput.value = String(clampInt(data.mixMoves, 1, 1000, Math.max(1, size * size)));
+      desiredStepsInput.value = String(clampInt(data.desiredSteps, 0, 400, 0));
+
+      const seedMode = String(data.seedMode || "auto");
+      seedModeSelect.value = ["auto", "zero", "one"].includes(seedMode) ? seedMode : "auto";
+
+      const mode = String(data.targetMode || "auto");
+      targetModeSelect.value = ["auto", "zero", "one"].includes(mode) ? mode : "auto";
+      showBothCheckbox.checked = !!data.showBoth;
+
+      attemptPasswordInput.value = String(data.password || "").trim();
+      codeWordInput.value = normalizeCodeWord(data.codeWord || "");
+
+      generationMeta = String(data.generationMeta || "Импортировано из JSON-шаблона.");
+      clearSolverMode();
+      render();
+    }
+
+    function buildStandaloneHtml(token) {
+      const t = JSON.stringify(token);
+      return [
+        "<!doctype html>",
+        "<html lang=\"ru\">",
+        "<head>",
+        "  <meta charset=\"UTF-8\">",
+        "  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">",
+        "  <title>Matrix Puzzle</title>",
+        "  <style>",
+        "    :root { --bg:#f3f4f6; --panel:#fff; --text:#111827; --muted:#6b7280; --border:#d1d5db; --accent:#0f766e; --ok:#166534; --ok-bg:#dcfce7; --warn:#92400e; --warn-bg:#fef3c7; --cell-size:42px; --gap:6px; }",
+        "    * { box-sizing:border-box; }",
+        "    body { margin:0; min-height:100vh; font-family:\"Segoe UI\",\"Noto Sans\",sans-serif; background:radial-gradient(circle at 20% 0%,#fff,var(--bg)); color:var(--text); display:grid; place-items:center; padding:20px; }",
+        "    .app { width:min(1280px,100%); background:var(--panel); border:1px solid var(--border); border-radius:16px; box-shadow:0 14px 30px rgba(17,24,39,.09); padding:16px; display:grid; gap:12px; }",
+        "    .toolbar { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }",
+        "    button { border:1px solid var(--border); background:#fff; color:var(--text); border-radius:10px; padding:8px 12px; font:inherit; cursor:pointer; }",
+        "    button.primary { background:var(--accent); color:#fff; border-color:var(--accent); }",
+        "    button:disabled { opacity:.55; cursor:not-allowed; }",
+        "    .counter { margin-left:auto; font-weight:700; padding:8px 12px; border:1px solid var(--border); border-radius:10px; }",
+        "    .status { border-radius:10px; padding:9px 12px; font-weight:600; }",
+        "    .status.ok { color:var(--ok); background:var(--ok-bg); border:1px solid #86efac; }",
+        "    .status.progress { color:var(--warn); background:var(--warn-bg); border:1px solid #fcd34d; }",
+        "    .codeword { border:1px dashed #86efac; border-radius:10px; padding:9px 12px; background:#f0fdf4; color:#166534; font-weight:700; }",
+        "    .auth { border:1px solid var(--border); border-radius:12px; background:#fcfcfd; padding:14px; display:grid; gap:10px; }",
+        "    .auth-row { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }",
+        "    input[type=password] { border:1px solid var(--border); border-radius:10px; padding:8px 10px; font:inherit; min-width:220px; }",
+        "    .auth-error { min-height:20px; font-size:13px; color:#b91c1c; font-weight:600; }",
+        "    .grid-wrap { overflow:auto; border:1px solid var(--border); border-radius:12px; background:#fafafa; padding:12px; min-height:300px; }",
+        "    .grid { display:grid; gap:var(--gap); width:max-content; margin:0 auto; }",
+        "    .cell { width:var(--cell-size); height:var(--cell-size); border-radius:9px; border:1px solid #9ca3af; background:#fff; color:#111827; display:grid; place-items:center; font-weight:700; cursor:pointer; user-select:none; }",
+        "    .cell.one { background:#111827; color:#fff; border-color:#111827; }",
+        "    .error { background:#fee2e2; color:#991b1b; border:1px solid #fca5a5; border-radius:10px; padding:10px 12px; font-weight:600; }",
+        "  </style>",
+        "</head>",
+        "<body>",
+        "  <main class=\"app\" id=\"app\">",
+        "    <section id=\"authGate\" class=\"auth\" hidden>",
+        "      <div><b>Задача защищена паролем.</b> Введите пароль.</div>",
+        "      <div class=\"auth-row\"><input id=\"passwordInput\" type=\"password\" placeholder=\"Пароль\"><button id=\"unlock\" class=\"primary\">Открыть задачу</button></div>",
+        "      <div id=\"authError\" class=\"auth-error\"></div>",
+        "    </section>",
+        "    <div id=\"gameArea\" hidden>",
+        "      <section class=\"toolbar\"><button id=\"restart\" class=\"primary\">Заново</button><button id=\"undo\">Отменить</button><button id=\"redo\">Повторить</button><div class=\"counter\" id=\"stepCounter\">Шаги: 0</div></section>",
+        "      <div id=\"status\" class=\"status progress\">В процессе</div>",
+        "      <div id=\"codeWordBox\" class=\"codeword\" hidden></div>",
+        "      <section class=\"grid-wrap\"><div id=\"grid\" class=\"grid\" aria-label=\"Поле задачи\"></div></section>",
+        "    </div>",
+        "  </main>",
+        "  <script>",
+        "    const EMBEDDED_TOKEN = " + t + ";",
+        "    const URL_CIPHER_KEY = \"matrix-1-0-lite-key\";",
+        "    const appEl=document.getElementById(\"app\"),authGateEl=document.getElementById(\"authGate\"),gameAreaEl=document.getElementById(\"gameArea\"),passwordInputEl=document.getElementById(\"passwordInput\"),unlockBtn=document.getElementById(\"unlock\"),authErrorEl=document.getElementById(\"authError\"),restartBtn=document.getElementById(\"restart\"),undoBtn=document.getElementById(\"undo\"),redoBtn=document.getElementById(\"redo\"),stepCounterEl=document.getElementById(\"stepCounter\"),statusEl=document.getElementById(\"status\"),codeWordBoxEl=document.getElementById(\"codeWordBox\"),gridEl=document.getElementById(\"grid\");",
+        "    let n=0,initialBoard=[],board=[],history=[],historyIndex=0,requiresPassword=false,authSalt=0,authHash=0,revealCodeWord=\"\",codeWordCipher=null,codeWordCipherSalt=0,codeWordCipherCheck=0,codeWordKey32=0,codeWordKeyReady=false;",
+        "    function decodeBase64Url(str){const padded=str.replace(/-/g,'+').replace(/_/g,'/')+'==='.slice((str.length+3)%4);const bin=atob(padded);const out=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)out[i]=bin.charCodeAt(i);return out;}",
+        "    function obfuscateBytes(bytes,keyText){const key=new TextEncoder().encode(keyText);const out=new Uint8Array(bytes.length);for(let i=0;i<bytes.length;i++)out[i]=bytes[i]^key[i%key.length]^((i*31)&255);return out;}",
+        "    function readUint32LE(bytes,o){return((bytes[o])|(bytes[o+1]<<8)|(bytes[o+2]<<16)|(bytes[o+3]<<24))>>>0;}",
+        "    function passwordHash32(password,salt32){const data=new TextEncoder().encode(password);let h=(0x811c9dc5^salt32)>>>0;for(let i=0;i<data.length;i++){h^=data[i];h=Math.imul(h,0x01000193)>>>0;h^=h>>>13;}h^=data.length>>>0;h=Math.imul(h,0x85ebca6b)>>>0;h^=h>>>16;return h>>>0;}",
+        "    function hashBytes32(bytes,salt32){let h=(0x811c9dc5^salt32)>>>0;for(let i=0;i<bytes.length;i++){h^=bytes[i];h=Math.imul(h,0x01000193)>>>0;h^=h>>>13;}h^=bytes.length>>>0;h=Math.imul(h,0x85ebca6b)>>>0;h^=h>>>16;return h>>>0;}",
+        "    function xorWithStream(bytes,seed32){let s=(seed32^0x9e3779b9)>>>0;const out=new Uint8Array(bytes.length);for(let i=0;i<bytes.length;i++){s^=(s<<13)>>>0;s^=s>>>17;s^=(s<<5)>>>0;out[i]=bytes[i]^(s&255);}return out;}",
+        "    function tryDecryptCodeWord(){if(!codeWordCipher||!codeWordKeyReady)return\"\";const plain=xorWithStream(codeWordCipher,codeWordKey32);const check=hashBytes32(plain,(codeWordCipherSalt^0x9e3779b9)>>>0);if(check!==codeWordCipherCheck)return\"\";try{return new TextDecoder().decode(plain);}catch(_){return\"\";}}",
+        "    function copyBoard(src){return src.map(r=>r.slice());}",
+        "    function isUniform(src){const b=src[0][0];for(let r=0;r<src.length;r++)for(let c=0;c<src.length;c++)if(src[r][c]!==b)return false;return true;}",
+        "    function targetBit(src){return src[0][0];}",
+        "    function toggleCell(r,c){if(r<0||r>=n||c<0||c>=n)return;board[r][c]^=1;}",
+        "    function applyMove(r,c){for(let dr=-1;dr<=1;dr++)for(let dc=-1;dc<=1;dc++)toggleCell(r+dr,c+dc);}",
+        "    function updateStatus(){const solved=isUniform(board);if(solved&&!revealCodeWord&&codeWordCipher)revealCodeWord=tryDecryptCodeWord();statusEl.className='status '+(solved?'ok':'progress');statusEl.textContent=solved?('Решено: все '+targetBit(board)):'В процессе';if(solved&&revealCodeWord){codeWordBoxEl.hidden=false;codeWordBoxEl.textContent='Кодовое слово: '+revealCodeWord;}else{codeWordBoxEl.hidden=true;codeWordBoxEl.textContent='';}stepCounterEl.textContent='Шаги: '+historyIndex;undoBtn.disabled=historyIndex===0;redoBtn.disabled=historyIndex>=history.length;}",
+        "    function renderGrid(){gridEl.style.gridTemplateColumns='repeat('+n+', var(--cell-size))';gridEl.innerHTML='';for(let r=0;r<n;r++)for(let c=0;c<n;c++){const b=document.createElement('button');b.type='button';b.className='cell '+(board[r][c]?'one':'');b.textContent=String(board[r][c]);b.addEventListener('click',()=>{if(historyIndex<history.length)history=history.slice(0,historyIndex);applyMove(r,c);history.push({r:r,c:c});historyIndex++;render();});gridEl.appendChild(b);}}",
+        "    function render(){renderGrid();updateStatus();}",
+        "    function parseCompactPayload(raw){if(raw.length<4)throw new Error('Слишком короткий payload.');const version=raw[0];if(version!==2&&version!==3&&version!==4&&version!==5)throw new Error('Не compact payload.');const parsedN=raw[1];if(!Number.isInteger(parsedN)||parsedN<2||parsedN>20)throw new Error('Некорректный размер поля.');const total=parsedN*parsedN,bitsBytes=Math.ceil(total/8),need=4+bitsBytes+(version>=3?8:0);if(raw.length<need)throw new Error('Неполный payload.');const parsedBoard=[];let k=0;for(let r=0;r<parsedN;r++){const row=[];for(let c=0;c<parsedN;c++){row.push((raw[4+(k>>>3)]>>>(k&7))&1);k++;}parsedBoard.push(row);}if(isUniform(parsedBoard))throw new Error('Задача уже решена.');n=parsedN;initialBoard=copyBoard(parsedBoard);board=copyBoard(parsedBoard);history=[];historyIndex=0;requiresPassword=false;authSalt=0;authHash=0;revealCodeWord='';codeWordCipher=null;codeWordCipherSalt=0;codeWordCipherCheck=0;codeWordKey32=0;codeWordKeyReady=false;if(version>=3){let tail=4+bitsBytes;authSalt=readUint32LE(raw,tail);authHash=readUint32LE(raw,tail+4);requiresPassword=true;tail+=8;if(version===4){const wl=raw[tail];revealCodeWord=new TextDecoder().decode(raw.subarray(tail+1,tail+1+wl));}else if(version===5){codeWordCipherSalt=readUint32LE(raw,tail);codeWordCipherCheck=readUint32LE(raw,tail+4);const wl=raw[tail+8];codeWordCipher=raw.slice(tail+9,tail+9+wl);}}}",
+        "    function loadFromEmbedded(){if(!EMBEDDED_TOKEN)throw new Error('Нет зашитой задачи.');const mixed=decodeBase64Url(EMBEDDED_TOKEN);const raw=obfuscateBytes(mixed,URL_CIPHER_KEY);parseCompactPayload(raw);}",
+        "    restartBtn.addEventListener('click',()=>{board=copyBoard(initialBoard);history=[];historyIndex=0;render();});",
+        "    undoBtn.addEventListener('click',()=>{if(historyIndex<=0)return;const m=history[historyIndex-1];applyMove(m.r,m.c);historyIndex--;render();});",
+        "    redoBtn.addEventListener('click',()=>{if(historyIndex>=history.length)return;const m=history[historyIndex];applyMove(m.r,m.c);historyIndex++;render();});",
+        "    unlockBtn.addEventListener('click',()=>{const entered=passwordInputEl.value;const got=passwordHash32(entered,authSalt);if(got!==authHash){authErrorEl.textContent='Неверный пароль.';passwordInputEl.select();return;}codeWordKey32=passwordHash32(entered+'|cw',codeWordCipherSalt);codeWordKeyReady=true;authErrorEl.textContent='';passwordInputEl.value='';authGateEl.remove();gameAreaEl.hidden=false;render();});",
+        "    passwordInputEl.addEventListener('keydown',e=>{if(e.key==='Enter')unlockBtn.click();});",
+        "    try{loadFromEmbedded();if(requiresPassword){authGateEl.hidden=false;gameAreaEl.hidden=true;passwordInputEl.focus();}else{authGateEl.hidden=true;gameAreaEl.hidden=false;render();}}catch(err){appEl.innerHTML='<div class=\"error\">Ошибка загрузки задачи: '+String(err.message||err)+'</div>';}",
+        "  </scr" + "ipt>",
+        "</body>",
+        "</html>"
+      ].join("\n");
+    }
+
+    function refreshAttemptUrl() {
+      const token = buildAttemptToken();
+      const url = new URL("puzzle.html", window.location.href);
+      url.searchParams.set("h", token);
+      attemptUrlInput.value = url.toString();
+    }
+
+    function idxOf(r, c, n) {
+      return r * n + c;
+    }
+
+    function bitGet(rowBits, col) {
+      return (rowBits[col >>> 5] >>> (col & 31)) & 1;
+    }
+
+    function bitFlip(rowBits, col) {
+      rowBits[col >>> 5] ^= (1 << (col & 31));
+    }
+
+    function xorRows(dst, src) {
+      for (let i = 0; i < dst.length; i++) dst[i] ^= src[i];
+    }
+
+    function toggleCell(r, c) {
+      if (r < 0 || r >= size || c < 0 || c >= size) return;
+      board[r][c] = board[r][c] ^ 1;
+    }
+
+    function applyMove(r, c) {
+      for (let dr = -1; dr <= 1; dr++) {
+        for (let dc = -1; dc <= 1; dc++) {
+          toggleCell(r + dr, c + dc);
+        }
+      }
+    }
+
+    function boardToVector(srcBoard) {
+      const out = new Uint8Array(size * size);
+      let k = 0;
+      for (let r = 0; r < size; r++) {
+        for (let c = 0; c < size; c++) {
+          out[k++] = srcBoard[r][c];
+        }
+      }
+      return out;
+    }
+
+    function getMatrixForSize(n) {
+      if (matrixCache.has(n)) return matrixCache.get(n);
+
+      const vars = n * n;
+      const words = Math.ceil(vars / 32);
+      const rows = Array.from({ length: vars }, () => new Uint32Array(words));
+
+      for (let r = 0; r < n; r++) {
+        for (let c = 0; c < n; c++) {
+          const varCol = idxOf(r, c, n);
+          for (let dr = -1; dr <= 1; dr++) {
+            for (let dc = -1; dc <= 1; dc++) {
+              const rr = r + dr;
+              const cc = c + dc;
+              if (rr < 0 || rr >= n || cc < 0 || cc >= n) continue;
+              const eqRow = idxOf(rr, cc, n);
+              bitFlip(rows[eqRow], varCol);
+            }
+          }
+        }
+      }
+
+      const packed = { n, vars, words, rows };
+      matrixCache.set(n, packed);
+      return packed;
+    }
+
+    function solveForTarget(targetBit) {
+      const { vars, words, rows: baseRows } = getMatrixForSize(size);
+      const rows = baseRows.map((row) => new Uint32Array(row));
+      const rhs = new Uint8Array(vars);
+
+      const bVec = boardToVector(board);
+      for (let i = 0; i < vars; i++) rhs[i] = bVec[i] ^ targetBit;
+
+      let pivotRow = 0;
+      const pivotCols = [];
+
+      for (let col = 0; col < vars && pivotRow < vars; col++) {
+        let found = -1;
+        for (let r = pivotRow; r < vars; r++) {
+          if (bitGet(rows[r], col)) {
+            found = r;
+            break;
+          }
+        }
+        if (found === -1) continue;
+
+        if (found !== pivotRow) {
+          const tmpRow = rows[pivotRow];
+          rows[pivotRow] = rows[found];
+          rows[found] = tmpRow;
+          const t = rhs[pivotRow];
+          rhs[pivotRow] = rhs[found];
+          rhs[found] = t;
+        }
+
+        for (let r = 0; r < vars; r++) {
+          if (r !== pivotRow && bitGet(rows[r], col)) {
+            xorRows(rows[r], rows[pivotRow]);
+            rhs[r] ^= rhs[pivotRow];
+          }
+        }
+
+        pivotCols.push(col);
+        pivotRow++;
+      }
+
+      for (let r = pivotRow; r < vars; r++) {
+        let hasAny = false;
+        for (let w = 0; w < words; w++) {
+          if (rows[r][w] !== 0) {
+            hasAny = true;
+            break;
+          }
+        }
+        if (!hasAny && rhs[r] === 1) {
+          return {
+            consistent: false,
+            rank: pivotCols.length,
+            freeVars: vars - pivotCols.length,
+            x: null,
+            freeCols: [],
+            basis: [],
+          };
+        }
+      }
+
+      const x = new Uint8Array(vars);
+      for (let r = 0; r < pivotCols.length; r++) {
+        x[pivotCols[r]] = rhs[r];
+      }
+
+      const pivotMask = new Uint8Array(vars);
+      for (let i = 0; i < pivotCols.length; i++) pivotMask[pivotCols[i]] = 1;
+
+      const freeCols = [];
+      for (let col = 0; col < vars; col++) {
+        if (!pivotMask[col]) freeCols.push(col);
+      }
+
+      const basis = freeCols.map((freeCol) => {
+        const v = new Uint8Array(vars);
+        v[freeCol] = 1;
+        for (let r = 0; r < pivotCols.length; r++) {
+          if (bitGet(rows[r], freeCol)) v[pivotCols[r]] = 1;
+        }
+        return v;
+      });
+
+      return {
+        consistent: true,
+        rank: pivotCols.length,
+        freeVars: vars - pivotCols.length,
+        x,
+        freeCols,
+        basis,
+      };
+    }
+
+    function vectorToMoves(x) {
+      const out = [];
+      for (let i = 0; i < x.length; i++) {
+        if (x[i] === 1) {
+          out.push({
+            index: i,
+            r: Math.floor(i / size),
+            c: i % size,
+          });
+        }
+      }
+      return out;
+    }
+
+    function popcount32(x) {
+      x -= (x >>> 1) & 0x55555555;
+      x = (x & 0x33333333) + ((x >>> 2) & 0x33333333);
+      x = (x + (x >>> 4)) & 0x0f0f0f0f;
+      x += x >>> 8;
+      x += x >>> 16;
+      return x & 0x3f;
+    }
+
+    function vectorToWords(vec) {
+      const words = new Uint32Array(Math.ceil(vec.length / 32));
+      for (let i = 0; i < vec.length; i++) {
+        if (vec[i]) words[i >>> 5] |= (1 << (i & 31));
+      }
+      return words;
+    }
+
+    function xorWordsInPlace(dst, src) {
+      for (let i = 0; i < dst.length; i++) dst[i] ^= src[i];
+    }
+
+    function wordsWeight(words) {
+      let sum = 0;
+      for (let i = 0; i < words.length; i++) sum += popcount32(words[i] >>> 0);
+      return sum;
+    }
+
+    function wordsToMoves(words, n) {
+      const vars = n * n;
+      const out = [];
+      for (let i = 0; i < vars; i++) {
+        if ((words[i >>> 5] >>> (i & 31)) & 1) {
+          out.push({
+            index: i,
+            r: Math.floor(i / n),
+            c: i % n,
+          });
+        }
+      }
+      return out;
+    }
+
+    function enumerateShortestPlansForTarget(solveRes, options = {}) {
+      if (!solveRes || !solveRes.consistent) return null;
+      const maxFreeVars = options.maxFreeVars ?? MAX_EXACT_FREE_VARS;
+      const maxStored = options.maxStored ?? MAX_STORED_SHORTEST;
+
+      const defaultPlan = vectorToMoves(solveRes.x);
+      const freeVars = solveRes.freeVars || 0;
+
+      if (freeVars === 0) {
+        return {
+          exact: true,
+          minLen: defaultPlan.length,
+          plans: [defaultPlan],
+          totalShortest: 1,
+          truncated: false,
+          note: "",
+        };
+      }
+
+      if (freeVars > maxFreeVars) {
+        return {
+          exact: false,
+          minLen: defaultPlan.length,
+          plans: [defaultPlan],
+          totalShortest: 1,
+          truncated: false,
+          note: `Свободных переменных: ${freeVars}. Полный перебор кратчайших отключен (лимит ${maxFreeVars}).`,
+        };
+      }
+
+      const basis = solveRes.basis || [];
+      const k = basis.length;
+      const combos = 1 << k;
+      const x0Words = vectorToWords(solveRes.x);
+      const basisWords = basis.map(vectorToWords);
+      const currentWords = new Uint32Array(x0Words);
+
+      let minWeight = wordsWeight(currentWords);
+      let prevGray = 0;
+      let totalShortest = 1;
+      const minMasks = [0];
+
+      for (let i = 1; i < combos; i++) {
+        const gray = i ^ (i >>> 1);
+        const diff = gray ^ prevGray;
+        const toggled = 31 - Math.clz32(diff);
+        xorWordsInPlace(currentWords, basisWords[toggled]);
+        const w = wordsWeight(currentWords);
+
+        if (w < minWeight) {
+          minWeight = w;
+          totalShortest = 1;
+          minMasks.length = 0;
+          minMasks.push(gray);
+        } else if (w === minWeight) {
+          totalShortest++;
+          if (minMasks.length < maxStored) minMasks.push(gray);
+        }
+
+        prevGray = gray;
+      }
+
+      const plans = minMasks.map((mask) => {
+        const words = new Uint32Array(x0Words);
+        for (let bit = 0; bit < k; bit++) {
+          if ((mask >>> bit) & 1) xorWordsInPlace(words, basisWords[bit]);
+        }
+        return wordsToMoves(words, size);
+      });
+
+      return {
+        exact: true,
+        minLen: minWeight,
+        plans,
+        totalShortest,
+        truncated: totalShortest > plans.length,
+        note: totalShortest > plans.length
+          ? `Кратчайших алгоритмов ${totalShortest}, показано первые ${plans.length}.`
+          : "",
+      };
+    }
+
+    function shortestSolveLengthForBoard(srcBoard) {
+      const prevBoard = board;
+      board = srcBoard;
+
+      const toZero = solveForTarget(0);
+      const toOne = solveForTarget(1);
+      const shortestZero = enumerateShortestPlansForTarget(toZero, { maxFreeVars: 10, maxStored: 1 });
+      const shortestOne = enumerateShortestPlansForTarget(toOne, { maxFreeVars: 10, maxStored: 1 });
+
+      board = prevBoard;
+
+      let best = Infinity;
+      if (shortestZero) best = Math.min(best, shortestZero.minLen);
+      if (shortestOne) best = Math.min(best, shortestOne.minLen);
+      return Number.isFinite(best) ? best : null;
+    }
+
+    function makeRandomGeneratedBoard(n, mix, seedMode) {
+      const targetBit = seedMode === "zero"
+        ? 0
+        : (seedMode === "one" ? 1 : (Math.random() < 0.5 ? 0 : 1));
+      const candidate = makeBoard(n, targetBit);
+      for (let i = 0; i < mix; i++) {
+        const r = Math.floor(Math.random() * n);
+        const c = Math.floor(Math.random() * n);
+        applyMoveToBoard(candidate, r, c);
+      }
+      return { candidate, targetBit };
+    }
+
+    function generateSolvableBoard() {
+      const n = clampInt(sizeInput.value, 2, 20, size);
+      const mix = clampInt(mixMovesInput.value, 1, 1000, Math.max(1, n * n));
+      const desiredSteps = clampInt(desiredStepsInput.value, 0, 400, 0);
+      const seedMode = ["auto", "zero", "one"].includes(seedModeSelect.value) ? seedModeSelect.value : "auto";
+      size = n;
+      sizeInput.value = String(size);
+      mixMovesInput.value = String(mix);
+      desiredStepsInput.value = String(desiredSteps);
+
+      const maxAttempts = desiredSteps > 0
+        ? (size <= 8 ? 180 : (size <= 14 ? 90 : 40))
+        : 1;
+      let bestBoard = null;
+      let bestTargetBit = 0;
+      let bestLen = null;
+      let bestDiff = Infinity;
+      let bestAttempt = 0;
+
+      for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+        const gen = makeRandomGeneratedBoard(size, mix, seedMode);
+        const len = shortestSolveLengthForBoard(gen.candidate);
+        if (len === null) continue;
+
+        const diff = desiredSteps > 0 ? Math.abs(len - desiredSteps) : 0;
+        if (diff < bestDiff || (diff === bestDiff && (bestLen === null || len < bestLen))) {
+          bestBoard = gen.candidate;
+          bestTargetBit = gen.targetBit;
+          bestLen = len;
+          bestDiff = diff;
+          bestAttempt = attempt;
+        }
+        if (desiredSteps > 0 && diff === 0) break;
+      }
+
+      if (!bestBoard) {
+        const fallback = makeRandomGeneratedBoard(size, mix, seedMode);
+        bestBoard = fallback.candidate;
+        bestTargetBit = fallback.targetBit;
+        bestLen = shortestSolveLengthForBoard(bestBoard);
+        bestDiff = desiredSteps > 0 && bestLen !== null ? Math.abs(bestLen - desiredSteps) : 0;
+        bestAttempt = maxAttempts;
+      }
+
+      board = bestBoard;
+      if (desiredSteps > 0) {
+        if (bestDiff === 0) {
+          generationMeta = `Решаемое поле: старт из всех ${bestTargetBit}, случайных ходов: ${mix}. Запрошено шагов: ${desiredSteps}, получено: ${bestLen} (точно, попыток: ${bestAttempt}/${maxAttempts}).`;
+        } else {
+          generationMeta = `Решаемое поле: старт из всех ${bestTargetBit}, случайных ходов: ${mix}. Запрошено шагов: ${desiredSteps}, получено ближайшее: ${bestLen} (разница: ${bestDiff}, попыток: ${bestAttempt}/${maxAttempts}).`;
+        }
+      } else {
+        generationMeta = `Решаемое поле: старт из всех ${bestTargetBit}, случайных ходов: ${mix}. Кратчайшее решение: ${bestLen}.`;
+      }
+      clearSolverMode();
+      render();
+    }
+
+    function render() {
+      renderCoords();
+      gridEl.style.gridTemplateColumns = `repeat(${size}, var(--cell-size))`;
+      gridEl.innerHTML = "";
+
+      let nextMoveIdx = -1;
+      if (solverState.active && solverState.stepIndex < solverState.steps.length) {
+        nextMoveIdx = solverState.steps[solverState.stepIndex].index;
+      }
+
+      for (let r = 0; r < size; r++) {
+        for (let c = 0; c < size; c++) {
+          const id = idxOf(r, c, size);
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = `cell ${board[r][c] ? "one" : ""} ${id === nextMoveIdx ? "next" : ""}`.trim();
+          btn.textContent = String(board[r][c]);
+          btn.setAttribute("aria-label", `Ячейка ${r + 1}-${c + 1}: ${board[r][c]}`);
+          btn.addEventListener("click", () => {
+            if (solverState.active) return;
+            applyMove(r, c);
+            render();
+          });
+          gridEl.appendChild(btn);
+        }
+      }
+
+      renderStats();
+      renderSolverPanel();
+      refreshAttemptUrl();
+    }
+
+    function renderStats() {
+      const total = size * size;
+      let ones = 0;
+      for (let r = 0; r < size; r++) {
+        for (let c = 0; c < size; c++) ones += board[r][c];
+      }
+      const zeros = total - ones;
+      statsEl.innerHTML = [
+        `Размер: <b>${size}x${size}</b>`,
+        `Ячеек: <b>${total}</b>`,
+        `Единиц: <b>${ones}</b>, нулей: <b>${zeros}</b>`,
+        `Режим: <b>${solverState.active ? "пошаговое решение" : "ручная игра"}</b>`,
+        `Источник поля: ${generationMeta}`,
+      ].join("<br>");
+    }
+
+    function renderSolverPanel() {
+      if (!solverState.analysis) {
+        solveInfoEl.innerHTML = "Решение пока не запрошено.";
+        movesDumpEl.textContent = "-";
+        setSolverButtons(false);
+        return;
+      }
+
+      const a = solverState.analysis;
+      const step = solverState.stepIndex;
+      const total = solverState.steps.length;
+      const shortestZero = a.shortestZero;
+      const shortestOne = a.shortestOne;
+      const requestedModeText = solverState.requestedMode === "auto"
+        ? "авто"
+        : (solverState.requestedMode === "zero" ? "к всем 0" : "к всем 1");
+      const zeroMin = shortestZero ? shortestZero.minLen : null;
+      const oneMin = shortestOne ? shortestOne.minLen : null;
+      const zeroVariants = shortestZero ? shortestZero.totalShortest : null;
+      const oneVariants = shortestOne ? shortestOne.totalShortest : null;
+
+      solveInfoEl.innerHTML = [
+        `Запрошенная цель: <b>${requestedModeText}</b>.`,
+        `Активный план: <b>к всем ${solverState.targetBit}</b>.`,
+        `Совместимость: цель 0 -> <b>${a.toZero.consistent ? "да" : "нет"}</b>, цель 1 -> <b>${a.toOne.consistent ? "да" : "нет"}</b>.`,
+        `Кратчайшие длины: к 0 -> <b>${zeroMin === null ? "-" : zeroMin}</b>, к 1 -> <b>${oneMin === null ? "-" : oneMin}</b>.`,
+        `Число кратчайших: к 0 -> <b>${zeroVariants === null ? "-" : zeroVariants}</b>, к 1 -> <b>${oneVariants === null ? "-" : oneVariants}</b>.`,
+        `Ранг матрицы: <b>${a.chosen.rank}</b>, свободных переменных: <b>${a.chosen.freeVars}</b>.`,
+        `Шаг активного плана: <b>${step}</b> / <b>${total}</b>.`,
+        solverState.modeNote ? `Примечание: ${solverState.modeNote}` : "",
+      ].join("<br>");
+
+      const formatPlanSet = (title, set, activeTrack) => {
+        if (!set) return `${title}: решения нет`;
+
+        const head = [
+          `${title}: кратчайшая длина ${set.minLen}, вариантов ${set.totalShortest}${set.truncated ? ` (показано ${set.plans.length})` : ""}.`,
+          set.note || "",
+        ].filter(Boolean).join("\n");
+
+        if (set.plans.length === 0) return head;
+
+        const blocks = set.plans.map((moves, planIdx) => {
+          const planHeader = set.plans.length > 1 ? `План ${planIdx + 1}:` : "";
+          if (moves.length === 0) {
+            return [planHeader, "  (без ходов)", ""].filter(Boolean).join("\n");
+          }
+          const strictCode = movesToStrictCode(moves);
+          const lines = moves.map((m, i) => {
+            const marker = activeTrack && planIdx === 0
+              ? (i === step ? "<= next" : (i < step ? "done" : ""))
+              : "";
+            return `  ${String(i + 1).padStart(3, " ")}. (${m.r + 1}, ${m.c + 1}) ${marker}`;
+          });
+          return [planHeader, strictCode, lines.join("\n")].filter(Boolean).join("\n");
+        });
+
+        return `${head}\n${blocks.join("\n\n")}`;
+      };
+
+      if (solverState.showBoth) {
+        const chosenIsZero = solverState.targetBit === 0;
+        const blockZero = formatPlanSet("Планы к всем 0", shortestZero, chosenIsZero);
+        const blockOne = formatPlanSet("Планы к всем 1", shortestOne, !chosenIsZero);
+        movesDumpEl.textContent = `${blockZero}\n\n${blockOne}`;
+      } else {
+        const activeSet = solverState.targetBit === 0 ? shortestZero : shortestOne;
+        movesDumpEl.textContent = formatPlanSet(`Планы к всем ${solverState.targetBit}`, activeSet, true);
+      }
+
+      setSolverButtons(true);
+      prevBtn.disabled = step === 0;
+      nextBtn.disabled = step >= total;
+      playBtn.disabled = step >= total;
+      stopBtn.disabled = !solverState.timer;
+      resetStepsBtn.disabled = total === 0;
+    }
+
+    function setSolverButtons(active) {
+      prevBtn.disabled = !active;
+      nextBtn.disabled = !active;
+      playBtn.disabled = !active;
+      stopBtn.disabled = !active;
+      resetStepsBtn.disabled = !active;
+      exitSolveBtn.disabled = !active;
+    }
+
+    function stopAutoPlay() {
+      if (solverState.timer) {
+        clearInterval(solverState.timer);
+        solverState.timer = null;
+      }
+    }
+
+    function clearSolverMode() {
+      stopAutoPlay();
+      solverState.active = false;
+      solverState.initialBoard = null;
+      solverState.targetBit = 0;
+      solverState.steps = [];
+      solverState.stepIndex = 0;
+      solverState.analysis = null;
+      solverState.requestedMode = "auto";
+      solverState.showBoth = false;
+      solverState.modeNote = "";
+      hintEl.textContent = "Клик по ячейке переключает её и все 8 соседей. Генерация всегда создаёт решаемые поля.";
+    }
+
+    function startSolverMode() {
+      stopAutoPlay();
+      const requestedMode = targetModeSelect.value;
+      const showBoth = showBothCheckbox.checked;
+
+      const toZero = solveForTarget(0);
+      const toOne = solveForTarget(1);
+
+      if (!toZero.consistent && !toOne.consistent) {
+        solveInfoEl.textContent = "Для текущего поля решение не найдено для целей 0/1.";
+        return;
+      }
+
+      const shortestZero = enumerateShortestPlansForTarget(toZero);
+      const shortestOne = enumerateShortestPlansForTarget(toOne);
+
+      let chosenTarget = 0;
+      let chosenSolve = toZero;
+      let chosenSet = shortestZero;
+      const modeNotes = [];
+
+      if (requestedMode === "zero") {
+        if (toZero.consistent) {
+          chosenTarget = 0;
+          chosenSolve = toZero;
+          chosenSet = shortestZero;
+        } else {
+          chosenTarget = 1;
+          chosenSolve = toOne;
+          chosenSet = shortestOne;
+          modeNotes.push("Цель к всем 0 недостижима для этого поля, выбран доступный план к всем 1.");
+        }
+      } else if (requestedMode === "one") {
+        if (toOne.consistent) {
+          chosenTarget = 1;
+          chosenSolve = toOne;
+          chosenSet = shortestOne;
+        } else {
+          chosenTarget = 0;
+          chosenSolve = toZero;
+          chosenSet = shortestZero;
+          modeNotes.push("Цель к всем 1 недостижима для этого поля, выбран доступный план к всем 0.");
+        }
+      } else if (!toZero.consistent && toOne.consistent) {
+        chosenTarget = 1;
+        chosenSolve = toOne;
+        chosenSet = shortestOne;
+      } else if (toZero.consistent && toOne.consistent) {
+        if ((shortestOne ? shortestOne.minLen : Infinity) < (shortestZero ? shortestZero.minLen : Infinity)) {
+          chosenTarget = 1;
+          chosenSolve = toOne;
+          chosenSet = shortestOne;
+        }
+      }
+
+      if (chosenSet && chosenSet.note) modeNotes.push(chosenSet.note);
+      if (chosenSet && chosenSet.totalShortest > 1) {
+        modeNotes.push("Пошаговое выполнение использует план 1 из списка кратчайших.");
+      }
+      const chosenSteps = chosenSet && chosenSet.plans.length > 0 ? chosenSet.plans[0] : [];
+
+      solverState.active = true;
+      solverState.initialBoard = copyBoard(board);
+      solverState.targetBit = chosenTarget;
+      solverState.steps = chosenSteps;
+      solverState.stepIndex = 0;
+      solverState.analysis = {
+        toZero,
+        toOne,
+        shortestZero,
+        shortestOne,
+        chosen: chosenSolve,
+      };
+      solverState.requestedMode = requestedMode;
+      solverState.showBoth = showBoth;
+      solverState.modeNote = modeNotes.join(" ");
+
+      hintEl.textContent = "Режим решения: ручные клики по полю отключены. Используйте кнопки шагов.";
+      render();
+    }
+
+    function applyNextStep() {
+      if (!solverState.active) return;
+      if (solverState.stepIndex >= solverState.steps.length) return;
+      const m = solverState.steps[solverState.stepIndex];
+      applyMove(m.r, m.c);
+      solverState.stepIndex++;
+      render();
+    }
+
+    function applyPrevStep() {
+      if (!solverState.active) return;
+      if (solverState.stepIndex <= 0) return;
+      const prev = solverState.steps[solverState.stepIndex - 1];
+      applyMove(prev.r, prev.c);
+      solverState.stepIndex--;
+      render();
+    }
+
+    function resetSteps() {
+      if (!solverState.active) return;
+      board = copyBoard(solverState.initialBoard);
+      solverState.stepIndex = 0;
+      render();
+    }
+
+    buildBtn.addEventListener("click", () => {
+      size = clampInt(sizeInput.value, 2, 20, size);
+      const seedMode = ["auto", "zero", "one"].includes(seedModeSelect.value) ? seedModeSelect.value : "auto";
+      const fillBit = seedMode === "one" ? 1 : 0;
+      sizeInput.value = String(size);
+      board = makeBoard(size, fillBit);
+      generationMeta = `Пустое поле (все ${fillBit}).`;
+      clearSolverMode();
+      render();
+    });
+
+    generateBtn.addEventListener("click", generateSolvableBoard);
+
+    solveBtn.addEventListener("click", () => {
+      startSolverMode();
+    });
+
+    prevBtn.addEventListener("click", applyPrevStep);
+    nextBtn.addEventListener("click", applyNextStep);
+
+    playBtn.addEventListener("click", () => {
+      if (!solverState.active || solverState.timer) return;
+      solverState.timer = setInterval(() => {
+        if (solverState.stepIndex >= solverState.steps.length) {
+          stopAutoPlay();
+          render();
+          return;
+        }
+        applyNextStep();
+      }, 380);
+      render();
+    });
+
+    stopBtn.addEventListener("click", () => {
+      stopAutoPlay();
+      render();
+    });
+
+    resetStepsBtn.addEventListener("click", resetSteps);
+
+    exitSolveBtn.addEventListener("click", () => {
+      clearSolverMode();
+      render();
+    });
+
+    buildAttemptLinkBtn.addEventListener("click", () => {
+      refreshAttemptUrl();
+    });
+
+    openAttemptBtn.addEventListener("click", () => {
+      if (!attemptUrlInput.value) refreshAttemptUrl();
+      window.open(attemptUrlInput.value, "_blank", "noopener");
+    });
+
+    regenPasswordBtn.addEventListener("click", () => {
+      attemptPasswordInput.value = randomPassword(8);
+      refreshAttemptUrl();
+    });
+
+    copyPasswordBtn.addEventListener("click", async () => {
+      const pwd = ensureAttemptPassword();
+      try {
+        await navigator.clipboard.writeText(pwd);
+        copyPasswordBtn.textContent = "Скопировано";
+      } catch (_) {
+        attemptPasswordInput.focus();
+        attemptPasswordInput.select();
+        document.execCommand("copy");
+        copyPasswordBtn.textContent = "Скопировано";
+      }
+      setTimeout(() => {
+        copyPasswordBtn.textContent = "Копировать пароль";
+      }, 1200);
+    });
+
+    copyAttemptBtn.addEventListener("click", async () => {
+      if (!attemptUrlInput.value) refreshAttemptUrl();
+      const text = attemptUrlInput.value;
+      try {
+        await navigator.clipboard.writeText(text);
+        copyAttemptBtn.textContent = "Скопировано";
+      } catch (_) {
+        attemptUrlInput.focus();
+        attemptUrlInput.select();
+        document.execCommand("copy");
+        copyAttemptBtn.textContent = "Скопировано";
+      }
+      setTimeout(() => {
+        copyAttemptBtn.textContent = "Копировать URL";
+      }, 1200);
+    });
+
+    downloadStandaloneBtn.addEventListener("click", () => {
+      const token = buildAttemptToken();
+      const html = buildStandaloneHtml(token);
+      const blob = new Blob([html], { type: "text/html;charset=utf-8" });
+      const a = document.createElement("a");
+      const ts = new Date().toISOString().replace(/[:.]/g, "-");
+      a.href = URL.createObjectURL(blob);
+      a.download = `matrix-puzzle-${ts}.html`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    });
+
+    exportTemplateBtn.addEventListener("click", () => {
+      const template = buildEditorTemplate();
+      const json = JSON.stringify(template, null, 2);
+      const blob = new Blob([json], { type: "application/json;charset=utf-8" });
+      const a = document.createElement("a");
+      const ts = new Date().toISOString().replace(/[:.]/g, "-");
+      a.href = URL.createObjectURL(blob);
+      a.download = `matrix-editor-template-${ts}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    });
+
+    importTemplateBtn.addEventListener("click", () => {
+      templateFileInput.value = "";
+      templateFileInput.click();
+    });
+
+    templateFileInput.addEventListener("change", async () => {
+      const file = templateFileInput.files && templateFileInput.files[0];
+      if (!file) return;
+      try {
+        const text = await file.text();
+        const parsed = JSON.parse(text);
+        applyEditorTemplate(parsed);
+        hintEl.textContent = "JSON-шаблон импортирован. Поле, пароль и кодовое слово восстановлены.";
+      } catch (err) {
+        alert(`Ошибка импорта шаблона: ${String(err.message || err)}`);
+      } finally {
+        templateFileInput.value = "";
+      }
+    });
+
+    sizeInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") buildBtn.click();
+    });
+
+    mixMovesInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") generateBtn.click();
+    });
+
+    desiredStepsInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") generateBtn.click();
+    });
+
+    attemptPasswordInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") refreshAttemptUrl();
+    });
+
+    codeWordInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") refreshAttemptUrl();
+    });
+
+    if (!attemptPasswordInput.value.trim()) {
+      attemptPasswordInput.value = randomPassword(8);
+    }
+
+    // TODO: add alternative solving strategies for educational mode (step-by-step Gaussian elimination visualization).
+    // TODO: add generator presets with difficulty grading (minimal moves, ambiguity, and branching factors).
+
+    render();
+  </script>
+</body>
+</html>
