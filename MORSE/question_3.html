@@ -45,7 +45,7 @@
       <section class="layout">
         <div class="grid-wrap"><div id="grid" class="grid" aria-label="Поле задачи"></div></div>
         <aside class="panel">
-          <h3>Алгоритм решения</h3>
+          <h3>История шагов</h3>
           <div id="solveInfo" class="hint"></div>
           <div id="movesDump" class="mono">-</div>
         </aside>
@@ -321,28 +321,17 @@
     }
 
     function updateSolverPanel() {
-      const toZero = solveForTarget(0);
-      const shortest = enumerateShortestPlansForTarget(toZero);
-      if (!shortest) {
-        solveInfoEl.textContent = "Для цели 'все нули' решение не найдено.";
+      const actual = history.slice(0, historyIndex);
+      solveInfoEl.textContent = actual.length
+        ? `Сделано шагов: ${actual.length}.`
+        : "Ходов пока нет.";
+      if (actual.length === 0) {
         movesDumpEl.textContent = "-";
         return;
       }
-
-      solveInfoEl.innerHTML = [
-        `Кратчайшая длина: <b>${shortest.minLen}</b>.`,
-        `Кратчайших алгоритмов: <b>${shortest.totalShortest}</b>${shortest.truncated ? ` (показано ${shortest.plans.length})` : ""}.`,
-        shortest.note || ""
-      ].filter(Boolean).join("<br>");
-
-      const blocks = shortest.plans.map((moves, idx) => {
-        const head = shortest.plans.length > 1 ? `План ${idx + 1}:` : "План:";
-        if (moves.length === 0) return `${head}\n(без ходов)`;
-        const strictCode = movesToStrictCode(moves);
-        const lines = moves.map((m, i) => `${String(i + 1).padStart(3, " ")}. ${moveCode6(m)}`).join("\n");
-        return `${head}\n${strictCode}\n${lines}`;
-      });
-      movesDumpEl.textContent = blocks.join("\n\n");
+      const strictCode = movesToStrictCode(actual);
+      const lines = actual.map((m, i) => `${String(i + 1).padStart(3, " ")}. ${moveCode6(m)}`).join("\n");
+      movesDumpEl.textContent = `${strictCode}\n${lines}`;
     }
 
     function updatePanel() {

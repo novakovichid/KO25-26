@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Local-only docs update. File is gitignored.
+node scripts/update_autodocs.mjs >/dev/null 2>&1 || true

@@ -1,0 +1,520 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <script src="../../section-auth.js"></script>
+  <script>window.SectionAuth && window.SectionAuth.guardPage("VIGENERE");</script>
+  <title>MyVideo — вход</title>
+  <style>
+    :root{
+      --bg:#0b1220;
+      --card:#111a2e;
+      --text:#eaf0ff;
+      --muted:#b7c2e6;
+      --border:#243055;
+      --accent:#4aa3ff;
+      --good:#2bd576;
+      --danger:#ff5c5c;
+      --shadow: 0 14px 40px rgba(0,0,0,.35);
+      --radius:16px;
+      --radius2:12px;
+      --font: system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Helvetica Neue", sans-serif;
+    }
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      font-family:var(--font);
+      background:
+        radial-gradient(1200px 700px at 20% 0%, rgba(74,163,255,.18), transparent 55%),
+        radial-gradient(900px 600px at 90% 10%, rgba(255,92,92,.10), transparent 60%),
+        linear-gradient(180deg, #070b15, var(--bg));
+      color:var(--text);
+      min-height:100vh;
+      padding:24px 16px;
+    }
+    .wrap{ max-width:860px; margin:0 auto; }
+
+    /* Tabs */
+    .tabs{
+      display:flex;
+      gap:8px;
+      align-items:center;
+      padding:10px;
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:14px;
+      background:rgba(255,255,255,.04);
+      box-shadow: 0 10px 28px rgba(0,0,0,.25);
+      overflow:auto;
+      scrollbar-width: thin;
+      margin:0 auto 16px;
+    }
+    .tab{
+      appearance:none;
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(17,26,46,.65);
+      color:var(--text);
+      padding:10px 12px;
+      border-radius:12px;
+      cursor:pointer;
+      font-weight:700;
+      font-size:13px;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      transition: transform .08s ease, background .2s ease, border-color .2s ease;
+      flex: 0 0 auto;
+      user-select:none;
+    }
+    .tab:active{ transform: translateY(1px); }
+    .tab[aria-selected="true"]{
+      background:rgba(74,163,255,.16);
+      border-color: rgba(74,163,255,.45);
+      box-shadow: 0 10px 24px rgba(74,163,255,.10);
+    }
+    .pill{
+      font-size:11px;
+      padding:2px 8px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.14);
+      color:var(--muted);
+      background:rgba(255,255,255,.06);
+    }
+    .pill.good{
+      border-color: rgba(43,213,118,.45);
+      background: rgba(43,213,118,.10);
+      color: #bff5d7;
+    }
+    .pill.bad{
+      border-color: rgba(255,92,92,.45);
+      background: rgba(255,92,92,.10);
+      color: #ffd2d2;
+    }
+
+    /* Panels */
+    .panel{
+      display:none;
+      border-radius: var(--radius);
+      border:1px solid rgba(255,255,255,.08);
+      background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+      box-shadow: var(--shadow);
+      padding:16px;
+    }
+    .panel[aria-hidden="false"]{ display:block; }
+
+    /* Browser bar */
+    .browserbar{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding:10px 12px;
+      border-radius: 14px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.20);
+      margin-bottom:14px;
+    }
+    .dots{ display:flex; gap:6px; }
+    .dot{
+      width:10px; height:10px;
+      border-radius:999px;
+      background: rgba(255,255,255,.16);
+    }
+    .address{
+      flex:1;
+      display:flex;
+      align-items:center;
+      gap:8px;
+      padding:9px 10px;
+      border-radius:12px;
+      background: rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.10);
+      font-size:12px;
+      color: var(--muted);
+      overflow:hidden;
+      white-space:nowrap;
+      text-overflow:ellipsis;
+    }
+    .lock{ font-weight:900; }
+    .lock.good{ color: var(--good); }
+    .lock.bad{ color: var(--danger); }
+
+    /* Card */
+    .card{
+      max-width:520px;
+      margin:0 auto;
+      border-radius: var(--radius);
+      background: rgba(17,26,46,.78);
+      border:1px solid rgba(255,255,255,.10);
+      padding:18px;
+      box-shadow: 0 12px 30px rgba(0,0,0,.25);
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      margin-bottom:10px;
+    }
+    .logoImg{
+      width:40px;
+      height:40px;
+      border-radius:12px;
+      object-fit:cover;
+      background: rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.10);
+      box-shadow: 0 10px 18px rgba(0,0,0,.22);
+    }
+    .brandname{
+      display:flex;
+      flex-direction:column;
+      line-height:1.1;
+    }
+    .brandname strong{
+      font-size:16px;
+      letter-spacing:.2px;
+    }
+    .brandname span{
+      font-size:12px;
+      color:var(--muted);
+    }
+
+    h2{
+      margin:12px 0 6px;
+      font-size:18px;
+    }
+    .lead{
+      color: var(--muted);
+      font-size:13px;
+      line-height:1.45;
+      margin:0 0 14px;
+    }
+
+    label{
+      display:block;
+      font-size:12px;
+      color: var(--muted);
+      margin:12px 0 6px;
+    }
+    input{
+      width:100%;
+      padding:11px 12px;
+      border-radius: 12px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.18);
+      color: var(--text);
+      outline:none;
+    }
+    input:focus{
+      border-color: rgba(74,163,255,.55);
+      box-shadow: 0 0 0 3px rgba(74,163,255,.16);
+    }
+
+    .row{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      margin-top:12px;
+    }
+    .checkbox{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      color: var(--muted);
+      font-size:12px;
+      user-select:none;
+    }
+    .checkbox input{ width:auto; }
+
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      padding:11px 14px;
+      border-radius: 12px;
+      border:1px solid rgba(74,163,255,.50);
+      background: rgba(74,163,255,.18);
+      color: var(--text);
+      font-weight:800;
+      cursor:pointer;
+      white-space:nowrap;
+      transition: transform .08s ease, background .2s ease;
+    }
+    .btn:active{ transform: translateY(1px); }
+    .btn:hover{ background: rgba(74,163,255,.24); }
+
+    .dangerBox{
+      margin-top:12px;
+      padding:10px 12px;
+      border-radius:12px;
+      border:1px solid rgba(255,92,92,.35);
+      background: rgba(255,92,92,.08);
+      color:#ffd2d2;
+      font-size:12px;
+      line-height:1.35;
+    }
+    .smallLinks{
+      margin-top:12px;
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      font-size:12px;
+      color: var(--muted);
+      flex-wrap:wrap;
+    }
+    a{
+      color:#cfe6ff;
+      text-decoration:none;
+      border-bottom:1px solid rgba(207,230,255,.25);
+    }
+    a:hover{ border-bottom-color: rgba(207,230,255,.55); }
+
+    .foot{
+      margin-top:14px;
+      padding-top:14px;
+      border-top:1px solid rgba(255,255,255,.08);
+      color: var(--muted);
+      font-size:12px;
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    /* Credit-card faux fields */
+    .grid2{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:10px;
+    }
+    @media (max-width:560px){
+      .grid2{ grid-template-columns:1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <nav class="tabs" role="tablist" aria-label="Переключатель сайтов">
+      <button class="tab" role="tab" id="tab-1" aria-controls="panel-1" aria-selected="false">
+        Сайт 1 
+      </button>
+      <button class="tab" role="tab" id="tab-2" aria-controls="panel-2" aria-selected="true">
+        Сайт 2 
+      </button>
+      <button class="tab" role="tab" id="tab-3" aria-controls="panel-3" aria-selected="false">
+        Сайт 3 
+      </button>
+    </nav>
+
+    <!-- Panel 1: "Correct" but HTTP -->
+    <section class="panel" id="panel-1" role="tabpanel" aria-labelledby="tab-1" aria-hidden="true">
+      <div class="browserbar" aria-label="Адресная строка">
+        <div class="dots" aria-hidden="true">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+        </div>
+        <div class="address" title="http://myvideo.ru/login">
+          <span class="lock bad">⚠</span>
+          http://myvideo.ru/login
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="brand">
+          <!-- ЗАМЕНИ logo.png на имя твоего файла (положи рядом с index.html) -->
+          <img class="logoImg" src="logo.png" alt="MyVideo" />
+          <div class="brandname">
+            <strong>MyVideo</strong>
+            <span>Вход в аккаунт</span>
+          </div>
+        </div>
+
+        <h2>Авторизация</h2>
+        <p class="lead">Войдите, чтобы загружать видео и управлять каналом.</p>
+
+        <form onsubmit="return false;" autocomplete="on">
+          <label for="login1">Электронная почта или логин</label>
+          <input id="login1" name="login" type="text" placeholder="example@mail.ru" />
+
+          <label for="pass1">Пароль</label>
+          <input id="pass1" name="password" type="password" placeholder="••••••••" />
+
+          <div class="row">
+            <label class="checkbox">
+              <input type="checkbox" name="remember" />
+              Запомнить меня
+            </label>
+            <button class="btn" type="submit">Войти</button>
+          </div>
+        </form>
+
+        <div class="smallLinks">
+          <a href="#" onclick="return false;">Забыли пароль?</a>
+          <a href="#" onclick="return false;">Регистрация</a>
+          <a href="#" onclick="return false;">Поддержка</a>
+        </div>
+
+        <div class="foot">
+          <span>© MyVideo</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Panel 2: Correct HTTPS -->
+    <section class="panel" id="panel-2" role="tabpanel" aria-labelledby="tab-2" aria-hidden="false">
+      <div class="browserbar" aria-label="Адресная строка">
+        <div class="dots" aria-hidden="true">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+        </div>
+        <div class="address" title="https://myvideo.ru/login">
+          <span class="lock good">🔒</span>
+          https://myvideo.ru/login
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="brand">
+          <img class="logoImg" src="logo.png" alt="MyVideo" />
+          <div class="brandname">
+            <strong>MyVideo</strong>
+            <span>Вход в аккаунт</span>
+          </div>
+        </div>
+
+        <h2>Авторизация</h2>
+        <p class="lead">Войдите, чтобы загружать видео и управлять каналом.</p>
+
+        <form onsubmit="return false;" autocomplete="on">
+          <label for="login2">Электронная почта или логин</label>
+          <input id="login2" name="login" type="text" placeholder="example@mail.ru" />
+
+          <label for="pass2">Пароль</label>
+          <input id="pass2" name="password" type="password" placeholder="••••••••" />
+
+          <div class="row">
+            <label class="checkbox">
+              <input type="checkbox" name="remember" />
+              Запомнить меня
+            </label>
+            <button class="btn" type="submit">Войти</button>
+          </div>
+        </form>
+
+        <div class="smallLinks">
+          <a href="#" onclick="return false;">Забыли пароль?</a>
+          <a href="#" onclick="return false;">Регистрация</a>
+          <a href="#" onclick="return false;">Поддержка</a>
+        </div>
+
+        <div class="foot">
+          <span>© MyVideo</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Panel 3: Phishing — asks for card details -->
+    <section class="panel" id="panel-3" role="tabpanel" aria-labelledby="tab-3" aria-hidden="true">
+      <div class="browserbar" aria-label="Адресная строка">
+        <div class="dots" aria-hidden="true">
+          <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+        </div>
+        <div class="address" title="https://myvideo-security.ru/login">
+          <span class="lock good">🔒</span>
+          https://myvideo-security.ru/login
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="brand">
+          <img class="logoImg" src="logo.png" alt="MyVideo" />
+          <div class="brandname">
+            <strong>MyVideo Security</strong>
+            <span>Проверка личности</span>
+          </div>
+        </div>
+
+        <h2>Подтверждение аккаунта</h2>
+        <p class="lead">
+          Для вашей безопасности и защиты от взлома требуется подтвердить личность.
+          После проверки вы сможете продолжить загрузку видео.
+        </p>
+
+        <form onsubmit="return false;" autocomplete="off">
+          <label for="login3">Электронная почта или логин</label>
+          <input id="login3" name="login" type="text" placeholder="example@mail.ru" />
+
+          <label for="pass3">Пароль</label>
+          <input id="pass3" name="password" type="password" placeholder="••••••••" />
+
+          <label>Данные банковской карты (для подтверждения личности)</label>
+          <input name="cc" type="text" placeholder="Номер карты (16 цифр)" inputmode="numeric" />
+
+          <div class="grid2">
+            <input name="exp" type="text" placeholder="Срок (MM/YY)" inputmode="numeric" />
+            <input name="cvv" type="password" placeholder="CVV" inputmode="numeric" />
+          </div>
+
+          <div class="row">
+            <label class="checkbox">
+              <input type="checkbox" checked />
+              Я подтверждаю, что это мой аккаунт
+            </label>
+            <button class="btn" type="submit">Продолжить</button>
+          </div>
+
+          <div class="dangerBox">
+            Внимание: без подтверждения личности загрузка будет временно ограничена.
+            Проверка занимает до 2 минут.
+          </div>
+        </form>
+
+        <div class="smallLinks">
+          <a href="#" onclick="return false;">Политика безопасности</a>
+          <a href="#" onclick="return false;">Техподдержка</a>
+        </div>
+
+        <div class="foot">
+          <span>Служба проверки</span>
+          <span>© MyVideo</span>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    (function () {
+      const tabs = Array.from(document.querySelectorAll('[role="tab"]'));
+      const panels = Array.from(document.querySelectorAll('[role="tabpanel"]'));
+
+      function activateTab(tab) {
+        tabs.forEach(t => t.setAttribute('aria-selected', String(t === tab)));
+        panels.forEach(p => p.setAttribute('aria-hidden', String(p.id !== tab.getAttribute('aria-controls'))));
+        tab.focus();
+      }
+
+      tabs.forEach(tab => {
+        tab.addEventListener('click', () => activateTab(tab));
+        tab.addEventListener('keydown', (e) => {
+          const idx = tabs.indexOf(tab);
+          if (e.key === 'ArrowRight') {
+            e.preventDefault();
+            activateTab(tabs[(idx + 1) % tabs.length]);
+          } else if (e.key === 'ArrowLeft') {
+            e.preventDefault();
+            activateTab(tabs[(idx - 1 + tabs.length) % tabs.length]);
+          } else if (e.key === 'Home') {
+            e.preventDefault();
+            activateTab(tabs[0]);
+          } else if (e.key === 'End') {
+            e.preventDefault();
+            activateTab(tabs[tabs.length - 1]);
+          }
+        });
+      });
+
+      // По умолчанию открываем "правильный" https (вторая вкладка)
+      activateTab(document.getElementById('tab-2'));
+    })();
+  </script>
+</body>
+</html>
