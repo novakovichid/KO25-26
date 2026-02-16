@@ -8,13 +8,31 @@
     ARKHIMED: { salt: "s_arkhimed_v1", hash: "233ef44a72cb86590641b602d226908b9427a948de68bac9a628c8b4eb28908b", marker: ["ARKHIMED"], indexFile: "index.html" },
     LOVELACE: { salt: "s_lovelace_v1", hash: "6375620c7aa743a0f9e78b0beecfc64f40c0ba424e673e0fbdb1a90fdffb8b28", marker: ["LOVELACE"], indexFile: "index.html" },
     MORSE: { salt: "s_morse_v1", hash: "8bef6414e62bf04e84ab628cd2cc232830107b02369ba2c74df9c7eb963321b1", marker: ["MORSE"], indexFile: "index.html" },
-    VIGENERE: { salt: "s_vigenere_v1", hash: "4814a0dbd4c3dfb0fef13f1bda8f432f42e7391b5d685834ea3d76c1a3c8da74", marker: ["VIGENERE"], indexFile: "index.html" },
+    VIGENERE: {
+      salt: "s_vigenere_v1",
+      hash: "4814a0dbd4c3dfb0fef13f1bda8f432f42e7391b5d685834ea3d76c1a3c8da74",
+      hashes: [
+        "4814a0dbd4c3dfb0fef13f1bda8f432f42e7391b5d685834ea3d76c1a3c8da74", // AB password
+        "cdac273473a30e313998c636b95ee9777375959de0742a9b8860458c7cdfe446"  // M password
+      ],
+      profileByHash: {
+        "4814a0dbd4c3dfb0fef13f1bda8f432f42e7391b5d685834ea3d76c1a3c8da74": "AB",
+        "cdac273473a30e313998c636b95ee9777375959de0742a9b8860458c7cdfe446": "M"
+      },
+      defaultProfile: "AB",
+      marker: ["VIGENERE"],
+      indexFile: "index.html"
+    },
     DA_VINCI: { salt: "s_da_vinci_v1", hash: "c087c747e9dede340e6f924f013187417fb912fee8597ad1c154f491ef3978e6", marker: ["DA_VINCI"], indexFile: "index.html" },
     DEV: { salt: "s_dev_v1", hash: "754acf06e56211f0798e7536ccbbc08f31fe8ddd6749bf23a73b909e7e4b6971", marker: ["dev", "morse"], indexFile: "editor.html" }
   };
 
   function storageKey(sectionId) {
     return `section.auth.${sectionId}`;
+  }
+
+  function profileStorageKey(sectionId) {
+    return `section.auth.profile.${sectionId}`;
   }
 
   function getConfig(sectionId) {
@@ -37,9 +55,40 @@
     return sha256Hex(`${sectionId}|${cfg.salt}|${password}|${PEPPER}`);
   }
 
-  async function buildSessionToken(sectionId) {
+  function getAllowedHashes(sectionId) {
     const cfg = getConfig(sectionId);
-    return sha256Hex(`${sectionId}|${cfg.salt}|${cfg.hash}|${SESSION_TAG}`);
+    if (Array.isArray(cfg.hashes) && cfg.hashes.length) return cfg.hashes.slice();
+    if (typeof cfg.hash === "string" && cfg.hash) return [cfg.hash];
+    return [];
+  }
+
+  function getProfileFromHash(sectionId, hash) {
+    const cfg = getConfig(sectionId);
+    if (!cfg.profileByHash || typeof cfg.profileByHash !== "object") return "";
+    const profile = cfg.profileByHash[hash];
+    return typeof profile === "string" ? profile : "";
+  }
+
+  function getDefaultProfile(sectionId) {
+    const cfg = getConfig(sectionId);
+    if (typeof cfg.defaultProfile === "string" && cfg.defaultProfile) return cfg.defaultProfile;
+    if (cfg.profileByHash && typeof cfg.profileByHash === "object") {
+      const vals = Object.values(cfg.profileByHash).filter((v) => typeof v === "string" && v);
+      if (vals.length) return vals[0];
+    }
+    return "";
+  }
+
+  function getProfile(sectionId) {
+    const stored = sessionStorage.getItem(profileStorageKey(sectionId));
+    if (stored) return stored;
+    return getDefaultProfile(sectionId);
+  }
+
+  async function buildSessionToken(sectionId, hashOverride = "") {
+    const cfg = getConfig(sectionId);
+    const hash = hashOverride || getAllowedHashes(sectionId)[0] || "";
+    return sha256Hex(`${sectionId}|${cfg.salt}|${hash}|${SESSION_TAG}`);
   }
 
   function safeEqual(a, b) {
@@ -50,9 +99,14 @@
   }
 
   async function isUnlocked(sectionId) {
-    const expected = await buildSessionToken(sectionId);
     const actual = sessionStorage.getItem(storageKey(sectionId));
-    return safeEqual(actual || "", expected);
+    if (!actual) return false;
+    const allowed = getAllowedHashes(sectionId);
+    for (let i = 0; i < allowed.length; i++) {
+      const expected = await buildSessionToken(sectionId, allowed[i]);
+      if (safeEqual(actual, expected)) return true;
+    }
+    return false;
   }
 
   function normalizeNext(raw) {
@@ -135,7 +189,7 @@
     }
   }
 
-  async function initIndex(sectionId) {
+  async function initIndex(sectionId, options = {}) {
     const lockEl = document.getElementById("authLock");
     const contentEl = document.getElementById("sectionContent");
     const inputEl = document.getElementById("sectionPassword");
@@ -150,6 +204,10 @@
     };
 
     if (await isUnlocked(sectionId)) {
+      const currentProfile = getProfile(sectionId);
+      if (typeof options.onAlreadyUnlocked === "function") {
+        try { options.onAlreadyUnlocked({ sectionId, profile: currentProfile }); } catch (_) {}
+      }
       showContent();
       return;
     }
@@ -161,17 +219,30 @@
     const tryUnlock = async () => {
       const entered = inputEl.value || "";
       const inputHash = await buildInputHash(sectionId, entered);
-      const targetHash = getConfig(sectionId).hash;
-      if (!safeEqual(inputHash, targetHash)) {
+      const allowedHashes = getAllowedHashes(sectionId);
+      let matchedHash = "";
+      for (let i = 0; i < allowedHashes.length; i++) {
+        if (safeEqual(inputHash, allowedHashes[i])) {
+          matchedHash = allowedHashes[i];
+          break;
+        }
+      }
+      if (!matchedHash) {
         errorEl.textContent = "Неверный пароль.";
         inputEl.select();
         return;
       }
 
-      const token = await buildSessionToken(sectionId);
+      const token = await buildSessionToken(sectionId, matchedHash);
       sessionStorage.setItem(storageKey(sectionId), token);
+      const profile = getProfileFromHash(sectionId, matchedHash) || getDefaultProfile(sectionId);
+      if (profile) sessionStorage.setItem(profileStorageKey(sectionId), profile);
       errorEl.textContent = "";
       inputEl.value = "";
+
+      if (typeof options.onUnlockSuccess === "function") {
+        try { options.onUnlockSuccess({ sectionId, profile, matchedHash }); } catch (_) {}
+      }
 
       const next = normalizeNext(new URLSearchParams(window.location.search).get("next") || "");
       if (next) {
@@ -187,5 +258,5 @@
     });
   }
 
-  window.SectionAuth = { guardPage, initIndex };
+  window.SectionAuth = { guardPage, initIndex, getProfile };
 })();

@@ -291,15 +291,33 @@
     @media (max-width:560px){
       .grid2{ grid-template-columns:1fr; }
     }
+
+    .back-menu{
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 1200;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.25);
+      background: rgba(15,118,110,.92);
+      color:#fff;
+      text-decoration:none;
+      font-weight:800;
+      padding:10px 14px;
+      box-shadow: 0 10px 22px rgba(0,0,0,.28);
+    }
+    .back-menu:hover{
+      background: rgba(13,148,136,.95);
+    }
   </style>
 </head>
 <body>
   <div class="wrap">
     <nav class="tabs" role="tablist" aria-label="Переключатель сайтов">
-      <button class="tab" role="tab" id="tab-1" aria-controls="panel-1" aria-selected="false">
+      <button class="tab" role="tab" id="tab-1" aria-controls="panel-1" aria-selected="true">
         Сайт 1 
       </button>
-      <button class="tab" role="tab" id="tab-2" aria-controls="panel-2" aria-selected="true">
+      <button class="tab" role="tab" id="tab-2" aria-controls="panel-2" aria-selected="false">
         Сайт 2 
       </button>
       <button class="tab" role="tab" id="tab-3" aria-controls="panel-3" aria-selected="false">
@@ -308,7 +326,7 @@
     </nav>
 
     <!-- Panel 1: "Correct" but HTTP -->
-    <section class="panel" id="panel-1" role="tabpanel" aria-labelledby="tab-1" aria-hidden="true">
+    <section class="panel" id="panel-1" role="tabpanel" aria-labelledby="tab-1" aria-hidden="false">
       <div class="browserbar" aria-label="Адресная строка">
         <div class="dots" aria-hidden="true">
           <span class="dot"></span><span class="dot"></span><span class="dot"></span>
@@ -361,7 +379,7 @@
     </section>
 
     <!-- Panel 2: Correct HTTPS -->
-    <section class="panel" id="panel-2" role="tabpanel" aria-labelledby="tab-2" aria-hidden="false">
+    <section class="panel" id="panel-2" role="tabpanel" aria-labelledby="tab-2" aria-hidden="true">
       <div class="browserbar" aria-label="Адресная строка">
         <div class="dots" aria-hidden="true">
           <span class="dot"></span><span class="dot"></span><span class="dot"></span>
@@ -480,6 +498,7 @@
       </div>
     </section>
   </div>
+  <a class="back-menu" href="../index.html">Назад</a>
 
   <script>
     (function () {
@@ -512,8 +531,8 @@
         });
       });
 
-      // По умолчанию открываем "правильный" https (вторая вкладка)
-      activateTab(document.getElementById('tab-2'));
+      // По умолчанию открываем первую вкладку
+      activateTab(document.getElementById('tab-1'));
     })();
   </script>
 </body>

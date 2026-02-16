@@ -20,7 +20,11 @@
     .goal { border:1px solid #c7d2fe; background:#eef2ff; color:#3730a3; border-radius:10px; padding:9px 12px; font-weight:700; }
     .layout { display:grid; gap:12px; grid-template-columns: 1fr 360px; align-items:start; }
     .grid-wrap { overflow:auto; border:1px solid var(--border); border-radius:12px; background:#fafafa; padding:12px; min-height:300px; }
-    .grid { display:grid; gap:var(--gap); width:max-content; margin:0 auto; }
+    .coords-top { display:grid; gap:var(--gap); margin-left:calc(var(--cell-size) + var(--gap)); }
+    .board-main { display:grid; grid-template-columns: var(--cell-size) auto; gap:var(--gap); align-items:start; width:max-content; margin:0 auto; }
+    .coords-left { display:grid; gap:var(--gap); width:var(--cell-size); }
+    .coord { width:var(--cell-size); height:var(--cell-size); color:#374151; display:grid; place-items:center; font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace; font-size:13px; font-weight:700; user-select:none; }
+    .grid { display:grid; gap:var(--gap); width:max-content; margin:0; }
     .cell { width:var(--cell-size); height:var(--cell-size); border-radius:9px; border:1px solid #9ca3af; background:#fff; color:#111827; display:grid; place-items:center; font-weight:700; cursor:pointer; user-select:none; }
     .cell.one { background:#111827; color:#fff; border-color:#111827; }
     .panel { border:1px solid var(--border); border-radius:12px; background:#fcfcfd; padding:10px; display:grid; gap:8px; align-content:start; }
@@ -43,7 +47,13 @@
       </section>
 
       <section class="layout">
-        <div class="grid-wrap"><div id="grid" class="grid" aria-label="Поле задачи"></div></div>
+        <div class="grid-wrap">
+          <div id="colCoords" class="coords-top"></div>
+          <div class="board-main">
+            <div id="rowCoords" class="coords-left"></div>
+            <div id="grid" class="grid" aria-label="Поле задачи"></div>
+          </div>
+        </div>
         <aside class="panel">
           <h3>История шагов</h3>
           <div id="solveInfo" class="hint"></div>
@@ -67,6 +77,8 @@
     const redoBtn = document.getElementById("redo");
     const stepCounterEl = document.getElementById("stepCounter");
     const gridEl = document.getElementById("grid");
+    const colCoordsEl = document.getElementById("colCoords");
+    const rowCoordsEl = document.getElementById("rowCoords");
     const solveInfoEl = document.getElementById("solveInfo");
     const movesDumpEl = document.getElementById("movesDump");
 
@@ -113,6 +125,25 @@
 
     function moveCode6(move) {
       return `${bin3(move.r)}${bin3(move.c)}`;
+    }
+
+    function renderCoords() {
+      colCoordsEl.style.gridTemplateColumns = `repeat(${n}, var(--cell-size))`;
+      rowCoordsEl.style.gridTemplateRows = `repeat(${n}, var(--cell-size))`;
+      colCoordsEl.innerHTML = "";
+      rowCoordsEl.innerHTML = "";
+      for (let c = 0; c < n; c++) {
+        const el = document.createElement("div");
+        el.className = "coord";
+        el.textContent = bin3(c);
+        colCoordsEl.appendChild(el);
+      }
+      for (let r = 0; r < n; r++) {
+        const el = document.createElement("div");
+        el.className = "coord";
+        el.textContent = bin3(r);
+        rowCoordsEl.appendChild(el);
+      }
     }
 
     function movesToStrictCode(moves) {
@@ -363,6 +394,7 @@
     }
 
     function render() {
+      renderCoords();
       renderGrid();
       updatePanel();
     }

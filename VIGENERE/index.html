@@ -19,7 +19,7 @@
           <button id="unlockSection" class="rounded-xl bg-teal-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-teal-700">Открыть</button>
         </div>
         <div id="sectionError" class="mt-2 min-h-5 text-sm font-semibold text-red-700"></div>
-        <a href="../index.html" class="mt-6 inline-flex items-center rounded-xl bg-slate-700 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800">Назад в корень</a>
+        <a href="../index.html" class="mt-6 inline-flex items-center rounded-xl bg-slate-700 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800">На главную</a>
       </section>
 
       <section id="sectionContent" hidden>
@@ -46,17 +46,53 @@
           <a href="./message_blogger_3/files/" class="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 font-semibold transition hover:border-teal-300 hover:bg-teal-50">
             Послание блогеру - 3
           </a>
-          <a href="./corrupted_file_ab/corrupted_file_ab.jpg" download class="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 font-semibold transition hover:border-teal-300 hover:bg-teal-50">
-            Повреждённый файл AB
-          </a>
-          <a href="./corrupted_file_m/corrupted_archive" download class="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 font-semibold transition hover:border-teal-300 hover:bg-teal-50">
-            Повреждённый файл M
+          <a id="corruptedLink" href="./corrupted_file_ab/corrupted_file_ab.jpg" download class="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 font-semibold transition hover:border-teal-300 hover:bg-teal-50">
+            Повреждённый файл **
           </a>
         </div>
-        <a href="../index.html" class="mt-6 inline-flex items-center rounded-xl bg-teal-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-teal-700">Назад в корень</a>
+        <a href="../index.html" class="mt-6 inline-flex items-center rounded-xl bg-teal-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-teal-700">На главную</a>
       </section>
     </main>
   </div>
-  <script>window.SectionAuth && window.SectionAuth.initIndex("VIGENERE");</script>
+  <script>
+    function profileCode(profile) {
+      return profile === "M" ? "m" : "ab";
+    }
+
+    function redirectToProfile(profile) {
+      const params = new URLSearchParams(window.location.search);
+      if (params.has("next")) return;
+      const v = profileCode(profile);
+      if (params.get("v") === v) return;
+      const url = new URL(window.location.href);
+      url.searchParams.set("v", v);
+      window.location.replace(url.toString());
+    }
+
+    function applyVigenereVariant(profile) {
+      const corruptedLinkEl = document.getElementById("corruptedLink");
+      if (!corruptedLinkEl) return;
+      if (profile === "M") {
+        // M-version: different corrupted file, letter M hidden in caption.
+        corruptedLinkEl.href = "./corrupted_file_m/corrupted_archive";
+        corruptedLinkEl.textContent = "Повреждённый файл *";
+      } else {
+        // AB-version: default corrupted file, letters AB hidden in caption.
+        corruptedLinkEl.href = "./corrupted_file_ab/corrupted_file_ab.jpg";
+        corruptedLinkEl.textContent = "Повреждённый файл **";
+      }
+    }
+
+    if (window.SectionAuth) {
+      window.SectionAuth.initIndex("VIGENERE", {
+        onAlreadyUnlocked: ({ profile }) => applyVigenereVariant(profile),
+        onUnlockSuccess: ({ profile }) => {
+          applyVigenereVariant(profile);
+          redirectToProfile(profile);
+        }
+      });
+      applyVigenereVariant(window.SectionAuth.getProfile("VIGENERE"));
+    }
+  </script>
 </body>
 </html>
