@@ -46,8 +46,8 @@
           <a href="./message_blogger_3/files/" class="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 font-semibold transition hover:border-teal-300 hover:bg-teal-50">
             Послание блогеру - 3
           </a>
-          <a id="corruptedLink" href="./corrupted_file_ab/corrupted_file_ab.jpg" download class="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 font-semibold transition hover:border-teal-300 hover:bg-teal-50">
-            Повреждённый файл **
+          <a id="corruptedLink" href="./corrupted_file_1/corrupted_file_1.jpg" download class="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 font-semibold transition hover:border-teal-300 hover:bg-teal-50">
+            Повреждённый файл
           </a>
         </div>
         <a href="../index.html" class="mt-6 inline-flex items-center rounded-xl bg-teal-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-teal-700">На главную</a>
@@ -73,13 +73,11 @@
       const corruptedLinkEl = document.getElementById("corruptedLink");
       if (!corruptedLinkEl) return;
       if (profile === "M") {
-        // M-version: different corrupted file, letter M hidden in caption.
-        corruptedLinkEl.href = "./corrupted_file_m/corrupted_archive";
-        corruptedLinkEl.textContent = "Повреждённый файл *";
+        corruptedLinkEl.href = "./corrupted_file_2/corrupted_archive";
+        corruptedLinkEl.textContent = "Повреждённый файл";
       } else {
-        // AB-version: default corrupted file, letters AB hidden in caption.
-        corruptedLinkEl.href = "./corrupted_file_ab/corrupted_file_ab.jpg";
-        corruptedLinkEl.textContent = "Повреждённый файл **";
+        corruptedLinkEl.href = "./corrupted_file_1/corrupted_file_1.jpg";
+        corruptedLinkEl.textContent = "Повреждённый файл";
       }
     }
 
