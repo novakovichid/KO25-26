@@ -1,0 +1,757 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E%F0%9F%A7%91%E2%80%8D%F0%9F%94%AC%3C/text%3E%3C/svg%3E">
+  <title>Эмодзи-программирование</title>
+  <script src="../section-auth.js"></script>
+  <script>window.SectionAuth && window.SectionAuth.guardPage("LOVELACE");</script>
+  <style>
+    :root {
+      --bg: #f3f4f6;
+      --panel: #ffffff;
+      --text: #111827;
+      --muted: #6b7280;
+      --border: #d1d5db;
+      --accent: #0f766e;
+      --accent-strong: #115e59;
+      --danger-bg: #fee2e2;
+      --danger-fg: #991b1b;
+      --ok-bg: #dcfce7;
+      --ok-fg: #166534;
+      --warn-bg: #fef3c7;
+      --warn-fg: #92400e;
+      --emoji-font: "Noto Color Emoji", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Sans", "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: radial-gradient(circle at 20% 0%, #ffffff, var(--bg));
+      color: var(--text);
+      font-family: "Segoe UI", "Noto Sans", sans-serif;
+      padding: 20px;
+    }
+
+    .app {
+      width: min(1320px, 100%);
+      margin: 0 auto;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 16px;
+      box-shadow: 0 14px 30px rgba(17, 24, 39, 0.09);
+      display: grid;
+      gap: 12px;
+    }
+
+    .topbar {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+
+    .title {
+      margin: 0;
+      font-size: clamp(1.35rem, 2vw, 1.8rem);
+      font-weight: 900;
+      letter-spacing: -0.02em;
+    }
+
+    .back-link {
+      text-decoration: none;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      background: #fff;
+      padding: 8px 12px;
+      font-weight: 700;
+      transition: 120ms ease;
+    }
+
+    .back-link:hover {
+      border-color: #9ca3af;
+      transform: translateY(-1px);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 12px;
+      align-items: start;
+    }
+
+    .panel {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: #fcfcfd;
+      padding: 12px;
+      display: grid;
+      gap: 10px;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 1rem;
+      font-weight: 800;
+    }
+
+    label {
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    textarea {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: #fff;
+      color: var(--text);
+      padding: 10px 12px;
+      outline: none;
+      transition: 120ms ease;
+      resize: vertical;
+    }
+
+    textarea:focus {
+      border-color: #0ea5a4;
+      box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.2);
+    }
+
+    .emoji-field {
+      font-family: var(--emoji-font);
+      font-size: 18px;
+      line-height: 1.45;
+    }
+
+    .code-input {
+      min-height: 320px;
+    }
+
+    .stdin-input {
+      min-height: 84px;
+    }
+
+    .output-box {
+      min-height: 140px;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .examples {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    button {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: #fff;
+      color: var(--text);
+      font: inherit;
+      font-weight: 700;
+      padding: 9px 12px;
+      cursor: pointer;
+      transition: 120ms ease;
+    }
+
+    button:hover {
+      border-color: #9ca3af;
+      transform: translateY(-1px);
+    }
+
+    button:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    button.primary {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    button.primary:hover {
+      background: var(--accent-strong);
+      border-color: var(--accent-strong);
+    }
+
+    .status-box {
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      padding: 10px 12px;
+      font-weight: 700;
+      background: #f3f4f6;
+      color: #1f2937;
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+    }
+
+    .status-box.ok {
+      background: var(--ok-bg);
+      color: var(--ok-fg);
+      border-color: #86efac;
+    }
+
+    .status-box.error {
+      background: var(--danger-bg);
+      color: var(--danger-fg);
+      border-color: #fca5a5;
+    }
+
+    .status-box.warn {
+      background: var(--warn-bg);
+      color: var(--warn-fg);
+      border-color: #fcd34d;
+    }
+
+    .step-count {
+      font-weight: 700;
+      color: #1f2937;
+      font-size: 14px;
+    }
+
+    .keyboard {
+      display: grid;
+      gap: 10px;
+    }
+
+    .emoji-group {
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      background: #fff;
+      padding: 10px;
+    }
+
+    .emoji-group.group-1 { background: linear-gradient(180deg, #ffffff, #f8fafc); }
+    .emoji-group.group-2 { background: linear-gradient(180deg, #ffffff, #f9fafb); }
+    .emoji-group.group-3 { background: linear-gradient(180deg, #ffffff, #f0fdfa); }
+
+    .emoji-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(40px, 1fr));
+      gap: 6px;
+    }
+
+    .emoji-btn {
+      font-family: var(--emoji-font);
+      font-size: 22px;
+      line-height: 1;
+      padding: 8px 6px;
+      min-height: 40px;
+      display: grid;
+      place-items: center;
+    }
+
+    .vars-panel[hidden] {
+      display: none !important;
+    }
+
+    @media (max-width: 1040px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <h1 class="title">Эмодзи-программирование</h1>
+      <a href="../index.html" class="back-link">На главную</a>
+    </header>
+
+    <section class="layout">
+      <section class="panel">
+        <h2>Программа</h2>
+        <label for="codeInput">Код</label>
+        <textarea id="codeInput" class="emoji-field code-input" spellcheck="false" autocomplete="off" autocapitalize="off"></textarea>
+
+        <label for="stdinInput">Входные данные</label>
+        <textarea id="stdinInput" class="emoji-field stdin-input" spellcheck="false" autocomplete="off" autocapitalize="off"></textarea>
+
+        <div class="controls">
+          <button id="runBtn" class="primary">Запустить</button>
+          <button id="resetBtn">Сброс</button>
+        </div>
+
+        <div class="examples">
+          <button id="example1Btn">Пример №1</button>
+          <button id="example2Btn">Пример №2</button>
+          <button id="example3Btn">Пример №3</button>
+        </div>
+      </section>
+
+      <aside class="panel">
+        <h2>Emoji-клавиатура</h2>
+        <div id="emojiKeyboard" class="keyboard"></div>
+
+        <h2>Состояние</h2>
+        <div id="statusBox" class="status-box">Ожидание запуска.</div>
+        <div id="stepCount" class="step-count">Шаги: 0</div>
+
+        <label for="outputBox">Вывод</label>
+        <textarea id="outputBox" class="emoji-field output-box" readonly></textarea>
+      </aside>
+    </section>
+
+    <section class="vars-panel" hidden>
+      <h2>Состояние переменных</h2>
+      <div id="varsGrid"></div>
+    </section>
+  </main>
+
+  <script>
+    const COMMAND_EMOJIS = ["🌞", "⭐", "🎲", "😎", "😀", "➕", "➖", "✖", "➗", "➰", "🤔", "😐"];
+    const VARIABLE_EMOJIS = [
+      "♈", "♉", "♊", "♋", "♌", "♍", "♎", "♏", "♐", "♑", "♒", "♓",
+      "🕐", "🕑", "🕒", "🕓", "🕔", "🕕", "🕖", "🕗", "🕘", "🕙", "🕚", "🕛",
+      "🚨"
+    ];
+    const DIGIT_EMOJIS = ["🆚", "📌", "✌", "🤟", "🤞", "🖐", "🤘", "👌", "👍", "👊"];
+    const DIGIT_TO_VALUE = new Map(DIGIT_EMOJIS.map((emoji, idx) => [emoji, String(idx)]));
+
+    const KEYBOARD_GROUPS = [COMMAND_EMOJIS, VARIABLE_EMOJIS, DIGIT_EMOJIS];
+
+    const EXAMPLES = [
+      {
+        code: [
+          "🌞♈📌",
+          "😀♈"
+        ].join("\n"),
+        input: ""
+      },
+      {
+        code: [
+          "⭐♈",
+          "🌞♉📌",
+          "➕♈♉",
+          "😎♈",
+          "😀♈"
+        ].join("\n"),
+        input: "A"
+      },
+      {
+        code: [
+          "🌞♈📌🆚",
+          "🌞♉📌👍",
+          "🎲♊♈♉",
+          "🌞♋✌",
+          "➰♊♋",
+          "😀♊",
+          "🌞♌📌",
+          "🤔♊♌",
+          "🌞♍👌👍",
+          "😎♍",
+          "😐"
+        ].join("\n"),
+        input: ""
+      }
+    ];
+
+    const HARD_STEP_LIMIT = 200000;
+    const YIELD_EVERY = 1500;
+
+    const codeInputEl = document.getElementById("codeInput");
+    const stdinInputEl = document.getElementById("stdinInput");
+    const runBtn = document.getElementById("runBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const example1Btn = document.getElementById("example1Btn");
+    const example2Btn = document.getElementById("example2Btn");
+    const example3Btn = document.getElementById("example3Btn");
+    const statusBoxEl = document.getElementById("statusBox");
+    const stepCountEl = document.getElementById("stepCount");
+    const outputBoxEl = document.getElementById("outputBox");
+    const emojiKeyboardEl = document.getElementById("emojiKeyboard");
+
+    const VARIABLE_SET = new Set(VARIABLE_EMOJIS);
+    let lastFocusedField = codeInputEl;
+
+    function makeError(kind, line, message) {
+      const err = new Error(message);
+      err.kind = kind;
+      err.line = line;
+      return err;
+    }
+
+    function normalizeCodeLine(line) {
+      return String(line || "").replace(/\uFE0F/g, "").replace(/\s+/g, "");
+    }
+
+    function requireVariable(symbol, line) {
+      if (!VARIABLE_SET.has(symbol)) {
+        throw makeError("parse", line, `Ожидалась переменная, получено: ${symbol || "пусто"}.`);
+      }
+      return symbol;
+    }
+
+    function parseEmojiNumber(emojis, line) {
+      if (!emojis.length) {
+        throw makeError("parse", line, "Команда 🌞 требует хотя бы одну emoji-цифру.");
+      }
+      let valueText = "";
+      for (let i = 0; i < emojis.length; i++) {
+        const value = DIGIT_TO_VALUE.get(emojis[i]);
+        if (typeof value !== "string") {
+          throw makeError("parse", line, `Неизвестная emoji-цифра: ${emojis[i]}.`);
+        }
+        valueText += value;
+      }
+      const numeric = Number(valueText);
+      if (!Number.isFinite(numeric)) {
+        throw makeError("parse", line, `Число не удалось распознать: ${valueText}.`);
+      }
+      return Math.trunc(numeric);
+    }
+
+    function parseProgram(source) {
+      const lines = String(source || "").replace(/\r\n?/g, "\n").split("\n");
+      const instructions = [];
+      const ifStack = [];
+
+      for (let idx = 0; idx < lines.length; idx++) {
+        const lineNo = idx + 1;
+        const compactLine = normalizeCodeLine(lines[idx]);
+        if (!compactLine) continue;
+
+        const tokens = Array.from(compactLine);
+        const op = tokens[0];
+
+        if (op === "🌞") {
+          if (tokens.length < 3) {
+            throw makeError("parse", lineNo, "Команда 🌞 требует формат: 🌞<переменная><emoji-число>.");
+          }
+          const target = requireVariable(tokens[1], lineNo);
+          const value = parseEmojiNumber(tokens.slice(2), lineNo);
+          instructions.push({ type: "set", target, value, line: lineNo });
+          continue;
+        }
+
+        if (op === "⭐") {
+          if (tokens.length !== 2) throw makeError("parse", lineNo, "Команда ⭐ требует формат: ⭐<переменная>.");
+          instructions.push({ type: "readChar", target: requireVariable(tokens[1], lineNo), line: lineNo });
+          continue;
+        }
+
+        if (op === "🎲") {
+          if (tokens.length !== 4) throw makeError("parse", lineNo, "Команда 🎲 требует формат: 🎲<переменная><lowVar><highVar>.");
+          instructions.push({
+            type: "random",
+            target: requireVariable(tokens[1], lineNo),
+            low: requireVariable(tokens[2], lineNo),
+            high: requireVariable(tokens[3], lineNo),
+            line: lineNo
+          });
+          continue;
+        }
+
+        if (op === "😎") {
+          if (tokens.length !== 2) throw makeError("parse", lineNo, "Команда 😎 требует формат: 😎<переменная>.");
+          instructions.push({ type: "printChar", target: requireVariable(tokens[1], lineNo), line: lineNo });
+          continue;
+        }
+
+        if (op === "😀") {
+          if (tokens.length !== 2) throw makeError("parse", lineNo, "Команда 😀 требует формат: 😀<переменная>.");
+          instructions.push({ type: "printNumber", target: requireVariable(tokens[1], lineNo), line: lineNo });
+          continue;
+        }
+
+        if (op === "➕" || op === "➖" || op === "✖" || op === "➗" || op === "➰") {
+          if (tokens.length !== 3) {
+            throw makeError("parse", lineNo, `Команда ${op} требует формат: ${op}<переменная><переменная>.`);
+          }
+          instructions.push({
+            type: "math",
+            op,
+            left: requireVariable(tokens[1], lineNo),
+            right: requireVariable(tokens[2], lineNo),
+            line: lineNo
+          });
+          continue;
+        }
+
+        if (op === "🤔") {
+          if (tokens.length !== 3) throw makeError("parse", lineNo, "Команда 🤔 требует формат: 🤔<переменная><переменная>.");
+          instructions.push({
+            type: "ifEq",
+            left: requireVariable(tokens[1], lineNo),
+            right: requireVariable(tokens[2], lineNo),
+            jumpTo: -1,
+            line: lineNo
+          });
+          ifStack.push(instructions.length - 1);
+          continue;
+        }
+
+        if (op === "😐") {
+          if (tokens.length !== 1) throw makeError("parse", lineNo, "Команда 😐 не принимает аргументы.");
+          if (!ifStack.length) throw makeError("parse", lineNo, "Лишний 😐 без открывающего 🤔.");
+          const ifIndex = ifStack.pop();
+          instructions.push({ type: "ifEnd", ifIndex, line: lineNo });
+          const endIndex = instructions.length - 1;
+          instructions[ifIndex].jumpTo = endIndex + 1;
+          continue;
+        }
+
+        throw makeError("parse", lineNo, `Неизвестная команда: ${op}.`);
+      }
+
+      if (ifStack.length) {
+        const firstUnclosed = instructions[ifStack[0]];
+        throw makeError("parse", firstUnclosed.line, "Блок 🤔 не закрыт командой 😐.");
+      }
+
+      return instructions;
+    }
+
+    function initialVariables() {
+      const out = {};
+      for (let i = 0; i < VARIABLE_EMOJIS.length; i++) out[VARIABLE_EMOJIS[i]] = 0;
+      return out;
+    }
+
+    function assertFiniteNumber(value, line, context) {
+      if (!Number.isFinite(value)) {
+        throw makeError("runtime", line, `${context}: получено нечисловое значение.`);
+      }
+      return Math.trunc(value);
+    }
+
+    function setStatus(kind, message) {
+      statusBoxEl.className = `status-box ${kind}`;
+      statusBoxEl.textContent = message;
+    }
+
+    function resetResultPanels() {
+      setStatus("", "Ожидание запуска.");
+      stepCountEl.textContent = "Шаги: 0";
+      outputBoxEl.value = "";
+    }
+
+    async function executeProgram(instructions, inputText) {
+      const vars = initialVariables();
+      const inputBuffer = Array.from(inputText || "");
+      let output = "";
+      let pc = 0;
+      let steps = 0;
+
+      while (pc < instructions.length) {
+        if (steps >= HARD_STEP_LIMIT) {
+          return {
+            status: "limit",
+            message: `Превышен внутренний лимит шагов (${HARD_STEP_LIMIT}).`,
+            steps,
+            output,
+            vars
+          };
+        }
+
+        const ins = instructions[pc];
+        steps += 1;
+
+        if (ins.type === "set") {
+          vars[ins.target] = ins.value;
+          pc += 1;
+        } else if (ins.type === "readChar") {
+          if (!inputBuffer.length) {
+            throw makeError("runtime", ins.line, "Команда ⭐ не может читать из пустых входных данных.");
+          }
+          const symbol = inputBuffer.shift();
+          const codePoint = symbol.codePointAt(0);
+          vars[ins.target] = assertFiniteNumber(codePoint, ins.line, "Команда ⭐");
+          pc += 1;
+        } else if (ins.type === "random") {
+          const low = assertFiniteNumber(vars[ins.low], ins.line, "Команда 🎲 (нижняя граница)");
+          const high = assertFiniteNumber(vars[ins.high], ins.line, "Команда 🎲 (верхняя граница)");
+          if (low > high) {
+            throw makeError("runtime", ins.line, `Команда 🎲: low (${low}) больше high (${high}).`);
+          }
+          const value = low + Math.floor(Math.random() * (high - low + 1));
+          vars[ins.target] = assertFiniteNumber(value, ins.line, "Команда 🎲 (результат)");
+          pc += 1;
+        } else if (ins.type === "printChar") {
+          const codePoint = assertFiniteNumber(vars[ins.target], ins.line, "Команда 😎");
+          const isInvalidSurrogate = codePoint >= 0xD800 && codePoint <= 0xDFFF;
+          if (codePoint < 0 || codePoint > 0x10FFFF || isInvalidSurrogate) {
+            throw makeError("runtime", ins.line, `Команда 😎: недопустимый code point ${codePoint}.`);
+          }
+          output += String.fromCodePoint(codePoint);
+          pc += 1;
+        } else if (ins.type === "printNumber") {
+          const value = assertFiniteNumber(vars[ins.target], ins.line, "Команда 😀");
+          output += String(value);
+          pc += 1;
+        } else if (ins.type === "math") {
+          const left = assertFiniteNumber(vars[ins.left], ins.line, `Команда ${ins.op}`);
+          const right = assertFiniteNumber(vars[ins.right], ins.line, `Команда ${ins.op}`);
+          let result = 0;
+
+          if (ins.op === "➕") result = left + right;
+          else if (ins.op === "➖") result = left - right;
+          else if (ins.op === "✖") result = left * right;
+          else if (ins.op === "➗") {
+            if (right === 0) throw makeError("runtime", ins.line, "Команда ➗: деление на ноль.");
+            result = Math.trunc(left / right);
+          } else if (ins.op === "➰") {
+            if (right === 0) throw makeError("runtime", ins.line, "Команда ➰: деление на ноль.");
+            result = left % right;
+          }
+
+          vars[ins.left] = assertFiniteNumber(result, ins.line, `Команда ${ins.op}`);
+          pc += 1;
+        } else if (ins.type === "ifEq") {
+          const left = assertFiniteNumber(vars[ins.left], ins.line, "Команда 🤔");
+          const right = assertFiniteNumber(vars[ins.right], ins.line, "Команда 🤔");
+          if (left === right) pc += 1;
+          else pc = ins.jumpTo;
+        } else if (ins.type === "ifEnd") {
+          pc += 1;
+        } else {
+          throw makeError("runtime", ins.line, `Неизвестная инструкция типа ${ins.type}.`);
+        }
+
+        if (steps % YIELD_EVERY === 0) {
+          await new Promise((resolve) => setTimeout(resolve, 0));
+        }
+      }
+
+      return {
+        status: "ok",
+        message: "Выполнение завершено.",
+        steps,
+        output,
+        vars
+      };
+    }
+
+    function updateFocusTarget(target) {
+      if (target === codeInputEl || target === stdinInputEl) lastFocusedField = target;
+    }
+
+    function resolveInsertTarget() {
+      if (lastFocusedField === codeInputEl || lastFocusedField === stdinInputEl) return lastFocusedField;
+      return codeInputEl;
+    }
+
+    function insertEmoji(emoji) {
+      const target = resolveInsertTarget();
+      target.focus();
+      const start = typeof target.selectionStart === "number" ? target.selectionStart : target.value.length;
+      const end = typeof target.selectionEnd === "number" ? target.selectionEnd : target.value.length;
+      target.setRangeText(emoji, start, end, "end");
+      updateFocusTarget(target);
+    }
+
+    function renderKeyboard() {
+      emojiKeyboardEl.textContent = "";
+      for (let i = 0; i < KEYBOARD_GROUPS.length; i++) {
+        const group = KEYBOARD_GROUPS[i];
+        const groupEl = document.createElement("section");
+        groupEl.className = `emoji-group group-${i + 1}`;
+
+        const gridEl = document.createElement("div");
+        gridEl.className = "emoji-grid";
+
+        for (let j = 0; j < group.length; j++) {
+          const emoji = group[j];
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "emoji-btn";
+          btn.textContent = emoji;
+          btn.title = `Вставить ${emoji}`;
+          btn.addEventListener("mousedown", (event) => {
+            event.preventDefault();
+          });
+          btn.addEventListener("click", () => {
+            insertEmoji(emoji);
+          });
+          gridEl.appendChild(btn);
+        }
+
+        groupEl.appendChild(gridEl);
+        emojiKeyboardEl.appendChild(groupEl);
+      }
+    }
+
+    async function handleRun() {
+      runBtn.disabled = true;
+      setStatus("", "Парсинг программы...");
+      stepCountEl.textContent = "Шаги: 0";
+
+      try {
+        const instructions = parseProgram(codeInputEl.value);
+        setStatus("", `Инструкций: ${instructions.length}. Выполнение...`);
+        const result = await executeProgram(instructions, stdinInputEl.value);
+        outputBoxEl.value = result.output;
+        stepCountEl.textContent = `Шаги: ${result.steps}`;
+
+        if (result.status === "ok") {
+          setStatus("ok", result.message);
+        } else if (result.status === "limit") {
+          setStatus("warn", result.message);
+        } else {
+          setStatus("", result.message);
+        }
+      } catch (err) {
+        outputBoxEl.value = "";
+        stepCountEl.textContent = "Шаги: 0";
+        if (err && (err.kind === "parse" || err.kind === "runtime")) {
+          setStatus("error", `Строка ${err.line}: ${err.message}`);
+        } else {
+          setStatus("error", "Неизвестная ошибка выполнения.");
+        }
+      } finally {
+        runBtn.disabled = false;
+      }
+    }
+
+    function handleReset() {
+      resetResultPanels();
+    }
+
+    function applyExample(index) {
+      const item = EXAMPLES[index];
+      if (!item) return;
+      codeInputEl.value = item.code;
+      stdinInputEl.value = item.input;
+      codeInputEl.focus();
+      updateFocusTarget(codeInputEl);
+      resetResultPanels();
+    }
+
+    for (const el of [codeInputEl, stdinInputEl]) {
+      el.addEventListener("focus", () => updateFocusTarget(el));
+      el.addEventListener("click", () => updateFocusTarget(el));
+      el.addEventListener("keyup", () => updateFocusTarget(el));
+    }
+
+    runBtn.addEventListener("click", () => {
+      handleRun();
+    });
+    resetBtn.addEventListener("click", handleReset);
+    example1Btn.addEventListener("click", () => applyExample(0));
+    example2Btn.addEventListener("click", () => applyExample(1));
+    example3Btn.addEventListener("click", () => applyExample(2));
+
+    renderKeyboard();
+    resetResultPanels();
+    codeInputEl.focus();
+    updateFocusTarget(codeInputEl);
+  </script>
+</body>
+</html>
