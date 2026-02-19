@@ -304,14 +304,30 @@
       gap: 6px;
     }
 
+    .task-text-label {
+      font-size: 14px;
+      font-weight: 700;
+    }
+
     .task-text {
       min-height: 72px;
-      resize: vertical;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: #fff;
+      padding: 10px 12px;
       font-size: 16px;
       line-height: 1.35;
       letter-spacing: 0;
       word-spacing: 0;
       font-variant-ligatures: none;
+    }
+
+    .task-text p {
+      margin: 0;
+    }
+
+    .task-text p + p {
+      margin-top: 6px;
     }
 
     .tests-toolbar {
@@ -606,8 +622,8 @@
             </div>
             <div id="taskSubtasks" class="subtask-grid" hidden></div>
             <section id="taskTextWrap" class="task-text-wrap" hidden>
-              <label for="taskText">Текст задания</label>
-              <textarea id="taskText" class="task-text" readonly spellcheck="false"></textarea>
+              <div class="task-text-label">Текст задания</div>
+              <div id="taskText" class="task-text"></div>
             </section>
           </section>
         </div>
@@ -809,22 +825,16 @@
       }
     });
     const SUBTASK_TEXTS = Object.freeze({
-      "2.1": [
-        "Правило подзадачи:",
-        "1 → 5",
-        "14 → 18",
-        "27 → 31",
-        "",
-        "Если все три теста дают именно эти результаты, откроется блок «Кодовая фраза»."
-      ].join("\n"),
-      "2.2": [
-        "Правило подзадачи:",
-        "4 → 2",
-        "8 → 4",
-        "16 → 8",
-        "",
-        "Если все три теста дают именно эти результаты, откроется блок «Кодовая фраза»."
-      ].join("\n")
+      "2.1": Object.freeze([
+        "Для значения 1 нужно получить значение 5.",
+        "Для значения 14 нужно получить значение 18.",
+        "Для значения 27 нужно получить значение 31."
+      ]),
+      "2.2": Object.freeze([
+        "Для значения 4 нужно получить значение 2.",
+        "Для значения 8 нужно получить значение 4.",
+        "Для значения 16 нужно получить значение 8."
+      ])
     });
 
     const codeInputEl = document.getElementById("codeInput");
@@ -1148,13 +1158,20 @@
     function setTaskText(subtaskKey) {
       if (!taskTextWrapEl || !taskTextEl) return;
       const raw = SUBTASK_TEXTS[subtaskKey];
-      const text = typeof raw === "string" ? raw.trim() : "";
-      if (!text) {
-        taskTextEl.value = "";
+      const lines = Array.isArray(raw)
+        ? raw.map((item) => String(item || "").trim()).filter((item) => item.length > 0)
+        : [];
+      if (!lines.length) {
+        taskTextEl.textContent = "";
         taskTextWrapEl.hidden = true;
         return;
       }
-      taskTextEl.value = text;
+      taskTextEl.textContent = "";
+      for (const line of lines) {
+        const p = document.createElement("p");
+        p.textContent = line;
+        taskTextEl.appendChild(p);
+      }
       taskTextWrapEl.hidden = false;
     }
 
