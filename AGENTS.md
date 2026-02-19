@@ -12,3 +12,4 @@
 - 2026-02-19: Добавлен локальный файл `LOVELACE/etalon-solutions.local.txt` с эталонами и кодовыми фразами для `2.1/2.2`; путь внесен в `.gitignore`.
 - 2026-02-19: В `LOVELACE/etalon-solutions.local.txt` для `2.1/2.2` добавлены эмодзи-программы решений (`x+4` и `x/2`).
 - 2026-02-20: `section-auth.js` расширен профилями `LOVELACE` (`CLASSIC`/`ROBOT`) и профильной проверкой в `guardPage`; маршрутизация Lovelace переведена через `LOVELACE/index.html`, а `LOVELACE/editor.html` закрыт профилем `CLASSIC`.
+- 2026-02-20: Добавлены `LOVELACE/editor-robot.html`, `LOVELACE/js/lab-shell.js`, `LOVELACE/js/domain-robot.js` и `LOVELACE/js/domain-classic.js`; robot-ветка работает без переменных, с keycap-цифрами, растительными цветами и отдельным DSL команд/предикатов.

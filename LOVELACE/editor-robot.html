@@ -1,0 +1,812 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E%F0%9F%A7%91%E2%80%8D%F0%9F%94%AC%3C/text%3E%3C/svg%3E">
+  <title>Эмодзи-робот</title>
+  <script src="../section-auth.js"></script>
+  <script>window.SectionAuth && window.SectionAuth.guardPage("LOVELACE", { requiredProfile: "ROBOT" });</script>
+  <style>
+    @font-face {
+      font-family: "Noto Color Emoji";
+      font-style: normal;
+      font-weight: 400;
+      font-display: swap;
+      src:
+        url("https://cdn.jsdelivr.net/fontsource/fonts/noto-color-emoji@latest/emoji-400-normal.woff2") format("woff2"),
+        url("https://cdn.jsdelivr.net/fontsource/fonts/noto-color-emoji@latest/emoji-400-normal.ttf") format("truetype");
+    }
+
+    :root {
+      --bg: #f3f4f6;
+      --panel: #ffffff;
+      --text: #111827;
+      --muted: #6b7280;
+      --border: #d1d5db;
+      --accent: #2563eb;
+      --accent-strong: #1d4ed8;
+      --danger-bg: #fee2e2;
+      --danger-fg: #991b1b;
+      --ok-bg: #dcfce7;
+      --ok-fg: #166534;
+      --warn-bg: #fef3c7;
+      --warn-fg: #92400e;
+      --emoji-font: "Noto Color Emoji", "Twemoji Mozilla", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Sans", "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: radial-gradient(circle at 20% 0%, #ffffff, var(--bg));
+      color: var(--text);
+      font-family: "Segoe UI", "Noto Sans", sans-serif;
+      padding: 20px;
+    }
+
+    .app {
+      width: min(1320px, 100%);
+      margin: 0 auto;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 16px;
+      box-shadow: 0 14px 30px rgba(17, 24, 39, 0.09);
+      display: grid;
+      gap: 12px;
+    }
+
+    .topbar {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+
+    .title {
+      margin: 0;
+      font-size: clamp(1.35rem, 2vw, 1.8rem);
+      font-weight: 900;
+      letter-spacing: -0.02em;
+    }
+
+    .back-link {
+      text-decoration: none;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      background: #fff;
+      padding: 8px 12px;
+      font-weight: 700;
+      transition: 120ms ease;
+    }
+
+    .back-link:hover {
+      border-color: #9ca3af;
+      transform: translateY(-1px);
+    }
+
+    .blocks {
+      display: grid;
+      gap: 12px;
+    }
+
+    .panel {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: #fcfcfd;
+      padding: 12px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .panel[hidden] {
+      display: none !important;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 1rem;
+      font-weight: 800;
+    }
+
+    .block-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .block-num {
+      width: 24px;
+      height: 24px;
+      border-radius: 999px;
+      display: inline-grid;
+      place-items: center;
+      font-size: 12px;
+      font-weight: 900;
+      background: #dbeafe;
+      color: #1d4ed8;
+      border: 1px solid #93c5fd;
+      flex: 0 0 auto;
+    }
+
+    .switchers {
+      display: grid;
+      gap: 10px;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .mini-title {
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      color: #475569;
+      margin-bottom: 6px;
+    }
+
+    label {
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    textarea {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: #fff;
+      color: var(--text);
+      padding: 10px 12px;
+      outline: none;
+      transition: 120ms ease;
+      resize: vertical;
+    }
+
+    .text-input {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: #fff;
+      color: var(--text);
+      padding: 10px 12px;
+      outline: none;
+      transition: 120ms ease;
+      font: inherit;
+    }
+
+    .text-input:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+    }
+
+    textarea:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+    }
+
+    .emoji-field {
+      font-family: var(--emoji-font);
+      font-size: 18px;
+      line-height: 1.45;
+    }
+
+    .code-editor {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      background: #fff;
+    }
+
+    .code-editor:focus-within {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+    }
+
+    .code-lines {
+      width: 84px;
+      min-width: 84px;
+      border: none;
+      border-right: 1px solid #e5e7eb;
+      border-radius: 0;
+      background: #f8fafc;
+      color: #64748b;
+      text-align: right;
+      resize: none;
+      overflow: hidden;
+      padding: 10px 8px;
+      letter-spacing: 0;
+      word-spacing: 0;
+      font-variant-ligatures: none;
+      user-select: none;
+      pointer-events: none;
+    }
+
+    .code-lines:focus {
+      box-shadow: none;
+      border-color: #e5e7eb;
+    }
+
+    .code-input {
+      min-height: 320px;
+      border: none;
+      border-radius: 0;
+      background: transparent;
+    }
+
+    .code-input:focus {
+      border-color: transparent;
+      box-shadow: none;
+    }
+
+    .stdin-input {
+      min-height: 84px;
+      font-family: "Noto Sans", "Segoe UI", "Noto Color Emoji", "Twemoji Mozilla", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
+      font-size: 18px;
+      line-height: 1.35;
+      letter-spacing: 0;
+      word-spacing: 0;
+      font-variant-ligatures: none;
+    }
+
+    .output-box {
+      min-height: 140px;
+      font-family: "Noto Sans", "Segoe UI", "Noto Color Emoji", "Twemoji Mozilla", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
+      font-size: 18px;
+      line-height: 1.35;
+      letter-spacing: 0;
+      word-spacing: 0;
+      font-variant-ligatures: none;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .examples {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .task-grid,
+    .subtask-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .subtask-grid {
+      margin-top: 8px;
+      min-height: 40px;
+    }
+
+    .subtask-grid[hidden] {
+      display: none !important;
+    }
+
+    .task-text-wrap[hidden] {
+      display: none !important;
+    }
+
+    .task-text-wrap {
+      margin-top: 8px;
+      display: grid;
+      gap: 6px;
+    }
+
+    .task-text-label {
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .task-text {
+      min-height: 72px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: #fff;
+      padding: 10px 12px;
+      font-size: 16px;
+      line-height: 1.35;
+      letter-spacing: 0;
+      word-spacing: 0;
+      font-variant-ligatures: none;
+    }
+
+    .task-text p {
+      margin: 0;
+    }
+
+    .task-text p + p {
+      margin-top: 6px;
+    }
+
+    .tests-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .test-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .test-item {
+      border: 1px solid #dbeafe;
+      background: #f8fafc;
+      border-radius: 10px;
+      padding: 10px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .test-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .test-label {
+      font-size: 13px;
+      font-weight: 800;
+      color: #334155;
+    }
+
+    .test-output-grid {
+      display: grid;
+      gap: 10px;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    }
+
+    .test-output-card {
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      background: #ffffff;
+      padding: 10px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .test-output-card.ok {
+      border-color: #86efac;
+      background: #f0fdf4;
+    }
+
+    .test-output-card.error {
+      border-color: #fca5a5;
+      background: #fef2f2;
+    }
+
+    .test-output-card.warn {
+      border-color: #fcd34d;
+      background: #fffbeb;
+    }
+
+    .test-output-meta {
+      font-size: 12px;
+      font-weight: 700;
+      color: #475569;
+    }
+
+    button {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: #fff;
+      color: var(--text);
+      font: inherit;
+      font-weight: 700;
+      padding: 9px 12px;
+      cursor: pointer;
+      transition: 120ms ease;
+    }
+
+    button:hover {
+      border-color: #9ca3af;
+      transform: translateY(-1px);
+    }
+
+    button:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .switchers button[aria-pressed="true"] {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+    }
+
+    .switchers button[aria-pressed="true"]:hover {
+      background: var(--accent-strong);
+      border-color: var(--accent-strong);
+    }
+
+    button.primary {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    button.primary:hover {
+      background: var(--accent-strong);
+      border-color: var(--accent-strong);
+    }
+
+    .status-box {
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      padding: 10px 12px;
+      font-weight: 700;
+      background: #f3f4f6;
+      color: #1f2937;
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+    }
+
+    .status-box.ok {
+      background: var(--ok-bg);
+      color: var(--ok-fg);
+      border-color: #86efac;
+    }
+
+    .status-box.error {
+      background: var(--danger-bg);
+      color: var(--danger-fg);
+      border-color: #fca5a5;
+    }
+
+    .status-box.warn {
+      background: var(--warn-bg);
+      color: var(--warn-fg);
+      border-color: #fcd34d;
+    }
+
+    .step-count {
+      font-weight: 700;
+      color: #1f2937;
+      font-size: 14px;
+    }
+
+    .keyboard {
+      display: grid;
+      gap: 10px;
+    }
+
+    .keyboard-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 220px;
+      gap: 10px;
+      align-items: start;
+    }
+
+    .keyboard-left {
+      display: grid;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .emoji-group {
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      background: #fff;
+      padding: 10px;
+    }
+
+    .emoji-group.group-1 { background: linear-gradient(180deg, #ffffff, #f8fafc); }
+    .emoji-group.group-2 { background: linear-gradient(180deg, #ffffff, #f9fafb); }
+    .emoji-group.group-3 { background: linear-gradient(180deg, #ffffff, #eff6ff); }
+
+    .emoji-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(40px, 1fr));
+      gap: 6px;
+    }
+
+    .emoji-btn {
+      font-family: var(--emoji-font);
+      font-size: 22px;
+      line-height: 1;
+      padding: 8px 6px;
+      min-height: 40px;
+      display: grid;
+      place-items: center;
+    }
+
+    .editor-nav {
+      border: 1px solid #d1d5db;
+      border-radius: 10px;
+      background: linear-gradient(180deg, #ffffff, #f8fafc);
+      padding: 10px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .nav-title {
+      margin: 0;
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+      color: #475569;
+    }
+
+    .nav-arrows {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-areas:
+        ". up ."
+        "left down right";
+      gap: 6px;
+    }
+
+    .nav-actions {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 6px;
+    }
+
+    .nav-btn {
+      min-height: 42px;
+      padding: 7px 8px;
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      border-radius: 10px;
+      user-select: none;
+    }
+
+    .nav-btn.up { grid-area: up; }
+    .nav-btn.left { grid-area: left; }
+    .nav-btn.down { grid-area: down; }
+    .nav-btn.right { grid-area: right; }
+    .nav-btn.enter { grid-column: 1 / -1; }
+
+    .vars-panel[hidden] {
+      display: none !important;
+    }
+
+    @media (max-width: 1040px) {
+      .switchers {
+        grid-template-columns: 1fr;
+      }
+
+      .keyboard-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <h1 class="title">Эмодзи-робот</h1>
+      <a href="../index.html" class="back-link">На главную</a>
+    </header>
+
+    <section class="blocks">
+      <section class="panel">
+        <h2 class="block-title"><span class="block-num">0</span>Примеры и Задания</h2>
+        <div class="switchers">
+          <section>
+            <div class="mini-title">Примеры</div>
+            <div class="examples">
+              <button id="example1Btn" type="button" aria-pressed="false">Пример №1</button>
+              <button id="example2Btn" type="button" aria-pressed="false">Пример №2</button>
+              <button id="example3Btn" type="button" aria-pressed="false">Пример №3</button>
+              <button id="example4Btn" type="button" aria-pressed="false">Пример №4</button>
+              <button id="example5Btn" type="button" aria-pressed="false">Пример №5</button>
+            </div>
+          </section>
+          <section>
+            <div class="mini-title">Задания</div>
+            <div id="taskButtons" class="task-grid">
+              <button type="button" data-task="1" aria-pressed="false">Задание 1</button>
+              <button type="button" data-task="2" aria-pressed="false">Задание 2</button>
+              <button type="button" data-task="3" aria-pressed="false">Задание 3</button>
+              <button type="button" data-task="4" aria-pressed="false">Задание 4</button>
+            </div>
+            <div id="taskSubtasks" class="subtask-grid" hidden></div>
+            <section id="taskTextWrap" class="task-text-wrap" hidden>
+              <div class="task-text-label">Текст задания</div>
+              <div id="taskText" class="task-text"></div>
+            </section>
+          </section>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2 class="block-title"><span class="block-num">1</span>Редактор кода</h2>
+        <label for="codeInput">Код</label>
+        <div class="code-editor">
+          <textarea id="codeLineNumbers" class="emoji-field code-lines" readonly tabindex="-1" aria-hidden="true">📌</textarea>
+          <textarea id="codeInput" class="emoji-field code-input" spellcheck="false" autocomplete="off" autocapitalize="off"></textarea>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2 class="block-title"><span class="block-num">2</span>Клавиатура</h2>
+        <div id="emojiKeyboard" class="keyboard"></div>
+      </section>
+
+      <section class="panel">
+        <h2 class="block-title"><span class="block-num">3</span>Тесты</h2>
+        <div class="tests-toolbar">
+          <button id="addTestBtn" type="button">Добавить тест</button>
+          <button id="resetTestsBtn" type="button">Сбросить тесты</button>
+        </div>
+        <div id="testList" class="test-list"></div>
+      </section>
+
+      <section class="panel">
+        <h2 class="block-title"><span class="block-num">4</span>Запуск</h2>
+        <div class="controls">
+          <button id="runBtn" class="primary">Запустить</button>
+          <button id="resetBtn">Сброс</button>
+        </div>
+        <div id="statusBox" class="status-box">Ожидание запуска.</div>
+        <div id="stepCount" class="step-count">Суммарные шаги: 0</div>
+      </section>
+
+      <section class="panel">
+        <h2 class="block-title"><span class="block-num">5</span>Выходные данные по тестам</h2>
+        <div id="testOutputs" class="test-output-grid"></div>
+      </section>
+
+      <section id="codePhrasePanel" class="panel" hidden>
+        <h2 class="block-title"><span class="block-num">6</span>Кодовая фраза</h2>
+        <label for="codePhraseInput">Кодовая фраза</label>
+        <input id="codePhraseInput" class="text-input" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Кодовая фраза" readonly>
+        <div class="controls">
+          <button id="copyCodePhraseBtn" type="button">Копировать</button>
+        </div>
+      </section>
+    </section>
+
+    <section class="vars-panel" hidden>
+      <h2>Состояние переменных</h2>
+      <div id="varsGrid"></div>
+    </section>
+  </main>
+
+  <script src="./js/lab-shell.js"></script>
+  <script src="./js/domain-classic.js"></script>
+  <script src="./js/domain-robot.js"></script>
+  <script>
+    function scenario(input) {
+      return JSON.stringify(input, null, 2);
+    }
+
+    const KEYCAP_DIGITS = ["0️⃣", "1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣"];
+
+    const ROBOT_EXAMPLES = [
+      {
+        label: "Пример №1",
+        code: [
+          "🚶🚠",
+          "🚶🚇"
+        ].join("\n"),
+        tests: [
+          scenario({ size: [3, 3], start: [0, 0], finish: [1, 1], blocked: [], cells: [], expect: { position: [1, 1], finishReached: true } }),
+          scenario({ size: [4, 3], start: [1, 0], finish: [2, 1], blocked: [], cells: [], expect: { position: [2, 1], finishReached: true } }),
+          scenario({ size: [3, 4], start: [0, 1], finish: [1, 2], blocked: [], cells: [], expect: { position: [1, 2], finishReached: true } })
+        ]
+      },
+      {
+        label: "Пример №2",
+        code: [
+          "🎨🌹"
+        ].join("\n"),
+        tests: [
+          scenario({ size: [3, 3], start: [0, 0], finish: [2, 2], blocked: [], cells: [], expect: { currentColor: "🌹" } }),
+          scenario({ size: [3, 3], start: [1, 1], finish: [2, 2], blocked: [], cells: [], expect: { currentColor: "🌹" } }),
+          scenario({ size: [4, 2], start: [3, 1], finish: [0, 0], blocked: [], cells: [{ x: 3, y: 1, color: "🍀", temp: 10 }], expect: { currentColor: "🌹" } })
+        ]
+      },
+      {
+        label: "Пример №3",
+        code: [
+          "🤔🧱🚠",
+          "🎨🌻",
+          "😐"
+        ].join("\n"),
+        tests: [
+          scenario({ size: [2, 1], start: [1, 0], finish: [1, 0], blocked: [], cells: [], expect: { currentColor: "🌻" } }),
+          scenario({ size: [3, 1], start: [1, 0], finish: [2, 0], blocked: [], cells: [], expect: { currentColor: null } }),
+          scenario({ size: [3, 1], start: [1, 0], finish: [1, 0], blocked: [[2, 0]], cells: [], expect: { currentColor: "🌻" } })
+        ]
+      },
+      {
+        label: "Пример №4",
+        code: [
+          "🔂3️⃣",
+          "🚶🚠",
+          "😐"
+        ].join("\n"),
+        tests: [
+          scenario({ size: [5, 1], start: [0, 0], finish: [3, 0], blocked: [], cells: [], expect: { position: [3, 0], finishReached: true } }),
+          scenario({ size: [6, 1], start: [1, 0], finish: [4, 0], blocked: [], cells: [], expect: { position: [4, 0], finishReached: true } }),
+          scenario({ size: [7, 1], start: [2, 0], finish: [5, 0], blocked: [], cells: [], expect: { position: [5, 0], finishReached: true } })
+        ]
+      },
+      {
+        label: "Пример №5",
+        code: [
+          "🔁🛤🚠",
+          "🚶🚠",
+          "😐"
+        ].join("\n"),
+        tests: [
+          scenario({ size: [5, 1], start: [0, 0], finish: [4, 0], blocked: [], cells: [], expect: { position: [4, 0], finishReached: true } }),
+          scenario({ size: [6, 1], start: [2, 0], finish: [5, 0], blocked: [], cells: [], expect: { position: [5, 0], finishReached: true } }),
+          scenario({ size: [5, 1], start: [0, 0], finish: [2, 0], blocked: [[3, 0]], cells: [], expect: { position: [2, 0], finishReached: true } })
+        ]
+      }
+    ];
+
+    const ROBOT_SUBTASK_PRESETS = Object.freeze({
+      "1.1": { code: ROBOT_EXAMPLES[0].code, tests: ROBOT_EXAMPLES[0].tests },
+      "1.2": { code: ROBOT_EXAMPLES[1].code, tests: ROBOT_EXAMPLES[1].tests },
+      "1.3": { code: ROBOT_EXAMPLES[2].code, tests: ROBOT_EXAMPLES[2].tests },
+      "1.4": { code: ROBOT_EXAMPLES[3].code, tests: ROBOT_EXAMPLES[3].tests },
+      "2.1": { code: "", tests: [scenario({ size: [5, 1], start: [0, 0], finish: [4, 0], blocked: [], cells: [], expect: { position: [4, 0], finishReached: true } })] },
+      "2.2": { code: "", tests: [scenario({ size: [4, 4], start: [0, 0], finish: [3, 3], blocked: [[1, 0], [1, 1], [2, 1]], cells: [], expect: { finishReached: true } })] },
+      "4.1": { code: "", tests: [""] }
+    });
+
+    const ROBOT_SUBTASK_TEXTS = Object.freeze({
+      "1.1": ["Базовое движение по полю. Проверить прохождение до финиша."],
+      "1.2": ["Проверить перекраску текущей клетки через растения-цвета."],
+      "1.3": ["Проверить условный блок с предикатом стены/свободы."],
+      "1.4": ["Проверить цикл по счетчику с keycap-числом."],
+      "2.1": ["Соберите программу, которая проходит сценарии с препятствиями."],
+      "2.2": ["Соберите программу с условиями/циклами и проверкой финиша."],
+      "4.1": ["Решить задачу «второй максимум» или аналог. Тестов 10. Открыто только 3 теста, остальные скрыты визуально, но имеются фактически (значения нельзя нигде увидеть, даже в коде страницы)."]
+    });
+
+    const ROBOT_KEYBOARD_GROUPS = [
+      ["🚶", "🎨", "🤔", "🔁", "🔂", "😐"],
+      ["✈️", "🚇", "🚠", "🚜", "🧱", "🛤", "🏁", "🎯", "🌡", "🌹", "🌻", "🍀", "🍇"],
+      ["🟰", "🚫", "🔥", "🧊", "🔥🟰", "🧊🟰", "0️⃣", "1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣"]
+    ];
+
+    const ROBOT_TEST_PLACEHOLDER = [
+      '{',
+      '  "size": [5, 5],',
+      '  "start": [0, 0],',
+      '  "finish": [4, 4],',
+      '  "blocked": [],',
+      '  "cells": [],',
+      '  "expect": { "finishReached": true }',
+      '}'
+    ].join("\n");
+
+    if (window.LovelaceLabShell && window.LovelaceDomains && typeof window.LovelaceDomains.createRobotDomain === "function") {
+      window.LovelaceLabShell.boot({
+        domain: window.LovelaceDomains.createRobotDomain(),
+        examples: ROBOT_EXAMPLES,
+        taskSubtaskCounts: { "2": 2, "4": 1 },
+        subtaskPresets: ROBOT_SUBTASK_PRESETS,
+        subtaskTexts: ROBOT_SUBTASK_TEXTS,
+        keyboardGroups: ROBOT_KEYBOARD_GROUPS,
+        lineDigits: KEYCAP_DIGITS,
+        testInputPlaceholder: ROBOT_TEST_PLACEHOLDER
+      });
+    }
+  </script>
+</body>
+</html>
