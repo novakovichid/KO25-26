@@ -161,6 +161,23 @@
       resize: vertical;
     }
 
+    .text-input {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: #fff;
+      color: var(--text);
+      padding: 10px 12px;
+      outline: none;
+      transition: 120ms ease;
+      font: inherit;
+    }
+
+    .text-input:focus {
+      border-color: #0ea5a4;
+      box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.2);
+    }
+
     textarea:focus {
       border-color: #0ea5a4;
       box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.2);
@@ -474,6 +491,13 @@
         <h2 class="block-title"><span class="block-num">5</span>Выходные данные по тестам</h2>
         <div id="testOutputs" class="test-output-grid"></div>
       </section>
+
+      <section id="codePhrasePanel" class="panel" hidden>
+        <h2 class="block-title"><span class="block-num">6</span>Кодовая фраза</h2>
+        <label for="codePhraseInput">Кодовая фраза</label>
+        <input id="codePhraseInput" class="text-input" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Введите кодовую фразу">
+        <p class="hint">Показывается только в выбранных сценариях.</p>
+      </section>
     </section>
 
     <section class="vars-panel" hidden>
@@ -500,7 +524,7 @@
           "⭐♈",
           "😀♈"
         ].join("\n"),
-        tests: ["37"]
+        tests: ["7", "42", "105"]
       },
       {
         code: [
@@ -511,7 +535,7 @@
           "➖♈♊",
           "😀♈"
         ].join("\n"),
-        tests: [""]
+        tests: ["", "1", "55"]
       },
       {
         code: [
@@ -522,7 +546,7 @@
           "😀♊",
           "😐"
         ].join("\n"),
-        tests: ["1", "2"]
+        tests: ["1", "2", "0", "10", "37"]
       },
       {
         code: [
@@ -535,25 +559,30 @@
           "😐",
           "😀♉"
         ].join("\n"),
-        tests: ["4"]
+        tests: ["1", "2", "4", "6", "8"]
       },
       {
         code: [
           "⭐♈",
           "🌞♉🆚",
-          "🌞♊📌",
-          "🔁♈♉",
-          "➕♉♈",
-          "➖♈♊",
+          "🌞♊🆚",
+          "🌞♋📌",
+          "🔁♊♈",
+          "➕♊♋",
+          "➕♉♊",
           "😐",
           "😀♉"
         ].join("\n"),
-        tests: ["4"]
+        tests: ["0", "1", "3", "4", "7"]
       }
     ];
 
     const HARD_STEP_LIMIT = 200000;
     const YIELD_EVERY = 1500;
+    const CODE_PHRASE_VISIBLE_SCENARIOS = new Set([
+      // "example:3",
+      // "task:2.1",
+    ]);
 
     const codeInputEl = document.getElementById("codeInput");
     const runBtn = document.getElementById("runBtn");
@@ -572,9 +601,12 @@
     const statusBoxEl = document.getElementById("statusBox");
     const stepCountEl = document.getElementById("stepCount");
     const emojiKeyboardEl = document.getElementById("emojiKeyboard");
+    const codePhrasePanelEl = document.getElementById("codePhrasePanel");
+    const codePhraseInputEl = document.getElementById("codePhraseInput");
 
     const VARIABLE_SET = new Set(VARIABLE_EMOJIS);
     let lastFocusedField = codeInputEl;
+    let currentScenarioKey = "";
 
     function makeError(kind, line, message) {
       const err = new Error(message);
@@ -787,6 +819,13 @@
       statusBoxEl.textContent = message;
     }
 
+    function setScenarioKey(key) {
+      currentScenarioKey = String(key || "");
+      const visible = CODE_PHRASE_VISIBLE_SCENARIOS.has(currentScenarioKey);
+      if (codePhrasePanelEl) codePhrasePanelEl.hidden = !visible;
+      if (!visible && codePhraseInputEl) codePhraseInputEl.value = "";
+    }
+
     function resetResultPanels() {
       setStatus("", "Ожидание запуска.");
       stepCountEl.textContent = "Суммарные шаги: 0";
@@ -895,6 +934,7 @@
           btn.textContent = `Подзадача ${taskIndex}.${i}`;
           btn.addEventListener("click", () => {
             setStatus("", `Плейсхолдер: выбрано Задание ${taskIndex}, Подзадача ${taskIndex}.${i}.`);
+            setScenarioKey(`task:${taskIndex}.${i}`);
           });
           taskSubtasksEl.appendChild(btn);
         }
@@ -905,6 +945,7 @@
         btn.addEventListener("click", () => {
           const task = String(btn.dataset.task || "1");
           renderSubtasks(task);
+          setScenarioKey(`task:${task}`);
         });
       }
       renderSubtasks(1);
@@ -1164,6 +1205,7 @@
       if (!item) return;
       codeInputEl.value = item.code;
       setTestsToUi(item.tests);
+      setScenarioKey(`example:${index + 1}`);
       codeInputEl.focus();
       updateFocusTarget(codeInputEl);
       resetResultPanels();
@@ -1197,6 +1239,7 @@
     renderKeyboard();
     initTaskPlaceholders();
     setTestsToUi([""]);
+    setScenarioKey("");
     resetResultPanels();
     codeInputEl.focus();
     updateFocusTarget(codeInputEl);

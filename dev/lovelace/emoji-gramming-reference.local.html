@@ -6,6 +6,16 @@
   <title>Emoji-gramming: полная справка</title>
   <script src="../../section-auth.js"></script>
   <style>
+    @font-face {
+      font-family: "Noto Color Emoji";
+      font-style: normal;
+      font-weight: 400;
+      font-display: swap;
+      src:
+        url("https://cdn.jsdelivr.net/fontsource/fonts/noto-color-emoji@latest/emoji-400-normal.woff2") format("woff2"),
+        url("https://cdn.jsdelivr.net/fontsource/fonts/noto-color-emoji@latest/emoji-400-normal.ttf") format("truetype");
+    }
+
     :root {
       --bg: #f3f4f6;
       --panel: #ffffff;
@@ -15,6 +25,7 @@
       --accent: #0f766e;
       --accent-strong: #115e59;
       --danger: #991b1b;
+      --emoji-font: "Noto Color Emoji", "Twemoji Mozilla", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Sans", "Segoe UI", sans-serif;
     }
 
     * { box-sizing: border-box; }
@@ -123,8 +134,12 @@
     th { background: #f9fafb; }
 
     .mono {
-      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
-      font-size: 0.93rem;
+      font-family: var(--emoji-font);
+      font-size: 18px;
+      line-height: 1.45;
+      letter-spacing: 0;
+      word-spacing: 0;
+      font-variant-ligatures: none;
       background: #f9fafb;
       border: 1px solid #e5e7eb;
       border-radius: 10px;
@@ -134,13 +149,22 @@
     }
 
     .vars {
+      font-family: var(--emoji-font);
       font-size: 1.2rem;
       line-height: 1.6;
     }
 
     .digits {
+      font-family: var(--emoji-font);
       font-size: 1.15rem;
       line-height: 1.6;
+    }
+
+    code {
+      font-family: var(--emoji-font);
+      letter-spacing: 0;
+      word-spacing: 0;
+      font-variant-ligatures: none;
     }
   </style>
 </head>
@@ -301,10 +325,11 @@
       <p class="hint"><b>Пример №5: цикл по условию</b></p>
       <div class="mono">⭐♈
 🌞♉🆚
-🌞♊📌
-🔁♈♉
-➕♉♈
-➖♈♊
+🌞♊🆚
+🌞♋📌
+🔁♊♈
+➕♊♋
+➕♉♊
 😐
 😀♉</div>
       <p class="hint">Вход: <code>4</code>. Выход: <code>10</code>.</p>
