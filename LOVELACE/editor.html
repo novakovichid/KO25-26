@@ -939,6 +939,12 @@
       statusBoxEl.textContent = message;
     }
 
+    function formatLineOnlyError(err) {
+      const line = err && Number.isInteger(err.line) ? err.line : 0;
+      if (line > 0) return `Ошибка в строке ${line}.`;
+      return "Ошибка.";
+    }
+
     function setPressedState(button, isPressed) {
       if (!button) return;
       button.setAttribute("aria-pressed", isPressed ? "true" : "false");
@@ -1460,12 +1466,10 @@
       try {
         instructions = parseProgram(codeInputEl.value);
       } catch (err) {
-        const msg = err && (err.kind === "parse" || err.kind === "runtime")
-          ? `Строка ${err.line}: ${err.message}`
-          : "Неизвестная ошибка парсинга.";
+        const msg = formatLineOnlyError(err);
         const failResults = safeTests.map(() => ({
           kind: "error",
-          meta: "Ошибка парсинга программы",
+          meta: "Ошибка",
           value: msg
         }));
         renderOutputs(failResults);
@@ -1510,12 +1514,10 @@
           }
         } catch (err) {
           errCount += 1;
-          const msg = err && (err.kind === "parse" || err.kind === "runtime")
-            ? `Строка ${err.line}: ${err.message}`
-            : "Неизвестная ошибка выполнения.";
+          const msg = formatLineOnlyError(err);
           results.push({
             kind: "error",
-            meta: "Ошибка выполнения",
+            meta: "Ошибка",
             value: msg
           });
         }
