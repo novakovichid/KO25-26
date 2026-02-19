@@ -1963,15 +1963,21 @@
 
       renderOutputs(results);
       stepCountEl.textContent = `Суммарные шаги: ${totalSteps}`;
+      const hasUnlockRule = Boolean(selectedSubtaskKey && CODE_PHRASE_UNLOCK_RULES[selectedSubtaskKey]);
+      const solvedByRule = hasUnlockRule
+        ? isCodePhraseSolved(selectedSubtaskKey, safeTests, results, runNonce)
+        : false;
       if (errCount > 0) {
         setStatus("error", `Готово: успех ${okCount}, предупреждения ${warnCount}, ошибки ${errCount}.`);
       } else if (warnCount > 0) {
         setStatus("warn", `Готово: успех ${okCount}, предупреждения ${warnCount}.`);
+      } else if (hasUnlockRule && !solvedByRule) {
+        setStatus("warn", `Готово: все ${okCount} тест(а/ов) выполнены, но эталон не совпал.`);
       } else {
         setStatus("ok", `Готово: все ${okCount} тест(а/ов) выполнены успешно.`);
       }
 
-      if (selectedSubtaskKey && isCodePhraseSolved(selectedSubtaskKey, safeTests, results, runNonce)) {
+      if (solvedByRule && selectedSubtaskKey) {
         const rule = CODE_PHRASE_UNLOCK_RULES[selectedSubtaskKey];
         const phrase = decodeUnlockPhrase(selectedSubtaskKey, rule);
         showCodePhrasePanel(phrase);
