@@ -1224,6 +1224,35 @@
       return String(value || "").trim();
     }
 
+    function createRunNonce() {
+      if (typeof crypto !== "undefined" && crypto && typeof crypto.getRandomValues === "function") {
+        const bytes = new Uint32Array(2);
+        crypto.getRandomValues(bytes);
+        return `${Date.now().toString(36)}:${bytes[0].toString(36)}:${bytes[1].toString(36)}`;
+      }
+      return `${Date.now().toString(36)}:${Math.random().toString(36).slice(2)}`;
+    }
+
+    function hashTextFNV1a32(text) {
+      const src = String(text || "");
+      let hash = 0x811c9dc5;
+      for (let i = 0; i < src.length; i++) {
+        hash ^= src.charCodeAt(i);
+        hash = Math.imul(hash, 0x01000193);
+      }
+      return (hash >>> 0).toString(16).padStart(8, "0");
+    }
+
+    function buildRunResultProof(nonce, testIndex, testInput, kind, value) {
+      return hashTextFNV1a32([
+        String(nonce || ""),
+        String(testIndex),
+        normalizeUnlockToken(testInput),
+        String(kind || ""),
+        normalizeUnlockToken(value)
+      ].join("::"));
+    }
+
     function makeUnlockProof(subtaskKey, tests, outputs) {
       return `${subtaskKey}::${tests.join("|")}::${outputs.join("|")}::LOVELACE`;
     }
@@ -1254,18 +1283,21 @@
       return text;
     }
 
-    function isCodePhraseSolved(subtaskKey, tests, results) {
+    function isCodePhraseSolved(subtaskKey, tests, results, runNonce) {
       const key = String(subtaskKey || "");
       const rule = CODE_PHRASE_UNLOCK_RULES[key];
       if (!rule) return false;
       if (!Array.isArray(tests) || !Array.isArray(results)) return false;
+      if (!runNonce) return false;
       if (tests.length !== rule.tests.length) return false;
       if (results.length !== rule.outputs.length) return false;
 
       for (let i = 0; i < rule.tests.length; i++) {
         if (normalizeUnlockToken(tests[i]) !== rule.tests[i]) return false;
         const result = results[i];
-        if (!result || result.kind !== "ok") return false;
+        if (!result || result.kind !== "ok" || result.source !== "runtime") return false;
+        const expectedProof = buildRunResultProof(runNonce, i, tests[i], result.kind, result.value);
+        if (result.proof !== expectedProof) return false;
         if (normalizeUnlockToken(result.value) !== rule.outputs[i]) return false;
       }
 
@@ -1832,6 +1864,7 @@
       hideCodePhrasePanel();
       setStatus("", "Парсинг программы...");
       stepCountEl.textContent = "Суммарные шаги: 0";
+      const runNonce = createRunNonce();
 
       const tests = getTestsFromUi();
       const hasAtLeastOneTest = tests.length > 0;
@@ -1848,7 +1881,9 @@
         const failResults = safeTests.map(() => ({
           kind: "error",
           meta: "Ошибка",
-          value: msg
+          value: msg,
+          source: "runtime",
+          proof: ""
         }));
         renderOutputs(failResults);
         setStatus("error", msg);
@@ -1873,21 +1908,27 @@
             results.push({
               kind: "ok",
               meta: `Успех. Шаги: ${result.steps}`,
-              value: result.output
+              value: result.output,
+              source: "runtime",
+              proof: buildRunResultProof(runNonce, i, safeTests[i], "ok", result.output)
             });
           } else if (result.status === "limit") {
             warnCount += 1;
             results.push({
               kind: "warn",
               meta: `Лимит шагов. Шаги: ${result.steps}`,
-              value: result.output
+              value: result.output,
+              source: "runtime",
+              proof: buildRunResultProof(runNonce, i, safeTests[i], "warn", result.output)
             });
           } else {
             warnCount += 1;
             results.push({
               kind: "warn",
               meta: `Необычный статус. Шаги: ${result.steps}`,
-              value: result.output
+              value: result.output,
+              source: "runtime",
+              proof: buildRunResultProof(runNonce, i, safeTests[i], "warn", result.output)
             });
           }
         } catch (err) {
@@ -1896,7 +1937,9 @@
           results.push({
             kind: "error",
             meta: "Ошибка",
-            value: msg
+            value: msg,
+            source: "runtime",
+            proof: buildRunResultProof(runNonce, i, safeTests[i], "error", msg)
           });
         }
       }
@@ -1911,7 +1954,7 @@
         setStatus("ok", `Готово: все ${okCount} тест(а/ов) выполнены успешно.`);
       }
 
-      if (selectedSubtaskKey && isCodePhraseSolved(selectedSubtaskKey, safeTests, results)) {
+      if (selectedSubtaskKey && isCodePhraseSolved(selectedSubtaskKey, safeTests, results, runNonce)) {
         const rule = CODE_PHRASE_UNLOCK_RULES[selectedSubtaskKey];
         const phrase = decodeUnlockPhrase(selectedSubtaskKey, rule);
         showCodePhrasePanel(phrase);
