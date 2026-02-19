@@ -193,8 +193,54 @@
       line-height: 1.45;
     }
 
+    .code-editor {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      background: #fff;
+    }
+
+    .code-editor:focus-within {
+      border-color: #0ea5a4;
+      box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.2);
+    }
+
+    .code-lines {
+      width: 84px;
+      min-width: 84px;
+      border: none;
+      border-right: 1px solid #e5e7eb;
+      border-radius: 0;
+      background: #f8fafc;
+      color: #64748b;
+      text-align: right;
+      resize: none;
+      overflow: hidden;
+      padding: 10px 8px;
+      letter-spacing: 0;
+      word-spacing: 0;
+      font-variant-ligatures: none;
+      user-select: none;
+      pointer-events: none;
+    }
+
+    .code-lines:focus {
+      box-shadow: none;
+      border-color: #e5e7eb;
+    }
+
     .code-input {
       min-height: 320px;
+      border: none;
+      border-radius: 0;
+      background: transparent;
+    }
+
+    .code-input:focus {
+      border-color: transparent;
+      box-shadow: none;
     }
 
     .stdin-input {
@@ -570,7 +616,10 @@
       <section class="panel">
         <h2 class="block-title"><span class="block-num">1</span>Редактор кода</h2>
         <label for="codeInput">Код</label>
-        <textarea id="codeInput" class="emoji-field code-input" spellcheck="false" autocomplete="off" autocapitalize="off"></textarea>
+        <div class="code-editor">
+          <textarea id="codeLineNumbers" class="emoji-field code-lines" readonly tabindex="-1" aria-hidden="true">📌</textarea>
+          <textarea id="codeInput" class="emoji-field code-input" spellcheck="false" autocomplete="off" autocapitalize="off"></textarea>
+        </div>
       </section>
 
       <section class="panel">
@@ -701,6 +750,7 @@
     });
 
     const codeInputEl = document.getElementById("codeInput");
+    const codeLineNumbersEl = document.getElementById("codeLineNumbers");
     const runBtn = document.getElementById("runBtn");
     const resetBtn = document.getElementById("resetBtn");
     const addTestBtn = document.getElementById("addTestBtn");
@@ -734,6 +784,7 @@
     let selectedExampleIndex = -1;
     let selectedTaskKey = "";
     let selectedSubtaskKey = "";
+    let codeInputResizeObserver = null;
 
     function makeError(kind, line, message) {
       const err = new Error(message);
@@ -770,6 +821,44 @@
         throw makeError("parse", line, `Число не удалось распознать: ${valueText}.`);
       }
       return Math.trunc(numeric);
+    }
+
+    function toEmojiNumberText(value) {
+      const safe = Math.max(0, Math.trunc(value));
+      const text = String(safe);
+      let out = "";
+      for (let i = 0; i < text.length; i++) {
+        const code = text.charCodeAt(i) - 48;
+        if (code >= 0 && code <= 9) out += DIGIT_EMOJIS[code];
+      }
+      return out || DIGIT_EMOJIS[0];
+    }
+
+    function editorLineCount() {
+      const source = String(codeInputEl.value || "").replace(/\r\n?/g, "\n");
+      return source.split("\n").length;
+    }
+
+    function syncCodeLineNumbersScroll() {
+      if (!codeLineNumbersEl) return;
+      codeLineNumbersEl.scrollTop = codeInputEl.scrollTop;
+    }
+
+    function syncCodeLineNumbersHeight() {
+      if (!codeLineNumbersEl) return;
+      const nextHeight = codeInputEl.offsetHeight;
+      if (nextHeight > 0) codeLineNumbersEl.style.height = `${nextHeight}px`;
+    }
+
+    function refreshCodeLineNumbers() {
+      if (!codeLineNumbersEl) return;
+      const lines = [];
+      const total = editorLineCount();
+      for (let i = 1; i <= total; i++) lines.push(toEmojiNumberText(i));
+      const content = lines.join("\n");
+      if (codeLineNumbersEl.value !== content) codeLineNumbersEl.value = content;
+      syncCodeLineNumbersHeight();
+      syncCodeLineNumbersScroll();
     }
 
     function parseProgram(source) {
@@ -1278,6 +1367,7 @@
       const end = typeof target.selectionEnd === "number" ? target.selectionEnd : target.value.length;
       target.setRangeText(emoji, start, end, "end");
       updateFocusTarget(target);
+      if (target === codeInputEl) refreshCodeLineNumbers();
     }
 
     function focusCodeInput() {
@@ -1471,6 +1561,7 @@
       const { start, end } = getSelectionRange(target);
       target.setRangeText(text, start, end, "end");
       updateFocusTarget(target);
+      refreshCodeLineNumbers();
     }
 
     function backspaceInCodeInput() {
@@ -1486,6 +1577,7 @@
         target.setRangeText("", range.start, range.end, "end");
       }
       updateFocusTarget(target);
+      refreshCodeLineNumbers();
     }
 
     function deleteInCodeInput() {
@@ -1501,6 +1593,7 @@
         target.setRangeText("", range.start, range.end, "end");
       }
       updateFocusTarget(target);
+      refreshCodeLineNumbers();
     }
 
     function createNavButton(text, title, className, onClick) {
@@ -1679,6 +1772,7 @@
       syncTaskButtons();
       clearSubtasks();
       codeInputEl.value = item.code;
+      refreshCodeLineNumbers();
       setTestsToUi(item.tests);
       setScenarioKey(`example:${index + 1}`);
       codeInputEl.focus();
@@ -1690,6 +1784,16 @@
       el.addEventListener("focus", () => updateFocusTarget(el));
       el.addEventListener("click", () => updateFocusTarget(el));
       el.addEventListener("keyup", () => updateFocusTarget(el));
+    }
+    codeInputEl.addEventListener("input", refreshCodeLineNumbers);
+    codeInputEl.addEventListener("scroll", syncCodeLineNumbersScroll);
+    if (typeof ResizeObserver === "function") {
+      codeInputResizeObserver = new ResizeObserver(() => {
+        syncCodeLineNumbersHeight();
+      });
+      codeInputResizeObserver.observe(codeInputEl);
+    } else {
+      window.addEventListener("resize", syncCodeLineNumbersHeight);
     }
 
     runBtn.addEventListener("click", () => {
@@ -1731,6 +1835,7 @@
     setTestsToUi([""]);
     setScenarioKey("");
     resetResultPanels();
+    refreshCodeLineNumbers();
     codeInputEl.focus();
     updateFocusTarget(codeInputEl);
   </script>
