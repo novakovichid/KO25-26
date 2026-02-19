@@ -745,6 +745,49 @@
       // "example:3",
       // "task:2.1",
     ]);
+    const SUBTASK_PRESETS = Object.freeze({
+      "1.1": {
+        code: [
+          "⭐🐶",
+          "😀🐶"
+        ].join("\n"),
+        tests: ["7", "42", "105"]
+      },
+      "1.2": {
+        code: [
+          "⭐🐶",
+          "🌞🐱📌",
+          "➕🐶🐱",
+          "😀🐶"
+        ].join("\n"),
+        tests: ["0", "5", "99"]
+      },
+      "1.3": {
+        code: [
+          "⭐🐶",
+          "🌞🐱📌",
+          "🌞🐭🆚",
+          "🤔🐶🐱",
+          "🌞🐭👊",
+          "😐",
+          "😀🐭"
+        ].join("\n"),
+        tests: ["1", "2", "0"]
+      },
+      "1.4": {
+        code: [
+          "⭐🐶",
+          "🌞🐱🆚",
+          "🌞🐭📌",
+          "🔂🐶",
+          "➕🐱🐶",
+          "➖🐶🐭",
+          "😐",
+          "😀🐱"
+        ].join("\n"),
+        tests: ["1", "3", "5"]
+      }
+    });
     const SUBTASK_TEXTS = Object.freeze({
       // "1.1": "Текст задания...",
     });
@@ -1080,11 +1123,22 @@
       taskTextWrapEl.hidden = false;
     }
 
+    function applySubtaskPreset(subtaskKey) {
+      const preset = SUBTASK_PRESETS[subtaskKey];
+      if (!preset || typeof preset !== "object") return;
+      codeInputEl.value = String(preset.code || "");
+      refreshCodeLineNumbers();
+      const tests = Array.isArray(preset.tests) && preset.tests.length ? preset.tests : [""];
+      setTestsToUi(tests);
+      resetResultPanels();
+    }
+
     function selectSubtask(subtaskKey) {
       selectedSubtaskKey = subtaskKey;
       syncSubtaskButtons();
       setTaskText(subtaskKey);
       setScenarioKey(`task:${subtaskKey}`);
+      applySubtaskPreset(subtaskKey);
     }
 
     function clearSubtasks() {
