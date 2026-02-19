@@ -726,6 +726,9 @@
     const VARIABLE_SET = new Set(VARIABLE_EMOJIS);
     const exampleButtons = [example1Btn, example2Btn, example3Btn, example4Btn, example5Btn];
     const taskButtons = Array.from(taskButtonsEl.querySelectorAll("[data-task]"));
+    const GRAPHEME_SEGMENTER = (typeof Intl !== "undefined" && typeof Intl.Segmenter === "function")
+      ? new Intl.Segmenter("ru", { granularity: "grapheme" })
+      : null;
     let lastFocusedField = codeInputEl;
     let currentScenarioKey = "";
     let selectedExampleIndex = -1;
@@ -1300,14 +1303,126 @@
       return idx === -1 ? text.length : idx;
     }
 
+    function getGraphemeBoundaries(text) {
+      const src = String(text || "");
+      const boundaries = [0];
+      if (!src.length) return boundaries;
+
+      if (GRAPHEME_SEGMENTER) {
+        const segments = GRAPHEME_SEGMENTER.segment(src);
+        for (const item of segments) {
+          const end = item.index + item.segment.length;
+          if (end > boundaries[boundaries.length - 1]) boundaries.push(end);
+        }
+      } else {
+        let idx = 0;
+        for (const ch of src) {
+          idx += ch.length;
+          boundaries.push(idx);
+        }
+      }
+
+      if (boundaries[boundaries.length - 1] !== src.length) boundaries.push(src.length);
+      return boundaries;
+    }
+
+    function boundaryAtOrBefore(text, pos) {
+      const src = String(text || "");
+      const clamped = Math.max(0, Math.min(src.length, pos));
+      const boundaries = getGraphemeBoundaries(src);
+      let out = 0;
+      for (let i = 0; i < boundaries.length; i++) {
+        const b = boundaries[i];
+        if (b <= clamped) out = b;
+        else break;
+      }
+      return out;
+    }
+
+    function boundaryAtOrAfter(text, pos) {
+      const src = String(text || "");
+      const clamped = Math.max(0, Math.min(src.length, pos));
+      const boundaries = getGraphemeBoundaries(src);
+      for (let i = 0; i < boundaries.length; i++) {
+        const b = boundaries[i];
+        if (b >= clamped) return b;
+      }
+      return src.length;
+    }
+
+    function previousBoundary(text, pos) {
+      const src = String(text || "");
+      const clamped = Math.max(0, Math.min(src.length, pos));
+      const boundaries = getGraphemeBoundaries(src);
+      let out = 0;
+      for (let i = 0; i < boundaries.length; i++) {
+        const b = boundaries[i];
+        if (b < clamped) out = b;
+        else break;
+      }
+      return out;
+    }
+
+    function nextBoundary(text, pos) {
+      const src = String(text || "");
+      const clamped = Math.max(0, Math.min(src.length, pos));
+      const boundaries = getGraphemeBoundaries(src);
+      for (let i = 0; i < boundaries.length; i++) {
+        const b = boundaries[i];
+        if (b > clamped) return b;
+      }
+      return src.length;
+    }
+
+    function graphemeIndexAtPosition(text, pos) {
+      const src = String(text || "");
+      const clamped = Math.max(0, Math.min(src.length, pos));
+      const boundaries = getGraphemeBoundaries(src);
+      let idx = 0;
+      for (let i = 0; i < boundaries.length; i++) {
+        if (boundaries[i] <= clamped) idx = i;
+        else break;
+      }
+      return idx;
+    }
+
+    function positionAtGraphemeIndex(text, index) {
+      const boundaries = getGraphemeBoundaries(text);
+      const safeIdx = Math.max(0, Math.min(index, boundaries.length - 1));
+      return boundaries[safeIdx];
+    }
+
+    function graphemeRangeContaining(text, pos) {
+      const src = String(text || "");
+      if (!src.length) return { start: 0, end: 0 };
+      const clamped = Math.max(0, Math.min(src.length - 1, pos));
+      const boundaries = getGraphemeBoundaries(src);
+      for (let i = 0; i < boundaries.length - 1; i++) {
+        const start = boundaries[i];
+        const end = boundaries[i + 1];
+        if (clamped >= start && clamped < end) return { start, end };
+      }
+      const last = boundaries[boundaries.length - 1];
+      return { start: last, end: last };
+    }
+
     function moveCaretHorizontal(delta) {
       const target = focusCodeInput();
+      const text = target.value;
       const { start, end } = getSelectionRange(target);
       let next = start;
       if (delta < 0) {
-        next = start !== end ? Math.min(start, end) : Math.max(0, start - 1);
+        if (start !== end) {
+          next = boundaryAtOrBefore(text, Math.min(start, end));
+        } else {
+          next = previousBoundary(text, start);
+        }
       } else {
-        next = start !== end ? Math.max(start, end) : Math.min(target.value.length, end + 1);
+        if (start !== end) {
+          next = boundaryAtOrAfter(text, Math.max(start, end));
+        } else {
+          next = nextBoundary(text, end);
+        }
       }
       target.setSelectionRange(next, next);
       updateFocusTarget(target);
@@ -1319,7 +1434,10 @@
       const { start, end } = getSelectionRange(target);
       const base = delta < 0 ? Math.min(start, end) : Math.max(start, end);
       const currStart = findLineStart(text, base);
-      const currCol = base - currStart;
+      const currEnd = findLineEnd(text, base);
+      const currLine = text.slice(currStart, currEnd);
+      const currRel = Math.max(0, Math.min(currLine.length, base - currStart));
+      const currCol = graphemeIndexAtPosition(currLine, currRel);
       let next = base;
 
       if (delta < 0) {
@@ -1328,18 +1446,19 @@
         } else {
           const prevEnd = currStart - 1;
           const prevStart = findLineStart(text, prevEnd);
-          const prevLen = prevEnd - prevStart;
-          next = prevStart + Math.min(currCol, prevLen);
+          const prevLine = text.slice(prevStart, prevEnd);
+          const prevRel = positionAtGraphemeIndex(prevLine, currCol);
+          next = prevStart + prevRel;
         }
       } else {
-        const currEnd = findLineEnd(text, base);
         if (currEnd >= text.length) {
           next = text.length;
         } else {
           const nextStart = currEnd + 1;
           const nextEnd = findLineEnd(text, nextStart);
-          const nextLen = nextEnd - nextStart;
-          next = nextStart + Math.min(currCol, nextLen);
+          const nextLine = text.slice(nextStart, nextEnd);
+          const nextRel = positionAtGraphemeIndex(nextLine, currCol);
+          next = nextStart + nextRel;
         }
       }
 
@@ -1356,22 +1475,30 @@
 
     function backspaceInCodeInput() {
       const target = focusCodeInput();
+      const text = target.value;
       const { start, end } = getSelectionRange(target);
       if (start !== end) {
-        target.setRangeText("", start, end, "end");
+        const delStart = boundaryAtOrBefore(text, Math.min(start, end));
+        const delEnd = boundaryAtOrAfter(text, Math.max(start, end));
+        target.setRangeText("", delStart, delEnd, "end");
       } else if (start > 0) {
-        target.setRangeText("", start - 1, start, "end");
+        const range = graphemeRangeContaining(text, start - 1);
+        target.setRangeText("", range.start, range.end, "end");
       }
       updateFocusTarget(target);
     }
 
     function deleteInCodeInput() {
       const target = focusCodeInput();
+      const text = target.value;
       const { start, end } = getSelectionRange(target);
       if (start !== end) {
-        target.setRangeText("", start, end, "end");
-      } else if (start < target.value.length) {
-        target.setRangeText("", start, start + 1, "end");
+        const delStart = boundaryAtOrBefore(text, Math.min(start, end));
+        const delEnd = boundaryAtOrAfter(text, Math.max(start, end));
+        target.setRangeText("", delStart, delEnd, "end");
+      } else if (start < text.length) {
+        const range = graphemeRangeContaining(text, start);
+        target.setRangeText("", range.start, range.end, "end");
       }
       updateFocusTarget(target);
     }
