@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Emoji-gramming: полная справка</title>
+  <script src="../../section-auth.js"></script>
+  <style>
+    :root {
+      --bg: #f3f4f6;
+      --panel: #ffffff;
+      --text: #111827;
+      --muted: #6b7280;
+      --border: #d1d5db;
+      --accent: #0f766e;
+      --accent-strong: #115e59;
+      --danger: #991b1b;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: radial-gradient(circle at 20% 0%, #ffffff, var(--bg));
+      color: var(--text);
+      font-family: "Segoe UI", "Noto Sans", sans-serif;
+      padding: 20px;
+    }
+
+    .card {
+      width: min(1100px, 100%);
+      margin: 0 auto;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: 0 14px 30px rgba(17, 24, 39, 0.09);
+      padding: 16px;
+      display: grid;
+      gap: 12px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 1.7rem;
+      font-weight: 900;
+      letter-spacing: -0.02em;
+    }
+
+    h2 {
+      margin: 8px 0 0;
+      font-size: 1.1rem;
+      font-weight: 800;
+    }
+
+    p,
+    li {
+      line-height: 1.45;
+      margin: 0;
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .lock {
+      display: grid;
+      gap: 10px;
+    }
+
+    .lock input {
+      width: min(360px, 100%);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 9px 11px;
+      font: inherit;
+      outline: none;
+    }
+
+    .lock input:focus {
+      border-color: #0ea5a4;
+      box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.2);
+    }
+
+    button {
+      width: fit-content;
+      border: 1px solid var(--accent);
+      background: var(--accent);
+      color: #fff;
+      border-radius: 10px;
+      padding: 9px 12px;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 120ms ease;
+    }
+
+    button:hover { background: var(--accent-strong); border-color: var(--accent-strong); }
+
+    .error {
+      min-height: 1.25rem;
+      color: var(--danger);
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 8px;
+      font-size: 0.95rem;
+    }
+
+    th,
+    td {
+      border: 1px solid #e5e7eb;
+      padding: 8px 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th { background: #f9fafb; }
+
+    .mono {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+      font-size: 0.93rem;
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      padding: 10px;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .vars {
+      font-size: 1.2rem;
+      line-height: 1.6;
+    }
+
+    .digits {
+      font-size: 1.15rem;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <section id="authLock" class="lock" hidden>
+      <h1>Emoji-gramming: полная справка</h1>
+      <p class="hint">Dev-раздел защищен единым паролем. После входа доступ действует в текущей вкладке.</p>
+      <label for="sectionPassword">Пароль dev-раздела</label>
+      <input id="sectionPassword" name="sectionPassword_DEV" type="password" autocomplete="off" autocapitalize="off" spellcheck="false">
+      <button id="unlockSection" type="button">Открыть справку</button>
+      <div id="sectionError" class="error"></div>
+    </section>
+
+    <article id="sectionContent" hidden>
+      <h1>Emoji-gramming: полная справка</h1>
+      <p class="hint">Семантика для текущего редактора: целые числа, построчное выполнение, строгий разбор команд.</p>
+
+      <h2>1. Переменные</h2>
+      <p class="vars">♈ ♉ ♊ ♋ ♌ ♍ ♎ ♏ ♐ ♑ ♒ ♓ 🕐 🕑 🕒 🕓 🕔 🕕 🕖 🕗 🕘 🕙 🕚 🕛 🚨</p>
+      <p>Все переменные хранят целые числа.</p>
+
+      <h2>2. Emoji-цифры</h2>
+      <p class="digits">🆚=0, 📌=1, ✌=2, 🤟=3, 🤞=4, 🖐=5, 🤘=6, 👌=7, 👍=8, 👊=9</p>
+      <p>Числа в `🌞` строятся склейкой этих цифр. Пример: `📌👌` это `17`.</p>
+
+      <h2>3. Команды</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Команда</th>
+            <th>Формат</th>
+            <th>Действие</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Присваивание</td>
+            <td><code>🌞&lt;var&gt;&lt;numEmoji...&gt;</code></td>
+            <td>Записывает число в переменную.</td>
+          </tr>
+          <tr>
+            <td>Ввод числа</td>
+            <td><code>⭐&lt;var&gt;</code></td>
+            <td>Читает следующее целое число из входных данных (цифры <code>0..9</code>) и записывает в переменную.</td>
+          </tr>
+          <tr>
+            <td>Случайное число</td>
+            <td><code>🎲&lt;var&gt;&lt;lowVar&gt;&lt;highVar&gt;</code></td>
+            <td>Пишет случайное целое из диапазона [low, high].</td>
+          </tr>
+          <tr>
+            <td>Вывод символа</td>
+            <td><code>😎&lt;var&gt;</code></td>
+            <td>Интерпретирует значение как code point и выводит символ.</td>
+          </tr>
+          <tr>
+            <td>Вывод числа</td>
+            <td><code>😀&lt;var&gt;</code></td>
+            <td>Добавляет число в вывод как текст.</td>
+          </tr>
+          <tr>
+            <td>Сложение</td>
+            <td><code>➕&lt;var1&gt;&lt;var2&gt;</code></td>
+            <td><code>var1 = var1 + var2</code></td>
+          </tr>
+          <tr>
+            <td>Вычитание</td>
+            <td><code>➖&lt;var1&gt;&lt;var2&gt;</code></td>
+            <td><code>var1 = var1 - var2</code></td>
+          </tr>
+          <tr>
+            <td>Умножение</td>
+            <td><code>✖&lt;var1&gt;&lt;var2&gt;</code></td>
+            <td><code>var1 = var1 * var2</code></td>
+          </tr>
+          <tr>
+            <td>Деление</td>
+            <td><code>➗&lt;var1&gt;&lt;var2&gt;</code></td>
+            <td><code>var1 = trunc(var1 / var2)</code>, при нуле runtime error.</td>
+          </tr>
+          <tr>
+            <td>Остаток</td>
+            <td><code>➰&lt;var1&gt;&lt;var2&gt;</code></td>
+            <td><code>var1 = var1 % var2</code>, при нуле runtime error.</td>
+          </tr>
+          <tr>
+            <td>Условие</td>
+            <td><code>🤔&lt;var1&gt;&lt;var2&gt;</code></td>
+            <td>Если значения равны, выполняется блок до соответствующего `😐`, иначе блок пропускается.</td>
+          </tr>
+          <tr>
+            <td>Конец условия</td>
+            <td><code>😐</code></td>
+            <td>Закрывает блок `🤔`.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>4. Правила синтаксиса</h2>
+      <ul>
+        <li>Программа разбирается построчно.</li>
+        <li>Пустые строки разрешены.</li>
+        <li>Лишние/неизвестные символы в строке команды вызывают parse error.</li>
+        <li>Незакрытый `🤔` или лишний `😐` вызывают parse error с номером строки.</li>
+      </ul>
+
+      <h2>5. Модель выполнения</h2>
+      <ul>
+        <li>Тип данных: целые числа.</li>
+        <li>Вывод накапливается в одну строку.</li>
+        <li>Команда `⭐` читает следующее число из входа; разделители между числами: пробел, таб, перенос строки.</li>
+        <li>Если `⭐` не находит число в текущей позиции входа, возникает runtime error.</li>
+        <li>Есть внутренний предохранительный лимит шагов для защиты от зависаний.</li>
+      </ul>
+
+      <h2>6. Мини-примеры</h2>
+      <div class="mono">🌞♈📌
+😀♈</div>
+      <div class="mono">⭐♈
+🌞♉📌
+➕♈♉
+😀♈</div>
+      <div class="mono">⭐♈
+🌞♉✌
+➰♈♉
+😀♈
+🌞♊📌
+🤔♈♊
+🌞♋👊
+😀♋
+😐</div>
+      <p class="hint">Для 2-го примера вход: <code>41</code>. Для 3-го примера вход: <code>17</code>.</p>
+    </article>
+  </main>
+
+  <script>window.SectionAuth && window.SectionAuth.initIndex("DEV");</script>
+</body>
+</html>

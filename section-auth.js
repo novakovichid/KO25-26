@@ -6,7 +6,7 @@
     // indexFile: entry point that contains the lock UI (authLock + sectionContent)
     LOMONOSOV: { salt: "s_lomonosov_v1", hash: "92c835751bb5dc627549cf652317674668387413527a060c38db251aede1bd5a", marker: ["LOMONOSOV"], indexFile: "index.html" },
     ARKHIMED: { salt: "s_arkhimed_v1", hash: "233ef44a72cb86590641b602d226908b9427a948de68bac9a628c8b4eb28908b", marker: ["ARKHIMED"], indexFile: "index.html" },
-    LOVELACE: { salt: "s_lovelace_v1", hash: "6375620c7aa743a0f9e78b0beecfc64f40c0ba424e673e0fbdb1a90fdffb8b28", marker: ["LOVELACE"], indexFile: "index.html" },
+    LOVELACE: { salt: "s_lovelace_v1", hash: "167d7d44b0987fcaac1ea9796add67663e2e765341ba143fda516c830ed98e69", marker: ["LOVELACE"], indexFile: "index.html" },
     MORSE: { salt: "s_morse_v1", hash: "8bef6414e62bf04e84ab628cd2cc232830107b02369ba2c74df9c7eb963321b1", marker: ["MORSE"], indexFile: "index.html" },
     VIGENERE: {
       salt: "s_vigenere_v1",
