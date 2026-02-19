@@ -14,3 +14,4 @@
 - 2026-02-20: `section-auth.js` расширен профилями `LOVELACE` (`CLASSIC`/`ROBOT`) и профильной проверкой в `guardPage`; маршрутизация Lovelace переведена через `LOVELACE/index.html`, а `LOVELACE/editor.html` закрыт профилем `CLASSIC`.
 - 2026-02-20: Добавлены `LOVELACE/editor-robot.html`, `LOVELACE/js/lab-shell.js`, `LOVELACE/js/domain-robot.js` и `LOVELACE/js/domain-classic.js`; robot-ветка работает без переменных, с keycap-цифрами, растительными цветами и отдельным DSL команд/предикатов.
 - 2026-02-20: `LOVELACE/js/domain-classic.js` обновлен со stub до полноценного classic-движка (парсер и исполнение команд текущего формата).
+- 2026-02-20: Добавлена локальная robot-справка `dev/lovelace/emoji-robot-reference.local.html`, путь внесен в `.gitignore`; на клиентской robot-странице подтверждено 5 примеров.
