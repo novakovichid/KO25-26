@@ -6,7 +6,21 @@
     // indexFile: entry point that contains the lock UI (authLock + sectionContent)
     LOMONOSOV: { salt: "s_lomonosov_v1", hash: "92c835751bb5dc627549cf652317674668387413527a060c38db251aede1bd5a", marker: ["LOMONOSOV"], indexFile: "index.html" },
     ARKHIMED: { salt: "s_arkhimed_v1", hash: "233ef44a72cb86590641b602d226908b9427a948de68bac9a628c8b4eb28908b", marker: ["ARKHIMED"], indexFile: "index.html" },
-    LOVELACE: { salt: "s_lovelace_v1", hash: "167d7d44b0987fcaac1ea9796add67663e2e765341ba143fda516c830ed98e69", marker: ["LOVELACE"], indexFile: "index.html" },
+    LOVELACE: {
+      salt: "s_lovelace_v1",
+      hash: "167d7d44b0987fcaac1ea9796add67663e2e765341ba143fda516c830ed98e69",
+      hashes: [
+        "167d7d44b0987fcaac1ea9796add67663e2e765341ba143fda516c830ed98e69", // 010
+        "0fd16c19acfdf5f5507b1e8b8cddc4599e4120f213842441964280d8897fab72"  // 101
+      ],
+      profileByHash: {
+        "167d7d44b0987fcaac1ea9796add67663e2e765341ba143fda516c830ed98e69": "CLASSIC",
+        "0fd16c19acfdf5f5507b1e8b8cddc4599e4120f213842441964280d8897fab72": "ROBOT"
+      },
+      defaultProfile: "CLASSIC",
+      marker: ["LOVELACE"],
+      indexFile: "index.html"
+    },
     MORSE: { salt: "s_morse_v1", hash: "8bef6414e62bf04e84ab628cd2cc232830107b02369ba2c74df9c7eb963321b1", marker: ["MORSE"], indexFile: "index.html" },
     VIGENERE: {
       salt: "s_vigenere_v1",
@@ -127,6 +141,25 @@
     return text.replace(/^\.\/+/, "");
   }
 
+  function getRequiredProfiles(options) {
+    const required = [];
+    if (options && typeof options.requiredProfile === "string" && options.requiredProfile.trim()) {
+      required.push(options.requiredProfile.trim());
+    }
+    if (options && Array.isArray(options.requiredProfiles)) {
+      for (const item of options.requiredProfiles) {
+        if (typeof item === "string" && item.trim()) required.push(item.trim());
+      }
+    }
+    return Array.from(new Set(required));
+  }
+
+  function isProfileAllowed(profile, requiredProfiles) {
+    if (!Array.isArray(requiredProfiles) || !requiredProfiles.length) return true;
+    if (typeof profile !== "string" || !profile) return false;
+    return requiredProfiles.includes(profile);
+  }
+
   function findLastSubarrayIndex(haystack, needle) {
     if (!Array.isArray(haystack) || !Array.isArray(needle) || needle.length === 0) return -1;
     for (let i = haystack.length - needle.length; i >= 0; i--) {
@@ -173,12 +206,18 @@
 
   async function guardPage(sectionId, options = {}) {
     try {
-      const unlocked = await isUnlocked(sectionId);
-      if (unlocked) return true;
       const auto = computeAutoRedirect(sectionId);
       const cfg = getConfig(sectionId);
       const overrideIndex = normalizeIndexPath(options.indexPath, auto.indexPath || cfg.indexFile || "index.html");
       const indexPath = overrideIndex || auto.indexPath;
+      const requiredProfiles = getRequiredProfiles(options);
+      const unlocked = await isUnlocked(sectionId);
+      if (unlocked) {
+        const profile = getProfile(sectionId);
+        if (isProfileAllowed(profile, requiredProfiles)) return true;
+        window.location.replace(indexPath);
+        return false;
+      }
       const next = auto.next;
       const target = next ? `${indexPath}?next=${encodeURIComponent(next)}` : indexPath;
       window.location.replace(target);

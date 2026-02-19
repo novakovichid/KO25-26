@@ -24,23 +24,40 @@
 
       <section id="sectionContent" hidden>
         <h1 class="text-3xl font-black tracking-tight">Лавлейс</h1>
-        <p class="mt-4 text-slate-600">Доступ открыт. Переходим в редактор.</p>
-        <a href="./editor.html" class="mt-6 inline-flex items-center rounded-xl bg-teal-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-teal-700">Открыть редактор</a>
+        <p class="mt-4 text-slate-600">Доступ открыт. Переходим в нужную версию редактора.</p>
+        <a id="openEditorLink" href="./editor.html" class="mt-6 inline-flex items-center rounded-xl bg-teal-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-teal-700">Открыть редактор</a>
       </section>
     </main>
   </div>
   <script>
+    function resolveLovelaceTarget(profile) {
+      return profile === "ROBOT" ? "./editor-robot.html" : "./editor.html";
+    }
+
+    function redirectToProfileEditor(profile) {
+      const target = resolveLovelaceTarget(profile);
+      const next = new URLSearchParams(window.location.search).get("next") || "";
+      if (!next) window.location.replace(target);
+    }
+
+    function applyOpenLink(profile) {
+      const linkEl = document.getElementById("openEditorLink");
+      if (!linkEl) return;
+      linkEl.href = resolveLovelaceTarget(profile);
+    }
+
     if (window.SectionAuth) {
       window.SectionAuth.initIndex("LOVELACE", {
-        onAlreadyUnlocked: () => {
-          const next = new URLSearchParams(window.location.search).get("next") || "";
-          if (!next) window.location.replace("./editor.html");
+        onAlreadyUnlocked: ({ profile }) => {
+          applyOpenLink(profile);
+          redirectToProfileEditor(profile);
         },
-        onUnlockSuccess: () => {
-          const next = new URLSearchParams(window.location.search).get("next") || "";
-          if (!next) window.location.replace("./editor.html");
+        onUnlockSuccess: ({ profile }) => {
+          applyOpenLink(profile);
+          redirectToProfileEditor(profile);
         }
       });
+      applyOpenLink(window.SectionAuth.getProfile("LOVELACE"));
     }
   </script>
 </body>
