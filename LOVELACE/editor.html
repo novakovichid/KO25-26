@@ -740,11 +740,20 @@
 
     const HARD_STEP_LIMIT = 200000;
     const YIELD_EVERY = 1500;
-    const CODE_PHRASE_PANEL_ENABLED = false;
-    const CODE_PHRASE_VISIBLE_SCENARIOS = new Set([
-      // "example:3",
-      // "task:2.1",
-    ]);
+    const CODE_PHRASE_UNLOCK_RULES = Object.freeze({
+      "2.1": Object.freeze({
+        tests: Object.freeze(["1", "14", "27"]),
+        outputs: Object.freeze(["5", "18", "31"]),
+        seed: 1374772855,
+        blob: Object.freeze([45291, 28554, 60224, 46832, 56516, 56824, 52380, 31333, 31764, 33038, 59126, 9155, 18990, 1010])
+      }),
+      "2.2": Object.freeze({
+        tests: Object.freeze(["4", "8", "16"]),
+        outputs: Object.freeze(["2", "4", "8"]),
+        seed: 2049653837,
+        blob: Object.freeze([31843, 22378, 44959, 52419, 13656, 46847, 46763, 16078, 32805, 3142, 23581, 58072])
+      })
+    });
     const TASK_SUBTASK_COUNTS = Object.freeze({
       "2": 2
     });
@@ -800,7 +809,22 @@
       }
     });
     const SUBTASK_TEXTS = Object.freeze({
-      // "1.1": "Текст задания...",
+      "2.1": [
+        "Правило подзадачи:",
+        "1 → 5",
+        "14 → 18",
+        "27 → 31",
+        "",
+        "Если все три теста дают именно эти результаты, откроется блок «Кодовая фраза»."
+      ].join("\n"),
+      "2.2": [
+        "Правило подзадачи:",
+        "4 → 2",
+        "8 → 4",
+        "16 → 8",
+        "",
+        "Если все три теста дают именно эти результаты, откроется блок «Кодовая фраза»."
+      ].join("\n")
     });
 
     const codeInputEl = document.getElementById("codeInput");
@@ -1179,20 +1203,82 @@
       syncSubtaskButtons();
     }
 
-    function setScenarioKey(key) {
-      currentScenarioKey = String(key || "");
+    function hideCodePhrasePanel() {
       if (!codePhrasePanelEl) return;
-      if (!CODE_PHRASE_PANEL_ENABLED) {
-        codePhrasePanelEl.hidden = true;
-        if (codePhraseInputEl) codePhraseInputEl.value = "";
-        return;
-      }
-      const visible = CODE_PHRASE_VISIBLE_SCENARIOS.has(currentScenarioKey);
-      codePhrasePanelEl.hidden = !visible;
+      codePhrasePanelEl.hidden = true;
       if (codePhraseInputEl) codePhraseInputEl.value = "";
     }
 
+    function showCodePhrasePanel(phrase) {
+      if (!codePhrasePanelEl || !codePhraseInputEl) return;
+      const text = String(phrase || "");
+      if (!text) {
+        hideCodePhrasePanel();
+        return;
+      }
+      codePhraseInputEl.value = text;
+      codePhrasePanelEl.hidden = false;
+    }
+
+    function normalizeUnlockToken(value) {
+      return String(value || "").trim();
+    }
+
+    function makeUnlockProof(subtaskKey, tests, outputs) {
+      return `${subtaskKey}::${tests.join("|")}::${outputs.join("|")}::LOVELACE`;
+    }
+
+    function deriveUnlockMasks(length, proof, seed) {
+      let state = seed >>> 0;
+      for (let i = 0; i < proof.length; i++) {
+        state ^= proof.charCodeAt(i);
+        state = (Math.imul((state + 0x9e3779b9) >>> 0, 1664525) + 1013904223) >>> 0;
+      }
+
+      const masks = [];
+      for (let i = 0; i < length; i++) {
+        state = (Math.imul((state ^ ((i + 1) * 0x45d9f3b)) >>> 0, 1597334677) + 12345) >>> 0;
+        masks.push((state >>> 8) & 0xffff);
+      }
+      return masks;
+    }
+
+    function decodeUnlockPhrase(subtaskKey, rule) {
+      if (!rule || !Array.isArray(rule.blob) || !rule.blob.length) return "";
+      const proof = makeUnlockProof(subtaskKey, rule.tests, rule.outputs);
+      const masks = deriveUnlockMasks(rule.blob.length, proof, rule.seed);
+      let text = "";
+      for (let i = 0; i < rule.blob.length; i++) {
+        text += String.fromCharCode(rule.blob[i] ^ masks[i]);
+      }
+      return text;
+    }
+
+    function isCodePhraseSolved(subtaskKey, tests, results) {
+      const key = String(subtaskKey || "");
+      const rule = CODE_PHRASE_UNLOCK_RULES[key];
+      if (!rule) return false;
+      if (!Array.isArray(tests) || !Array.isArray(results)) return false;
+      if (tests.length !== rule.tests.length) return false;
+      if (results.length !== rule.outputs.length) return false;
+
+      for (let i = 0; i < rule.tests.length; i++) {
+        if (normalizeUnlockToken(tests[i]) !== rule.tests[i]) return false;
+        const result = results[i];
+        if (!result || result.kind !== "ok") return false;
+        if (normalizeUnlockToken(result.value) !== rule.outputs[i]) return false;
+      }
+
+      return true;
+    }
+
+    function setScenarioKey(key) {
+      currentScenarioKey = String(key || "");
+      hideCodePhrasePanel();
+    }
+
     function resetResultPanels() {
+      hideCodePhrasePanel();
       setStatus("", "Ожидание запуска.");
       stepCountEl.textContent = "Суммарные шаги: 0";
       testOutputsEl.textContent = "";
@@ -1743,6 +1829,7 @@
 
     async function handleRun() {
       runBtn.disabled = true;
+      hideCodePhrasePanel();
       setStatus("", "Парсинг программы...");
       stepCountEl.textContent = "Суммарные шаги: 0";
 
@@ -1823,6 +1910,13 @@
       } else {
         setStatus("ok", `Готово: все ${okCount} тест(а/ов) выполнены успешно.`);
       }
+
+      if (selectedSubtaskKey && isCodePhraseSolved(selectedSubtaskKey, safeTests, results)) {
+        const rule = CODE_PHRASE_UNLOCK_RULES[selectedSubtaskKey];
+        const phrase = decodeUnlockPhrase(selectedSubtaskKey, rule);
+        showCodePhrasePanel(phrase);
+      }
+
       runBtn.disabled = false;
     }
 
