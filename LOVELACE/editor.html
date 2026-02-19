@@ -89,11 +89,9 @@
       transform: translateY(-1px);
     }
 
-    .layout {
+    .blocks {
       display: grid;
-      grid-template-columns: 1.2fr 1fr;
       gap: 12px;
-      align-items: start;
     }
 
     .panel {
@@ -109,6 +107,41 @@
       margin: 0;
       font-size: 1rem;
       font-weight: 800;
+    }
+
+    .block-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .block-num {
+      width: 24px;
+      height: 24px;
+      border-radius: 999px;
+      display: inline-grid;
+      place-items: center;
+      font-size: 12px;
+      font-weight: 900;
+      background: #e6fffa;
+      color: #115e59;
+      border: 1px solid #99f6e4;
+      flex: 0 0 auto;
+    }
+
+    .switchers {
+      display: grid;
+      gap: 10px;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .mini-title {
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      color: #475569;
+      margin-bottom: 6px;
     }
 
     label {
@@ -145,6 +178,12 @@
 
     .stdin-input {
       min-height: 84px;
+      font-family: "Noto Sans", "Segoe UI", "Noto Color Emoji", "Twemoji Mozilla", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
+      font-size: 18px;
+      line-height: 1.35;
+      letter-spacing: 0;
+      word-spacing: 0;
+      font-variant-ligatures: none;
     }
 
     .output-box {
@@ -169,6 +208,89 @@
       flex-wrap: wrap;
       gap: 8px;
       align-items: center;
+    }
+
+    .task-grid,
+    .subtask-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .subtask-grid {
+      margin-top: 8px;
+      min-height: 40px;
+    }
+
+    .tests-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .test-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .test-item {
+      border: 1px solid #dbeafe;
+      background: #f8fafc;
+      border-radius: 10px;
+      padding: 10px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .test-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .test-label {
+      font-size: 13px;
+      font-weight: 800;
+      color: #334155;
+    }
+
+    .test-output-grid {
+      display: grid;
+      gap: 10px;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    }
+
+    .test-output-card {
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      background: #ffffff;
+      padding: 10px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .test-output-card.ok {
+      border-color: #86efac;
+      background: #f0fdf4;
+    }
+
+    .test-output-card.error {
+      border-color: #fca5a5;
+      background: #fef2f2;
+    }
+
+    .test-output-card.warn {
+      border-color: #fcd34d;
+      background: #fffbeb;
+    }
+
+    .test-output-meta {
+      font-size: 12px;
+      font-weight: 700;
+      color: #475569;
     }
 
     button {
@@ -278,7 +400,7 @@
     }
 
     @media (max-width: 1040px) {
-      .layout {
+      .switchers {
         grid-template-columns: 1fr;
       }
     }
@@ -291,38 +413,67 @@
       <a href="../index.html" class="back-link">На главную</a>
     </header>
 
-    <section class="layout">
+    <section class="blocks">
       <section class="panel">
-        <h2>Программа</h2>
+        <h2 class="block-title"><span class="block-num">0</span>Переключалки</h2>
+        <div class="switchers">
+          <section>
+            <div class="mini-title">Примеры</div>
+            <div class="examples">
+              <button id="example1Btn">Пример №1</button>
+              <button id="example2Btn">Пример №2</button>
+              <button id="example3Btn">Пример №3</button>
+              <button id="example4Btn">Пример №4</button>
+              <button id="example5Btn">Пример №5</button>
+            </div>
+          </section>
+          <section>
+            <div class="mini-title">Задания (плейсхолдер)</div>
+            <div id="taskButtons" class="task-grid">
+              <button type="button" data-task="1">Задание 1</button>
+              <button type="button" data-task="2">Задание 2</button>
+              <button type="button" data-task="3">Задание 3</button>
+              <button type="button" data-task="4">Задание 4</button>
+            </div>
+            <div id="taskSubtasks" class="subtask-grid"></div>
+          </section>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2 class="block-title"><span class="block-num">1</span>Редактор кода</h2>
         <label for="codeInput">Код</label>
         <textarea id="codeInput" class="emoji-field code-input" spellcheck="false" autocomplete="off" autocapitalize="off"></textarea>
+      </section>
 
-        <label for="stdinInput">Входные данные (числа)</label>
-        <textarea id="stdinInput" class="emoji-field stdin-input" spellcheck="false" autocomplete="off" autocapitalize="off"></textarea>
+      <section class="panel">
+        <h2 class="block-title"><span class="block-num">2</span>Клавиатура</h2>
+        <div id="emojiKeyboard" class="keyboard"></div>
+      </section>
 
+      <section class="panel">
+        <h2 class="block-title"><span class="block-num">3</span>Тесты</h2>
+        <div class="tests-toolbar">
+          <button id="addTestBtn" type="button">Добавить тест</button>
+          <button id="resetTestsBtn" type="button">Сбросить тесты</button>
+        </div>
+        <div id="testList" class="test-list"></div>
+      </section>
+
+      <section class="panel">
+        <h2 class="block-title"><span class="block-num">4</span>Запуск</h2>
         <div class="controls">
           <button id="runBtn" class="primary">Запустить</button>
           <button id="resetBtn">Сброс</button>
         </div>
-
-        <div class="examples">
-          <button id="example1Btn">Пример №1 (без входа)</button>
-          <button id="example2Btn">Пример №2 (вход 41)</button>
-          <button id="example3Btn">Пример №3 (цикл, вход 4)</button>
-        </div>
+        <div id="statusBox" class="status-box">Ожидание запуска.</div>
+        <div id="stepCount" class="step-count">Суммарные шаги: 0</div>
       </section>
 
-      <aside class="panel">
-        <h2>Emoji-клавиатура</h2>
-        <div id="emojiKeyboard" class="keyboard"></div>
-
-        <h2>Состояние</h2>
-        <div id="statusBox" class="status-box">Ожидание запуска.</div>
-        <div id="stepCount" class="step-count">Шаги: 0</div>
-
-        <label for="outputBox">Вывод</label>
-        <textarea id="outputBox" class="output-box" readonly></textarea>
-      </aside>
+      <section class="panel">
+        <h2 class="block-title"><span class="block-num">5</span>Выходные данные по тестам</h2>
+        <div id="testOutputs" class="test-output-grid"></div>
+      </section>
     </section>
 
     <section class="vars-panel" hidden>
@@ -332,7 +483,7 @@
   </main>
 
   <script>
-    const COMMAND_EMOJIS = ["🌞", "⭐", "🎲", "😀", "➕", "➖", "✖", "➗", "➰", "🤔", "🔁", "😐"];
+    const COMMAND_EMOJIS = ["🌞", "⭐", "🎲", "😀", "➕", "➖", "✖", "➗", "➰", "🤔", "🔂", "🔁", "😐"];
     const VARIABLE_EMOJIS = [
       "♈", "♉", "♊", "♋", "♌", "♍", "♎", "♏", "♐", "♑", "♒", "♓",
       "🕐", "🕑", "🕒", "🕓", "🕔", "🕕", "🕖", "🕗", "🕘", "🕙", "🕚", "🕛",
@@ -346,33 +497,58 @@
     const EXAMPLES = [
       {
         code: [
-          "🌞♈📌",
+          "⭐♈",
           "😀♈"
         ].join("\n"),
-        input: ""
+        tests: ["37"]
+      },
+      {
+        code: [
+          "🌞♈📌🆚",
+          "🌞♉✌",
+          "✖♈♉",
+          "🌞♊📌",
+          "➖♈♊",
+          "😀♈"
+        ].join("\n"),
+        tests: [""]
       },
       {
         code: [
           "⭐♈",
           "🌞♉📌",
-          "➕♈♉",
-          "😀♈"
+          "🤔♈♉",
+          "🌞♊👊",
+          "😀♊",
+          "😐"
         ].join("\n"),
-        input: "41"
+        tests: ["1", "2"]
       },
       {
         code: [
           "⭐♈",
           "🌞♉🆚",
-          "🌞♊🆚",
-          "🌞♋📌",
-          "🔁♈♉",
-          "➕♊♈",
-          "➖♈♋",
+          "🌞♊📌",
+          "🔂♈",
+          "➕♉♈",
+          "➖♈♊",
           "😐",
-          "😀♊"
+          "😀♉"
         ].join("\n"),
-        input: "4"
+        tests: ["4"]
+      },
+      {
+        code: [
+          "⭐♈",
+          "🌞♉🆚",
+          "🌞♊📌",
+          "🔁♈♉",
+          "➕♉♈",
+          "➖♈♊",
+          "😐",
+          "😀♉"
+        ].join("\n"),
+        tests: ["4"]
       }
     ];
 
@@ -380,15 +556,21 @@
     const YIELD_EVERY = 1500;
 
     const codeInputEl = document.getElementById("codeInput");
-    const stdinInputEl = document.getElementById("stdinInput");
     const runBtn = document.getElementById("runBtn");
     const resetBtn = document.getElementById("resetBtn");
+    const addTestBtn = document.getElementById("addTestBtn");
+    const resetTestsBtn = document.getElementById("resetTestsBtn");
+    const testListEl = document.getElementById("testList");
+    const testOutputsEl = document.getElementById("testOutputs");
     const example1Btn = document.getElementById("example1Btn");
     const example2Btn = document.getElementById("example2Btn");
     const example3Btn = document.getElementById("example3Btn");
+    const example4Btn = document.getElementById("example4Btn");
+    const example5Btn = document.getElementById("example5Btn");
+    const taskButtonsEl = document.getElementById("taskButtons");
+    const taskSubtasksEl = document.getElementById("taskSubtasks");
     const statusBoxEl = document.getElementById("statusBox");
     const stepCountEl = document.getElementById("stepCount");
-    const outputBoxEl = document.getElementById("outputBox");
     const emojiKeyboardEl = document.getElementById("emojiKeyboard");
 
     const VARIABLE_SET = new Set(VARIABLE_EMOJIS);
@@ -505,6 +687,18 @@
           continue;
         }
 
+        if (op === "🔂") {
+          if (tokens.length !== 2) throw makeError("parse", lineNo, "Команда 🔂 требует формат: 🔂<переменная>.");
+          instructions.push({
+            type: "loopCount",
+            count: requireVariable(tokens[1], lineNo),
+            jumpTo: -1,
+            line: lineNo
+          });
+          blockStack.push({ type: "loopCount", index: instructions.length - 1 });
+          continue;
+        }
+
         if (op === "🔁") {
           if (tokens.length !== 3) throw makeError("parse", lineNo, "Команда 🔁 требует формат: 🔁<переменная><переменная>.");
           instructions.push({
@@ -514,16 +708,18 @@
             jumpTo: -1,
             line: lineNo
           });
-          blockStack.push({ type: "loop", index: instructions.length - 1 });
+          blockStack.push({ type: "loopNeq", index: instructions.length - 1 });
           continue;
         }
 
         if (op === "😐") {
           if (tokens.length !== 1) throw makeError("parse", lineNo, "Команда 😐 не принимает аргументы.");
-          if (!blockStack.length) throw makeError("parse", lineNo, "Лишний 😐 без открывающего 🤔 или 🔁.");
+          if (!blockStack.length) throw makeError("parse", lineNo, "Лишний 😐 без открывающего 🤔, 🔂 или 🔁.");
           const block = blockStack.pop();
           if (block.type === "if") {
             instructions.push({ type: "ifEnd", ifIndex: block.index, line: lineNo });
+          } else if (block.type === "loopCount") {
+            instructions.push({ type: "loopCountEnd", loopIndex: block.index, line: lineNo });
           } else {
             instructions.push({ type: "loopEnd", loopIndex: block.index, line: lineNo });
           }
@@ -538,7 +734,7 @@
       if (blockStack.length) {
         const firstBlock = blockStack[0];
         const firstUnclosed = instructions[firstBlock.index];
-        const opener = firstBlock.type === "if" ? "🤔" : "🔁";
+        const opener = firstBlock.type === "if" ? "🤔" : (firstBlock.type === "loopCount" ? "🔂" : "🔁");
         throw makeError("parse", firstUnclosed.line, `Блок ${opener} не закрыт командой 😐.`);
       }
 
@@ -593,14 +789,132 @@
 
     function resetResultPanels() {
       setStatus("", "Ожидание запуска.");
-      stepCountEl.textContent = "Шаги: 0";
-      outputBoxEl.value = "";
+      stepCountEl.textContent = "Суммарные шаги: 0";
+      testOutputsEl.textContent = "";
+    }
+
+    function createTestItem(inputText = "") {
+      const wrap = document.createElement("section");
+      wrap.className = "test-item";
+
+      const head = document.createElement("div");
+      head.className = "test-head";
+
+      const label = document.createElement("div");
+      label.className = "test-label";
+      label.dataset.testLabel = "1";
+
+      const removeBtn = document.createElement("button");
+      removeBtn.type = "button";
+      removeBtn.textContent = "Удалить";
+      removeBtn.dataset.testRemove = "1";
+      removeBtn.addEventListener("click", () => {
+        wrap.remove();
+        renumberTests();
+        resetResultPanels();
+      });
+
+      head.appendChild(label);
+      head.appendChild(removeBtn);
+
+      const input = document.createElement("textarea");
+      input.className = "stdin-input";
+      input.spellcheck = false;
+      input.autocomplete = "off";
+      input.autocapitalize = "off";
+      input.dataset.testInput = "1";
+      input.value = String(inputText || "");
+
+      wrap.appendChild(head);
+      wrap.appendChild(input);
+      return wrap;
+    }
+
+    function renumberTests() {
+      const tests = Array.from(testListEl.querySelectorAll(".test-item"));
+      if (!tests.length) {
+        testListEl.appendChild(createTestItem(""));
+        return renumberTests();
+      }
+      for (let i = 0; i < tests.length; i++) {
+        const item = tests[i];
+        const label = item.querySelector("[data-test-label]");
+        const removeBtn = item.querySelector("[data-test-remove]");
+        if (label) label.textContent = `Тест ${i + 1}`;
+        if (removeBtn) removeBtn.disabled = tests.length === 1;
+      }
+    }
+
+    function getTestsFromUi() {
+      const fields = Array.from(testListEl.querySelectorAll("[data-test-input]"));
+      return fields.map((field) => String(field.value || ""));
+    }
+
+    function setTestsToUi(inputs) {
+      testListEl.textContent = "";
+      const list = Array.isArray(inputs) && inputs.length ? inputs : [""];
+      for (const text of list) {
+        testListEl.appendChild(createTestItem(text));
+      }
+      renumberTests();
+    }
+
+    function renderOutputs(results) {
+      testOutputsEl.textContent = "";
+      for (let i = 0; i < results.length; i++) {
+        const result = results[i];
+        const card = document.createElement("section");
+        card.className = `test-output-card ${result.kind}`;
+
+        const title = document.createElement("div");
+        title.className = "test-label";
+        title.textContent = `Тест ${i + 1}`;
+
+        const meta = document.createElement("div");
+        meta.className = "test-output-meta";
+        meta.textContent = result.meta;
+
+        const out = document.createElement("textarea");
+        out.className = "output-box";
+        out.readOnly = true;
+        out.value = result.value;
+
+        card.appendChild(title);
+        card.appendChild(meta);
+        card.appendChild(out);
+        testOutputsEl.appendChild(card);
+      }
+    }
+
+    function initTaskPlaceholders() {
+      function renderSubtasks(taskIndex) {
+        taskSubtasksEl.textContent = "";
+        for (let i = 1; i <= 4; i++) {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.textContent = `Подзадача ${taskIndex}.${i}`;
+          btn.addEventListener("click", () => {
+            setStatus("", `Плейсхолдер: выбрано Задание ${taskIndex}, Подзадача ${taskIndex}.${i}.`);
+          });
+          taskSubtasksEl.appendChild(btn);
+        }
+      }
+
+      const taskBtns = Array.from(taskButtonsEl.querySelectorAll("[data-task]"));
+      for (const btn of taskBtns) {
+        btn.addEventListener("click", () => {
+          const task = String(btn.dataset.task || "1");
+          renderSubtasks(task);
+        });
+      }
+      renderSubtasks(1);
     }
 
     async function executeProgram(instructions, inputText) {
       const vars = initialVariables();
       const normalizedInput = String(inputText || "");
       const inputState = { index: 0 };
+      const loopCountState = new Map();
       let output = "";
       let pc = 0;
       let steps = 0;
@@ -661,6 +975,19 @@
           const right = assertFiniteNumber(vars[ins.right], ins.line, "Команда 🤔");
           if (left === right) pc += 1;
           else pc = ins.jumpTo;
+        } else if (ins.type === "loopCount") {
+          if (!loopCountState.has(pc)) {
+            const total = assertFiniteNumber(vars[ins.count], ins.line, "Команда 🔂");
+            loopCountState.set(pc, total);
+          }
+          const remaining = loopCountState.get(pc);
+          if (remaining > 0) {
+            loopCountState.set(pc, remaining - 1);
+            pc += 1;
+          } else {
+            loopCountState.delete(pc);
+            pc = ins.jumpTo;
+          }
         } else if (ins.type === "loopNeq") {
           const left = assertFiniteNumber(vars[ins.left], ins.line, "Команда 🔁");
           const right = assertFiniteNumber(vars[ins.right], ins.line, "Команда 🔁");
@@ -668,6 +995,8 @@
           else pc = ins.jumpTo;
         } else if (ins.type === "ifEnd") {
           pc += 1;
+        } else if (ins.type === "loopCountEnd") {
+          pc = ins.loopIndex;
         } else if (ins.type === "loopEnd") {
           pc = ins.loopIndex;
         } else {
@@ -689,11 +1018,11 @@
     }
 
     function updateFocusTarget(target) {
-      if (target === codeInputEl || target === stdinInputEl) lastFocusedField = target;
+      if (target === codeInputEl) lastFocusedField = target;
     }
 
     function resolveInsertTarget() {
-      if (lastFocusedField === codeInputEl || lastFocusedField === stdinInputEl) return lastFocusedField;
+      if (lastFocusedField === codeInputEl) return lastFocusedField;
       return codeInputEl;
     }
 
@@ -740,33 +1069,90 @@
     async function handleRun() {
       runBtn.disabled = true;
       setStatus("", "Парсинг программы...");
-      stepCountEl.textContent = "Шаги: 0";
+      stepCountEl.textContent = "Суммарные шаги: 0";
 
-      try {
-        const instructions = parseProgram(codeInputEl.value);
-        setStatus("", `Инструкций: ${instructions.length}. Выполнение...`);
-        const result = await executeProgram(instructions, stdinInputEl.value);
-        outputBoxEl.value = result.output;
-        stepCountEl.textContent = `Шаги: ${result.steps}`;
-
-        if (result.status === "ok") {
-          setStatus("ok", result.message);
-        } else if (result.status === "limit") {
-          setStatus("warn", result.message);
-        } else {
-          setStatus("", result.message);
-        }
-      } catch (err) {
-        outputBoxEl.value = "";
-        stepCountEl.textContent = "Шаги: 0";
-        if (err && (err.kind === "parse" || err.kind === "runtime")) {
-          setStatus("error", `Строка ${err.line}: ${err.message}`);
-        } else {
-          setStatus("error", "Неизвестная ошибка выполнения.");
-        }
-      } finally {
-        runBtn.disabled = false;
+      const tests = getTestsFromUi();
+      const hasAtLeastOneTest = tests.length > 0;
+      if (!hasAtLeastOneTest) {
+        setTestsToUi([""]);
       }
+      const safeTests = hasAtLeastOneTest ? tests : [""];
+
+      let instructions = [];
+      try {
+        instructions = parseProgram(codeInputEl.value);
+      } catch (err) {
+        const msg = err && (err.kind === "parse" || err.kind === "runtime")
+          ? `Строка ${err.line}: ${err.message}`
+          : "Неизвестная ошибка парсинга.";
+        const failResults = safeTests.map(() => ({
+          kind: "error",
+          meta: "Ошибка парсинга программы",
+          value: msg
+        }));
+        renderOutputs(failResults);
+        setStatus("error", msg);
+        runBtn.disabled = false;
+        return;
+      }
+
+      setStatus("", `Инструкций: ${instructions.length}. Выполнение тестов...`);
+
+      const results = [];
+      let totalSteps = 0;
+      let okCount = 0;
+      let warnCount = 0;
+      let errCount = 0;
+
+      for (let i = 0; i < safeTests.length; i++) {
+        try {
+          const result = await executeProgram(instructions, safeTests[i]);
+          totalSteps += result.steps;
+          if (result.status === "ok") {
+            okCount += 1;
+            results.push({
+              kind: "ok",
+              meta: `Успех. Шаги: ${result.steps}`,
+              value: result.output
+            });
+          } else if (result.status === "limit") {
+            warnCount += 1;
+            results.push({
+              kind: "warn",
+              meta: `Лимит шагов. Шаги: ${result.steps}`,
+              value: result.output
+            });
+          } else {
+            warnCount += 1;
+            results.push({
+              kind: "warn",
+              meta: `Необычный статус. Шаги: ${result.steps}`,
+              value: result.output
+            });
+          }
+        } catch (err) {
+          errCount += 1;
+          const msg = err && (err.kind === "parse" || err.kind === "runtime")
+            ? `Строка ${err.line}: ${err.message}`
+            : "Неизвестная ошибка выполнения.";
+          results.push({
+            kind: "error",
+            meta: "Ошибка выполнения",
+            value: msg
+          });
+        }
+      }
+
+      renderOutputs(results);
+      stepCountEl.textContent = `Суммарные шаги: ${totalSteps}`;
+      if (errCount > 0) {
+        setStatus("error", `Готово: успех ${okCount}, предупреждения ${warnCount}, ошибки ${errCount}.`);
+      } else if (warnCount > 0) {
+        setStatus("warn", `Готово: успех ${okCount}, предупреждения ${warnCount}.`);
+      } else {
+        setStatus("ok", `Готово: все ${okCount} тест(а/ов) выполнены успешно.`);
+      }
+      runBtn.disabled = false;
     }
 
     function handleReset() {
@@ -777,13 +1163,13 @@
       const item = EXAMPLES[index];
       if (!item) return;
       codeInputEl.value = item.code;
-      stdinInputEl.value = item.input;
+      setTestsToUi(item.tests);
       codeInputEl.focus();
       updateFocusTarget(codeInputEl);
       resetResultPanels();
     }
 
-    for (const el of [codeInputEl, stdinInputEl]) {
+    for (const el of [codeInputEl]) {
       el.addEventListener("focus", () => updateFocusTarget(el));
       el.addEventListener("click", () => updateFocusTarget(el));
       el.addEventListener("keyup", () => updateFocusTarget(el));
@@ -796,8 +1182,21 @@
     example1Btn.addEventListener("click", () => applyExample(0));
     example2Btn.addEventListener("click", () => applyExample(1));
     example3Btn.addEventListener("click", () => applyExample(2));
+    example4Btn.addEventListener("click", () => applyExample(3));
+    example5Btn.addEventListener("click", () => applyExample(4));
+    addTestBtn.addEventListener("click", () => {
+      testListEl.appendChild(createTestItem(""));
+      renumberTests();
+      resetResultPanels();
+    });
+    resetTestsBtn.addEventListener("click", () => {
+      setTestsToUi([""]);
+      resetResultPanels();
+    });
 
     renderKeyboard();
+    initTaskPlaceholders();
+    setTestsToUi([""]);
     resetResultPanels();
     codeInputEl.focus();
     updateFocusTarget(codeInputEl);
