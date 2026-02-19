@@ -178,16 +178,6 @@
       box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.2);
     }
 
-    .text-input.is-valid {
-      border-color: #16a34a;
-      box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.2);
-    }
-
-    .text-input.is-invalid {
-      border-color: #dc2626;
-      box-shadow: 0 0 0 3px rgba(252, 165, 165, 0.22);
-    }
-
     textarea:focus {
       border-color: #0ea5a4;
       box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.2);
@@ -252,6 +242,26 @@
 
     .subtask-grid[hidden] {
       display: none !important;
+    }
+
+    .task-text-wrap[hidden] {
+      display: none !important;
+    }
+
+    .task-text-wrap {
+      margin-top: 8px;
+      display: grid;
+      gap: 6px;
+    }
+
+    .task-text {
+      min-height: 72px;
+      resize: vertical;
+      font-size: 16px;
+      line-height: 1.35;
+      letter-spacing: 0;
+      word-spacing: 0;
+      font-variant-ligatures: none;
     }
 
     .tests-toolbar {
@@ -458,7 +468,7 @@
 
     <section class="blocks">
       <section class="panel">
-        <h2 class="block-title"><span class="block-num">0</span>Переключалки</h2>
+        <h2 class="block-title"><span class="block-num">0</span>Примеры и Задания</h2>
         <div class="switchers">
           <section>
             <div class="mini-title">Примеры</div>
@@ -479,6 +489,10 @@
               <button type="button" data-task="4" aria-pressed="false">Задание 4</button>
             </div>
             <div id="taskSubtasks" class="subtask-grid" hidden></div>
+            <section id="taskTextWrap" class="task-text-wrap" hidden>
+              <label for="taskText">Текст задания</label>
+              <textarea id="taskText" class="task-text" readonly spellcheck="false"></textarea>
+            </section>
           </section>
         </div>
       </section>
@@ -521,9 +535,10 @@
       <section id="codePhrasePanel" class="panel" hidden>
         <h2 class="block-title"><span class="block-num">6</span>Кодовая фраза</h2>
         <label for="codePhraseInput">Кодовая фраза</label>
-        <input id="codePhraseInput" class="text-input" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Введите кодовую фразу">
-        <p class="hint">Показывается только в выбранных сценариях.</p>
-        <p id="codePhraseStatus" class="hint"></p>
+        <input id="codePhraseInput" class="text-input" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Кодовая фраза" readonly>
+        <div class="controls">
+          <button id="copyCodePhraseBtn" type="button">Копировать</button>
+        </div>
       </section>
     </section>
 
@@ -610,10 +625,8 @@
       // "example:3",
       // "task:2.1",
     ]);
-    const CODE_PHRASE_PEPPER = "secmod-2026-k0";
-    const CODE_PHRASE_HASH_CONFIG = Object.freeze({
-      // "task:2.1": { salt: "s_task_2_1_phrase_v1", hash: "..." },
-      // "task:2.1": { salt: "s_task_2_1_phrase_v1", hashes: ["...", "..."] },
+    const SUBTASK_TEXTS = Object.freeze({
+      // "1.1": "Текст задания...",
     });
 
     const codeInputEl = document.getElementById("codeInput");
@@ -630,12 +643,14 @@
     const example5Btn = document.getElementById("example5Btn");
     const taskButtonsEl = document.getElementById("taskButtons");
     const taskSubtasksEl = document.getElementById("taskSubtasks");
+    const taskTextWrapEl = document.getElementById("taskTextWrap");
+    const taskTextEl = document.getElementById("taskText");
     const statusBoxEl = document.getElementById("statusBox");
     const stepCountEl = document.getElementById("stepCount");
     const emojiKeyboardEl = document.getElementById("emojiKeyboard");
     const codePhrasePanelEl = document.getElementById("codePhrasePanel");
     const codePhraseInputEl = document.getElementById("codePhraseInput");
-    const codePhraseStatusEl = document.getElementById("codePhraseStatus");
+    const copyCodePhraseBtn = document.getElementById("copyCodePhraseBtn");
 
     const VARIABLE_SET = new Set(VARIABLE_EMOJIS);
     const exampleButtons = [example1Btn, example2Btn, example3Btn, example4Btn, example5Btn];
@@ -645,7 +660,6 @@
     let selectedExampleIndex = -1;
     let selectedTaskKey = "";
     let selectedSubtaskKey = "";
-    let codePhraseCheckNonce = 0;
 
     function makeError(kind, line, message) {
       const err = new Error(message);
@@ -858,71 +872,6 @@
       statusBoxEl.textContent = message;
     }
 
-    async function sha256Hex(text) {
-      const data = new TextEncoder().encode(String(text || ""));
-      const digest = await crypto.subtle.digest("SHA-256", data);
-      const bytes = new Uint8Array(digest);
-      let out = "";
-      for (let i = 0; i < bytes.length; i++) out += bytes[i].toString(16).padStart(2, "0");
-      return out;
-    }
-
-    function safeEqual(a, b) {
-      if (typeof a !== "string" || typeof b !== "string" || a.length !== b.length) return false;
-      let diff = 0;
-      for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
-      return diff === 0;
-    }
-
-    function getCodePhraseRule(scenarioKey) {
-      const raw = CODE_PHRASE_HASH_CONFIG[scenarioKey];
-      if (!raw || typeof raw !== "object") return null;
-      const salt = typeof raw.salt === "string" ? raw.salt : "";
-      if (!salt) return null;
-      const hashes = [];
-      if (typeof raw.hash === "string" && raw.hash) hashes.push(raw.hash);
-      if (Array.isArray(raw.hashes)) {
-        for (const h of raw.hashes) {
-          if (typeof h === "string" && h) hashes.push(h);
-        }
-      }
-      if (!hashes.length) return null;
-      return { salt, hashes };
-    }
-
-    function clearCodePhraseValidation() {
-      if (!codePhraseInputEl) return;
-      codePhraseInputEl.classList.remove("is-valid", "is-invalid");
-      if (codePhraseStatusEl) codePhraseStatusEl.textContent = "";
-    }
-
-    async function validateCodePhraseInput() {
-      if (!codePhraseInputEl || !codePhrasePanelEl || codePhrasePanelEl.hidden) return;
-      const rule = getCodePhraseRule(currentScenarioKey);
-      const entered = String(codePhraseInputEl.value || "");
-
-      clearCodePhraseValidation();
-      if (!rule || !entered) return;
-
-      const nonce = ++codePhraseCheckNonce;
-      const hash = await sha256Hex(`${currentScenarioKey}|${rule.salt}|${entered}|${CODE_PHRASE_PEPPER}`);
-      if (nonce !== codePhraseCheckNonce) return;
-
-      let matched = false;
-      for (const allowedHash of rule.hashes) {
-        if (safeEqual(hash, allowedHash)) {
-          matched = true;
-          break;
-        }
-      }
-
-      codePhraseInputEl.classList.toggle("is-valid", matched);
-      codePhraseInputEl.classList.toggle("is-invalid", !matched);
-      if (codePhraseStatusEl) {
-        codePhraseStatusEl.textContent = matched ? "Кодовая фраза верна." : "Кодовая фраза не совпадает.";
-      }
-    }
-
     function setPressedState(button, isPressed) {
       if (!button) return;
       button.setAttribute("aria-pressed", isPressed ? "true" : "false");
@@ -949,10 +898,31 @@
       }
     }
 
+    function setTaskText(subtaskKey) {
+      if (!taskTextWrapEl || !taskTextEl) return;
+      const raw = SUBTASK_TEXTS[subtaskKey];
+      const text = typeof raw === "string" ? raw.trim() : "";
+      if (!text) {
+        taskTextEl.value = "";
+        taskTextWrapEl.hidden = true;
+        return;
+      }
+      taskTextEl.value = text;
+      taskTextWrapEl.hidden = false;
+    }
+
+    function selectSubtask(subtaskKey) {
+      selectedSubtaskKey = subtaskKey;
+      syncSubtaskButtons();
+      setTaskText(subtaskKey);
+      setScenarioKey(`task:${subtaskKey}`);
+    }
+
     function clearSubtasks() {
       selectedSubtaskKey = "";
       taskSubtasksEl.textContent = "";
       taskSubtasksEl.hidden = true;
+      setTaskText("");
     }
 
     function renderSubtasks(taskKey) {
@@ -965,9 +935,7 @@
         btn.setAttribute("aria-pressed", "false");
         btn.textContent = `Подзадача ${subtaskKey}`;
         btn.addEventListener("click", () => {
-          selectedSubtaskKey = subtaskKey;
-          syncSubtaskButtons();
-          setScenarioKey(`task:${subtaskKey}`);
+          selectSubtask(subtaskKey);
         });
         taskSubtasksEl.appendChild(btn);
       }
@@ -979,9 +947,7 @@
       currentScenarioKey = String(key || "");
       const visible = CODE_PHRASE_VISIBLE_SCENARIOS.has(currentScenarioKey);
       if (codePhrasePanelEl) codePhrasePanelEl.hidden = !visible;
-      codePhraseCheckNonce += 1;
       if (codePhraseInputEl) codePhraseInputEl.value = "";
-      clearCodePhraseValidation();
     }
 
     function resetResultPanels() {
@@ -1098,7 +1064,7 @@
           syncExampleButtons();
           syncTaskButtons();
           renderSubtasks(taskKey);
-          setScenarioKey(`task:${taskKey}`);
+          selectSubtask(`${taskKey}.1`);
         });
       }
     }
@@ -1390,9 +1356,21 @@
       setTestsToUi([""]);
       resetResultPanels();
     });
-    if (codePhraseInputEl) {
-      codePhraseInputEl.addEventListener("input", () => {
-        validateCodePhraseInput();
+    if (copyCodePhraseBtn && codePhraseInputEl) {
+      copyCodePhraseBtn.addEventListener("click", async () => {
+        const text = String(codePhraseInputEl.value || "");
+        if (!text) {
+          setStatus("warn", "Кодовая фраза пуста.");
+          return;
+        }
+        try {
+          await navigator.clipboard.writeText(text);
+          setStatus("ok", "Кодовая фраза скопирована.");
+        } catch (_) {
+          codePhraseInputEl.focus();
+          codePhraseInputEl.select();
+          setStatus("warn", "Копирование через буфер недоступно. Текст выделен для копирования.");
+        }
       });
     }
 

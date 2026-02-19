@@ -24,54 +24,24 @@
 
       <section id="sectionContent" hidden>
         <h1 class="text-3xl font-black tracking-tight">Лавлейс</h1>
-        <p class="mt-4 text-slate-600">
-          Ада Лавлейс (1815–1852), полное имя Августа Ада Кинг, графиня Лавлейс, была английской математичкой.
-          Её часто называют одним из первых людей, кто увидел в вычислительной машине не просто “калькулятор”, а устройство для работы с правилами и символами.
-        </p>
-
-        <div class="mt-6 grid gap-4">
-          <section class="rounded-2xl border border-slate-200 bg-slate-50 p-5">
-            <h2 class="text-lg font-extrabold">Практика</h2>
-            <p class="mt-2 text-slate-700">
-              Откройте фронтенд-редактор для языка Emoji-gramming с встроенной emoji-клавиатурой и запуском программы прямо в браузере.
-            </p>
-            <a href="./editor.html" class="mt-4 inline-flex items-center rounded-xl bg-teal-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-teal-700">
-              Emoji-gramming редактор
-            </a>
-          </section>
-
-          <section class="rounded-2xl border border-slate-200 bg-slate-50 p-5">
-            <h2 class="text-lg font-extrabold">Почему её помнят</h2>
-            <ul class="mt-2 list-disc space-y-1 pl-5 text-slate-700">
-              <li>Она написала знаменитые заметки о “аналитической машине” Чарльза Бэббиджа.</li>
-              <li>В этих заметках есть пример алгоритма (часто упоминают вычисление чисел Бернулли).</li>
-              <li>Ада рассуждала о том, что машина может обрабатывать не только числа, но и музыку, тексты, схемы, если описать правила.</li>
-            </ul>
-          </section>
-
-          <section class="rounded-2xl border border-slate-200 bg-slate-50 p-5">
-            <h2 class="text-lg font-extrabold">Идея “алгоритма” простыми словами</h2>
-            <p class="mt-2 text-slate-700">
-              Алгоритм это последовательность шагов: что делать сначала, что потом и как проверять результат.
-              Именно такое “пошаговое мышление” стало основой программирования.
-            </p>
-          </section>
-
-          <section class="rounded-2xl border border-slate-200 bg-slate-50 p-5">
-            <h2 class="text-lg font-extrabold">Мини-хронология</h2>
-            <div class="mt-2 grid gap-2 text-slate-700">
-              <div><span class="font-mono text-sm text-slate-500">1815</span> Родилась в Лондоне.</div>
-              <div><span class="font-mono text-sm text-slate-500">1830–1840-е</span> Занималась математикой, общалась с учёными и инженерами своего времени.</div>
-              <div><span class="font-mono text-sm text-slate-500">1843</span> Опубликовала расширенные заметки к описанию аналитической машины.</div>
-              <div><span class="font-mono text-sm text-slate-500">1852</span> Умерла, оставив идеи, которые позже стали частью истории компьютеров.</div>
-            </div>
-          </section>
-        </div>
-
-        <a href="../index.html" class="mt-6 inline-flex items-center rounded-xl bg-teal-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-teal-700">На главную</a>
+        <p class="mt-4 text-slate-600">Доступ открыт. Переходим в редактор.</p>
+        <a href="./editor.html" class="mt-6 inline-flex items-center rounded-xl bg-teal-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-teal-700">Открыть редактор</a>
       </section>
     </main>
   </div>
-  <script>window.SectionAuth && window.SectionAuth.initIndex("LOVELACE");</script>
+  <script>
+    if (window.SectionAuth) {
+      window.SectionAuth.initIndex("LOVELACE", {
+        onAlreadyUnlocked: () => {
+          const next = new URLSearchParams(window.location.search).get("next") || "";
+          if (!next) window.location.replace("./editor.html");
+        },
+        onUnlockSuccess: () => {
+          const next = new URLSearchParams(window.location.search).get("next") || "";
+          if (!next) window.location.replace("./editor.html");
+        }
+      });
+    }
+  </script>
 </body>
 </html>
