@@ -621,6 +621,7 @@
 
     const HARD_STEP_LIMIT = 200000;
     const YIELD_EVERY = 1500;
+    const CODE_PHRASE_PANEL_ENABLED = false;
     const CODE_PHRASE_VISIBLE_SCENARIOS = new Set([
       // "example:3",
       // "task:2.1",
@@ -945,8 +946,14 @@
 
     function setScenarioKey(key) {
       currentScenarioKey = String(key || "");
+      if (!codePhrasePanelEl) return;
+      if (!CODE_PHRASE_PANEL_ENABLED) {
+        codePhrasePanelEl.hidden = true;
+        if (codePhraseInputEl) codePhraseInputEl.value = "";
+        return;
+      }
       const visible = CODE_PHRASE_VISIBLE_SCENARIOS.has(currentScenarioKey);
-      if (codePhrasePanelEl) codePhrasePanelEl.hidden = !visible;
+      codePhrasePanelEl.hidden = !visible;
       if (codePhraseInputEl) codePhraseInputEl.value = "";
     }
 
