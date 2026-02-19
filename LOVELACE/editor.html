@@ -421,6 +421,19 @@
       gap: 10px;
     }
 
+    .keyboard-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 220px;
+      gap: 10px;
+      align-items: start;
+    }
+
+    .keyboard-left {
+      display: grid;
+      gap: 10px;
+      min-width: 0;
+    }
+
     .emoji-group {
       border: 1px solid #e5e7eb;
       border-radius: 10px;
@@ -448,12 +461,65 @@
       place-items: center;
     }
 
+    .editor-nav {
+      border: 1px solid #d1d5db;
+      border-radius: 10px;
+      background: linear-gradient(180deg, #ffffff, #f8fafc);
+      padding: 10px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .nav-title {
+      margin: 0;
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+      color: #475569;
+    }
+
+    .nav-arrows {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-areas:
+        ". up ."
+        "left down right";
+      gap: 6px;
+    }
+
+    .nav-actions {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 6px;
+    }
+
+    .nav-btn {
+      min-height: 42px;
+      padding: 7px 8px;
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      border-radius: 10px;
+      user-select: none;
+    }
+
+    .nav-btn.up { grid-area: up; }
+    .nav-btn.left { grid-area: left; }
+    .nav-btn.down { grid-area: down; }
+    .nav-btn.right { grid-area: right; }
+    .nav-btn.enter { grid-column: 1 / -1; }
+
     .vars-panel[hidden] {
       display: none !important;
     }
 
     @media (max-width: 1040px) {
       .switchers {
+        grid-template-columns: 1fr;
+      }
+
+      .keyboard-layout {
         grid-template-columns: 1fr;
       }
     }
@@ -1201,8 +1267,126 @@
       updateFocusTarget(target);
     }
 
+    function focusCodeInput() {
+      codeInputEl.focus();
+      updateFocusTarget(codeInputEl);
+      return codeInputEl;
+    }
+
+    function getSelectionRange(target) {
+      const start = typeof target.selectionStart === "number" ? target.selectionStart : target.value.length;
+      const end = typeof target.selectionEnd === "number" ? target.selectionEnd : start;
+      return { start, end };
+    }
+
+    function findLineStart(text, pos) {
+      if (pos <= 0) return 0;
+      const idx = text.lastIndexOf("\n", pos - 1);
+      return idx === -1 ? 0 : idx + 1;
+    }
+
+    function findLineEnd(text, pos) {
+      const idx = text.indexOf("\n", pos);
+      return idx === -1 ? text.length : idx;
+    }
+
+    function moveCaretHorizontal(delta) {
+      const target = focusCodeInput();
+      const { start, end } = getSelectionRange(target);
+      let next = start;
+      if (delta < 0) {
+        next = start !== end ? Math.min(start, end) : Math.max(0, start - 1);
+      } else {
+        next = start !== end ? Math.max(start, end) : Math.min(target.value.length, end + 1);
+      }
+      target.setSelectionRange(next, next);
+      updateFocusTarget(target);
+    }
+
+    function moveCaretVertical(delta) {
+      const target = focusCodeInput();
+      const text = target.value;
+      const { start, end } = getSelectionRange(target);
+      const base = delta < 0 ? Math.min(start, end) : Math.max(start, end);
+      const currStart = findLineStart(text, base);
+      const currCol = base - currStart;
+      let next = base;
+
+      if (delta < 0) {
+        if (currStart === 0) {
+          next = 0;
+        } else {
+          const prevEnd = currStart - 1;
+          const prevStart = findLineStart(text, prevEnd);
+          const prevLen = prevEnd - prevStart;
+          next = prevStart + Math.min(currCol, prevLen);
+        }
+      } else {
+        const currEnd = findLineEnd(text, base);
+        if (currEnd >= text.length) {
+          next = text.length;
+        } else {
+          const nextStart = currEnd + 1;
+          const nextEnd = findLineEnd(text, nextStart);
+          const nextLen = nextEnd - nextStart;
+          next = nextStart + Math.min(currCol, nextLen);
+        }
+      }
+
+      target.setSelectionRange(next, next);
+      updateFocusTarget(target);
+    }
+
+    function insertCodeText(text) {
+      const target = focusCodeInput();
+      const { start, end } = getSelectionRange(target);
+      target.setRangeText(text, start, end, "end");
+      updateFocusTarget(target);
+    }
+
+    function backspaceInCodeInput() {
+      const target = focusCodeInput();
+      const { start, end } = getSelectionRange(target);
+      if (start !== end) {
+        target.setRangeText("", start, end, "end");
+      } else if (start > 0) {
+        target.setRangeText("", start - 1, start, "end");
+      }
+      updateFocusTarget(target);
+    }
+
+    function deleteInCodeInput() {
+      const target = focusCodeInput();
+      const { start, end } = getSelectionRange(target);
+      if (start !== end) {
+        target.setRangeText("", start, end, "end");
+      } else if (start < target.value.length) {
+        target.setRangeText("", start, start + 1, "end");
+      }
+      updateFocusTarget(target);
+    }
+
+    function createNavButton(text, title, className, onClick) {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = `nav-btn ${className}`;
+      btn.textContent = text;
+      btn.title = title;
+      btn.addEventListener("mousedown", (event) => {
+        event.preventDefault();
+      });
+      btn.addEventListener("click", onClick);
+      return btn;
+    }
+
     function renderKeyboard() {
       emojiKeyboardEl.textContent = "";
+      const layoutEl = document.createElement("div");
+      layoutEl.className = "keyboard-layout";
+
+      const leftEl = document.createElement("div");
+      leftEl.className = "keyboard-left";
+
       for (let i = 0; i < KEYBOARD_GROUPS.length; i++) {
         const group = KEYBOARD_GROUPS[i];
         const groupEl = document.createElement("section");
@@ -1228,8 +1412,36 @@
         }
 
         groupEl.appendChild(gridEl);
-        emojiKeyboardEl.appendChild(groupEl);
+        leftEl.appendChild(groupEl);
       }
+
+      const navEl = document.createElement("section");
+      navEl.className = "editor-nav";
+
+      const navTitleEl = document.createElement("p");
+      navTitleEl.className = "nav-title";
+      navTitleEl.textContent = "Навигация";
+
+      const arrowsEl = document.createElement("div");
+      arrowsEl.className = "nav-arrows";
+      arrowsEl.appendChild(createNavButton("↑", "Стрелка вверх", "up", () => moveCaretVertical(-1)));
+      arrowsEl.appendChild(createNavButton("←", "Стрелка влево", "left", () => moveCaretHorizontal(-1)));
+      arrowsEl.appendChild(createNavButton("↓", "Стрелка вниз", "down", () => moveCaretVertical(1)));
+      arrowsEl.appendChild(createNavButton("→", "Стрелка вправо", "right", () => moveCaretHorizontal(1)));
+
+      const actionsEl = document.createElement("div");
+      actionsEl.className = "nav-actions";
+      actionsEl.appendChild(createNavButton("Enter", "Вставить перенос строки", "enter", () => insertCodeText("\n")));
+      actionsEl.appendChild(createNavButton("Backspace", "Удалить символ слева", "backspace", () => backspaceInCodeInput()));
+      actionsEl.appendChild(createNavButton("Delete", "Удалить символ справа", "delete", () => deleteInCodeInput()));
+
+      navEl.appendChild(navTitleEl);
+      navEl.appendChild(arrowsEl);
+      navEl.appendChild(actionsEl);
+
+      layoutEl.appendChild(leftEl);
+      layoutEl.appendChild(navEl);
+      emojiKeyboardEl.appendChild(layoutEl);
     }
 
     async function handleRun() {
