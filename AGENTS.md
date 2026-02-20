@@ -16,3 +16,4 @@
 - 2026-02-20: `LOVELACE/js/domain-classic.js` обновлен со stub до полноценного classic-движка (парсер и исполнение команд текущего формата).
 - 2026-02-20: Добавлена локальная robot-справка `dev/lovelace/emoji-robot-reference.local.html`, путь внесен в `.gitignore`; на клиентской robot-странице подтверждено 5 примеров.
 - 2026-02-20: В `LOVELACE/editor-robot.html` убрана панель ручных тестов, добавлена визуализация поля сценария; сценарии переведены в скрытые закодированные blobs, а проверка успеха идет только при запуске через `fixedTestsByScenario` и снимки состояния (`snapshot`) из `LOVELACE/js/domain-robot.js`.
+- 2026-02-20: В robot-ветке (`LOVELACE/editor-robot.html`) добавлен toggle микроанимации движения робота, цветовые подсказки из легенды поля убраны, а примеры усложнены; `LOVELACE/js/domain-robot.js` теперь возвращает трассу шагов (`trace`), и `LOVELACE/js/lab-shell.js` передает лимит `maxTracePoints` в runtime.

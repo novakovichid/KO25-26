@@ -335,6 +335,31 @@
       gap: 10px;
     }
 
+    .scenario-tools {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+    }
+
+    .scenario-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #1f2937;
+      user-select: none;
+      cursor: pointer;
+    }
+
+    .scenario-toggle input {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--accent);
+      cursor: pointer;
+      margin: 0;
+    }
+
     .scenario-meta {
       font-size: 13px;
       font-weight: 700;
@@ -767,6 +792,12 @@
       <section class="panel">
         <h2 class="block-title"><span class="block-num">3</span>Поле сценария</h2>
         <div class="scenario-wrap">
+          <div class="scenario-tools">
+            <label class="scenario-toggle" for="scenarioAnimationToggle">
+              <input id="scenarioAnimationToggle" type="checkbox" checked>
+              Анимация робота
+            </label>
+          </div>
           <div id="scenarioMeta" class="scenario-meta"></div>
           <div id="scenarioBoard" class="scenario-board"></div>
           <div class="scenario-legend">
@@ -774,10 +805,6 @@
             <span class="legend-item"><span class="legend-chip blocked">■</span>Стена</span>
             <span class="legend-item"><span class="legend-chip">S</span>Старт</span>
             <span class="legend-item"><span class="legend-chip">F</span>Финиш</span>
-            <span class="legend-item"><span class="legend-chip red"></span>🌹</span>
-            <span class="legend-item"><span class="legend-chip yellow"></span>🌻</span>
-            <span class="legend-item"><span class="legend-chip green"></span>🍀</span>
-            <span class="legend-item"><span class="legend-chip purple"></span>🍇</span>
           </div>
         </div>
       </section>
@@ -820,11 +847,11 @@
     const COLOR_CSS_BY_CODE = { red: "color-red", yellow: "color-yellow", green: "color-green", purple: "color-purple" };
 
     const ROBOT_EXAMPLES = [
-      { label: "Пример №1", code: ["🚶🚠", "🚶🚇"].join("\n") },
-      { label: "Пример №2", code: ["🎨🌹"].join("\n") },
-      { label: "Пример №3", code: ["🤔🧱🚠", "🎨🌻", "😐"].join("\n") },
-      { label: "Пример №4", code: ["🔂3️⃣", "🚶🚠", "😐"].join("\n") },
-      { label: "Пример №5", code: ["🔁🛤🚠", "🚶🚠", "😐"].join("\n") }
+      { label: "Пример №1", code: ["🚶🚠", "🚶🚠", "🚶🚇", "🚶🚇", "🚶🚜"].join("\n") },
+      { label: "Пример №2", code: ["🚶🚠", "🚶🚇", "🎨🌹", "🚶🚠", "🎨🍀"].join("\n") },
+      { label: "Пример №3", code: ["🤔🧱🚠", "🚶🚇", "😐", "🚶🚠", "🎨🌻"].join("\n") },
+      { label: "Пример №4", code: ["🔂4️⃣", "🚶🚠", "😐", "🚶🚇", "🎨🍇"].join("\n") },
+      { label: "Пример №5", code: ["🔁🛤🚠", "🚶🚠", "😐", "🚶🚇", "🎨🍀"].join("\n") }
     ];
 
     const ROBOT_SUBTASK_PRESETS = Object.freeze({
@@ -858,15 +885,15 @@
     ];
 
     const ROBOT_SCENARIO_BLOBS = Object.freeze({
-      "example:1": [{ "seed": 495056334, "blob": "tfdDppi8RkltKPRjl42uCOoE8quQU++yKpx1S7hXteUHhrjNuKI2v+RgVFUIrUP4VeBE3WjSCY+Erq3rViJekVVIXC1HYdTWFSk6rXHDvNStzLR2ncfW+R3fRJWHXT6tx1t5XKprIbJ1Fd3TiDsYqQugHUI=" }],
-      "example:2": [{ "seed": 3149492103, "blob": "/BgiFdFrN0pUFjWQ7lp/a+Nrk7iZ5P7yM8D02OEghAbOqRk+8fUHPB2fFWaxehLb3M9lTuElmEwd8az4j5UvMpwBs8TJdGecbRt73sGavzu4Jk5+2STHZy1XjFohqg/cgnfBfjHZCA1DIBz8YzPejNXQOo54y3fSGrx9l0xKIjolgPOOTuq33K3B7FZBk7PsQ+8MPBlkEmy9FEAaKrUFukI7kvQuSpeq2zDMoS7r" }],
-      "example:3": [{ "seed": 1508960576, "blob": "O70BQA4m5FezFHbAwWcMxuTOMM3mac3PFAd3rc49lyuJzHprLjhUobga1jNeB6G2W6qG+14oazH6NK/N4Ai8X9uCnkvR+3bISxO4C6epDYCineeXcNC5URcFSPsO4lvpTJAlq3iBwKSm7kk5Ls5vdhhqRjuexwQofep3" }],
-      "example:4": [{ "seed": 4163396345, "blob": "gibgv0cdVVCaG7cP2AzdIf010dLv8twLfUz2IjcWZkxw19tUZ0OjJtGRl/zHrHCRwpGnZNcz+vZTf67CWWMN+GIZ/zQYwMfPYhj5RL5CT/26/ZePYmblQMqIx34InG0EMIqaxfUKsitCZJ56xzorQJxRfvs=" }],
-      "example:5": [{ "seed": 2522864818, "blob": "yUvH6nzICl3BBvC6M9nynPaYduf0ByNGRvFxtxzjSZE7+jyBnJb9qwoMUIlseR9sSXzAkUwGQ6Em0ZHm8oejep7Fh+F8tjWL+BRku8tWZA34QmajeQ7Rw8NuAvlEnlUTopS4wYBkZq4J+e6OLzbYKgZ73ofE6D2qNw==" }],
-      "task:1.1": [{ "seed": 882333291, "blob": "EOymWbWH+14oBTHrCuaD/w//F/T9iDKErzbwBEX8WLLiHZ3y1dnIKKKLEVoVBq5P8FvhAsUJ1HiBxaik60lzRvBTOVJqWmnB0AJ/IuwokaPIt9GpcJyLzph3wVn69lN6osBcY0eQXCWwfhjclZB1Hq4buB0=" }],
-      "task:1.2": [{ "seed": 3536769060, "blob": "XxGFtOJyqFsXD3IWHbNQWgAitBnKHQHAsHpzmbLJK9etIP7fAmwbrd0G0meC030qfwYCr7Icpz0eCKu5XLzA4z8IFGX6bfuNrgK8X7HzkArb72nfCl24SLnnApqnza7bcPa7TVpNWbxxtxzgWI836iCBnLbq5E8jDs5gYTNgTnbWkUx/avJuw+CZvdCybZfHgJcjgBiF4EIw6chcfkaxURa2dx7Q0s4jVq8MsAVC7w==" }],
-      "task:1.3": [{ "seed": 1896237533, "blob": "prpk4xspGWR+crNDdFhhtRmJVS7TphAfmaDybpuiOviUS18Iu7dq0nW9kzAreAwF5u0j2CtnNuL3U6qOtRdRDEaFe+jE9Av7BvT9iBKW4HPfWgL0RZ/kApqizbjbffa6URcASO0O/VfrSYw62zHCxaWt4xhrCNl7cA1y" }],
-      "task:1.4": [{ "seed": 255706006, "blob": "7d9LXlDkzmGlcMyOT2U2EBLs+jPYK2db4uVt48C/DR1fbrB18Pq/V644rP3QBdvgbchMRaBqgadMlrWD7oomqY1gVFUPuVz+XfECxSmrJMzVpLzuVT9ekVUmXD9/NYbVHzNx5GKzqdq9zaV70JOAsTOIFdo=" }],
+      "example:1": [{ "seed": 495056334, "blob": "tfdDppi8RkltK/Ril42uCOoE8quQU++yKp11S7hXteUHhrjNuKI2v+RgVFUIrUP4VeBE3WjSCY+Erq3rViJekVVIXC1HYdTWFSk6rXHDvNStzLR2ncfW+R3fRJWHXT6tx1t5XKprIbJ1Fd3TiDsYqQugHUI=" }],
+      "example:2": [{ "seed": 3149492103, "blob": "/BgiFdFrN0pUFzWX7lp/a+Nrk7iZ5P7wM8L02OEghAbOqRk+8fUHPB6fFWaxehLb3M9lTuElmEwd8az4j5UvMpwBs8TJdGScbRt73sKavyyyJ1EuwSqYLCQQkRY5tAGKnjiLbSfMFj8DbQumKXTEnZuGLts5kifUGr959hkfMBUrmLSEW+v2hK2Y4gZVn7PxZOIzKVo9TSX7UBMAMbMIxAU8mPIiXd3TwC7WtnGs319FT+SCedJng8pgO3ENEtntKoozBlLi91OqjrUXUQxGo3Wyg7ZKskf5/YhYmKFlwkQI6BPmqRyQtM3/pHnu" }],
+      "example:3": [{ "seed": 1508960576, "blob": "O70BQA4m5FezE3bCwWcMxuTOMM3mac3MFAd3rc49lyuJzHprLjhUobka1jNeB6G2W6qG+14obS/0Z5f8oFn9AOyzwUuO2FuBCgLiQbnoGtfqlKCfbf2/ThAlD6BP81vhAsUm+yHGiu+u7lQ4D8NNehxgUDuekQ84dPtllu7Gow==" }],
+      "example:4": [{ "seed": 4163396345, "blob": "gibgv0cdVVCaGrcN2AzdIf010dLv8twKfUz2IjcWZkxw19tUZ0OjJtCRl/zHrHCRwpGnZNcz+vZTf67CWWMN+GIZ/zQYwMfPYhj5RL5CWfun/ZCOX22mGfnZj2xvxD0XPMjR0PQ2vjlJT5RyinJ9CMtEdvRdxII4zCE=" }],
+      "example:5": [{ "seed": 2522864818, "blob": "yUvH6nzICl3BBPC4M9nynPaYduf0ByNHRvFxtxzjSZE7+jyBnJb7qwsMUIlseR9sSXzAkUwGQ6Mm0ZHm8oejep7Fh+F8tjWL+BRku8tWZA34Qma1fxPRxMJTCbodrQVbsPPgkZNoJOUc+NKCPT3zIA42ltGMvz+lL0Ri2WOY" }],
+      "task:1.1": [{ "seed": 882333291, "blob": "EOymWbWH+14oADHtCuaD/w//F/T9iDKFrzbwBEX8WLLiHZ3y1dnLKKGLEVoVBq5P8FvhAsUJ1HiBxaik60lzRvBTOVJqWmnB0AJ/IuwokaPIt9GpcJyLzph0wVr69lN6osBcY0eQXCWwfhjclZB1Hq4buB0=" }],
+      "task:1.2": [{ "seed": 3536769060, "blob": "XxGFtOJyqFsXDnIWHbNQWgAitBnKHQHBsHtzmbLJK9etIP7fAmwYrd0G0meC030qfwYCr7Icpz0eCKu5XLzA4z8IFGX6bfuNrgK8X7HzkB3R7naPElPnHaepFtfq3a7bfbHsDFRVCa5A9EynGt0r7DjPybrqqxglGcZ+N0o2X0SIkRMlaPJple6BpYemdpzAh6sUiAnEshR46ZRBYlqnFWa1fxPRxMJCA7cRt0IFsK7mhoNjKutY8smZPDDeOzY8iYOUp2H7aEJpl3KWImVpkhZ7pBeZyzjIfjHfWXIMbRXrYXSH2oWPJY5m43jd" }],
+      "task:1.3": [{ "seed": 1896237533, "blob": "prpk4xspGWR+dLNBdFhhtRmJVS7TphAfmaDybpuiOviUS18Iu7dp0nS9kzAreAwF5u0j2CtnMPz5AJK/9UYQU3G0JOib1yayR+WnwgzX9ySXU0X8WLLiHZ2CiuOabPayH0IDGLRJtxzjSZE7+jzgyaGn9RhrXtJreRxgVTvZzg==" }],
+      "task:1.4": [{ "seed": 255706006, "blob": "7d9LXlDkzmGlc8yMT2U2EBLs+jPYK2db4uVt48C/DR1fbrB18Pq4V684rP3QBdvgbchMRaBqgadMlrWD7oomqY1gVFUPuVz+XfECxSmrMsrIpLvvaDQdyGZwFC0YbdbGE3E68WOPpci25q9zndvW+WSdHdWqHXnp00g=" }],
       "task:2.1": [{ "seed": 2910141775, "blob": "NEAqjYnTv2KMfw0/pjLHcytTm0AhvHaYyyrscCmIHD4GcRGmKQ2J1MW3bY550mrDFLdt9hl9FnkriozQcL+5wdKOwhcfx4DFO6gCKVcyVmKlKVJWO+RX3At4iL5xHJmyzC3VqyG0xxpOT+2ANIlnzJ1mLHkTRLe5Oqc9Hg62pVWslvteCBR7sTmj0uQp+wTjt9cNlrly310CthO64gCco4fBlmj8pB9CVQ2zSf5Qp12C" }],
       "task:2.2": [{ "seed": 1269610248, "blob": "c+UJ+MaObG/re05tud+U7iy2OFUuwUXVLGxvxRZl70PBlHKTZlDdWWAyLlvmfznek5KOY5ZA5TSMTY8ljxIKfBUr4ePQGtPI3K3B/Ehfhf+iTPFDNBlkFmy9CwtOc+pPi0g2nu5pFJfpyi7VqyS00RpDT+ycecR1neI+a3EbFujrM9grR0movF6mkbE2Fld+sDKug7YP7BDl85AP3e1v3kAk9V2z+UzP8p/3i3T/sx8FCg==" }],
       "task:3.1": [{ "seed": 3924046017, "blob": "ug7oV/9F3WjSYI+UkOSlSSUd2Xo3SlQSNZTuWn9+/mSIv9P8n5ss3pip72SPBMi5GnmvjA9LdPMVdI5LUZrUz20AqFz/O2K+6/Gblmhrs1irx8koPN4mETG2ltf+MLIuAzaPbJBlIk8=" }],
@@ -934,6 +961,13 @@
       return `${x}:${y}`;
     }
 
+    function clampCoord(value, maxValue) {
+      const num = Number(value);
+      if (!Number.isFinite(num)) return 0;
+      const n = Math.trunc(num);
+      return Math.max(0, Math.min(maxValue, n));
+    }
+
     function setScenarioError(boardEl, metaEl, scenarioKey, message) {
       if (!boardEl || !metaEl) return;
       metaEl.textContent = `${scenarioLabelFromKey(scenarioKey)}: ошибка сценария.`;
@@ -960,39 +994,109 @@
       return out;
     }
 
-    function renderScenario(boardEl, metaEl, scenarioKey, scenarioData, snapshot) {
+    function cloneBoardState(boardState) {
+      return {
+        width: boardState.width,
+        height: boardState.height,
+        start: boardState.start.slice(),
+        finish: boardState.finish.slice(),
+        robot: boardState.robot.slice(),
+        blockedSet: new Set(boardState.blockedSet.values()),
+        cells: cloneCells(boardState.cells, boardState.width, boardState.height),
+        finishReached: Boolean(boardState.finishReached)
+      };
+    }
+
+    function boardStateFromScenario(scenarioData) {
+      const width = scenarioData.width;
+      const height = scenarioData.height;
+      const blockedSet = new Set();
+      for (const item of scenarioData.blocked.values()) blockedSet.add(String(item));
+      const start = scenarioData.start.slice();
+      const finish = scenarioData.finish.slice();
+      const robot = start.slice();
+      return {
+        width,
+        height,
+        start,
+        finish,
+        robot,
+        blockedSet,
+        cells: cloneCells(scenarioData.cells, width, height),
+        finishReached: robot[0] === finish[0] && robot[1] === finish[1]
+      };
+    }
+
+    function applySnapshotToBoardState(boardState, snapshot) {
+      const out = cloneBoardState(boardState);
+      if (!snapshot || typeof snapshot !== "object") return out;
+
+      if (Array.isArray(snapshot.robot) && snapshot.robot.length === 2) {
+        out.robot = [
+          clampCoord(snapshot.robot[0], out.width - 1),
+          clampCoord(snapshot.robot[1], out.height - 1)
+        ];
+      }
+
+      if (Array.isArray(snapshot.blocked)) {
+        const blockedSet = new Set();
+        for (const pair of snapshot.blocked) {
+          if (!Array.isArray(pair) || pair.length !== 2) continue;
+          const x = Number(pair[0]);
+          const y = Number(pair[1]);
+          if (!Number.isFinite(x) || !Number.isFinite(y)) continue;
+          const nx = Math.trunc(x);
+          const ny = Math.trunc(y);
+          if (nx < 0 || nx >= out.width || ny < 0 || ny >= out.height) continue;
+          blockedSet.add(keyOf(nx, ny));
+        }
+        out.blockedSet = blockedSet;
+      }
+
+      if (Array.isArray(snapshot.cells)) {
+        out.cells = cloneCells(snapshot.cells, out.width, out.height);
+      }
+
+      out.finishReached = out.robot[0] === out.finish[0] && out.robot[1] === out.finish[1];
+      return out;
+    }
+
+    function normalizeTrace(trace, boardState) {
+      const start = boardState.start.slice();
+      const out = [start];
+      if (!Array.isArray(trace)) return out;
+
+      function pushPos(x, y) {
+        const last = out[out.length - 1];
+        if (last && last[0] === x && last[1] === y) return;
+        out.push([x, y]);
+      }
+
+      for (const pair of trace) {
+        if (!Array.isArray(pair) || pair.length !== 2) continue;
+        const x = Number(pair[0]);
+        const y = Number(pair[1]);
+        if (!Number.isFinite(x) || !Number.isFinite(y)) continue;
+        const nx = Math.trunc(x);
+        const ny = Math.trunc(y);
+        if (nx < 0 || nx >= boardState.width || ny < 0 || ny >= boardState.height) continue;
+        pushPos(nx, ny);
+      }
+
+      return out;
+    }
+
+    function renderScenarioBoard(boardEl, metaEl, scenarioKey, boardState, phaseText) {
       if (!boardEl || !metaEl) return;
       boardEl.textContent = "";
 
-      const width = scenarioData.width;
-      const height = scenarioData.height;
-      const start = scenarioData.start.slice();
-      const finish = scenarioData.finish.slice();
-      const blockedSet = new Set();
-      for (const item of scenarioData.blocked.values()) blockedSet.add(String(item));
-      let robot = start.slice();
-      let cells = cloneCells(scenarioData.cells, width, height);
-
-      if (snapshot && typeof snapshot === "object") {
-        if (Array.isArray(snapshot.robot) && snapshot.robot.length === 2) {
-          robot = [Math.trunc(Number(snapshot.robot[0])) || 0, Math.trunc(Number(snapshot.robot[1])) || 0];
-        }
-        if (Array.isArray(snapshot.blocked)) {
-          blockedSet.clear();
-          for (const pair of snapshot.blocked) {
-            if (!Array.isArray(pair) || pair.length !== 2) continue;
-            const x = Math.trunc(Number(pair[0]));
-            const y = Math.trunc(Number(pair[1]));
-            if (Number.isFinite(x) && Number.isFinite(y)) blockedSet.add(keyOf(x, y));
-          }
-        }
-        if (Array.isArray(snapshot.cells)) {
-          cells = cloneCells(snapshot.cells, width, height);
-        }
-      }
-
-      const isFinishReached = robot[0] === finish[0] && robot[1] === finish[1];
-      const phaseText = snapshot ? (isFinishReached ? "после запуска: финиш достигнут." : "после запуска: финиш не достигнут.") : "начальное состояние.";
+      const width = boardState.width;
+      const height = boardState.height;
+      const start = boardState.start;
+      const finish = boardState.finish;
+      const robot = boardState.robot;
+      const blockedSet = boardState.blockedSet;
+      const cells = boardState.cells;
       metaEl.textContent = `${scenarioLabelFromKey(scenarioKey)}: поле ${width}x${height}, ${phaseText}`;
 
       const gridEl = document.createElement("div");
@@ -1055,11 +1159,37 @@
       const fixedTestsByScenario = decodeScenarioMap(ROBOT_SCENARIO_BLOBS);
       const scenarioMetaEl = document.getElementById("scenarioMeta");
       const scenarioBoardEl = document.getElementById("scenarioBoard");
+      const scenarioAnimationToggleEl = document.getElementById("scenarioAnimationToggle");
+      const ANIMATION_STEP_MS = 120;
 
-      function drawScenarioView(payload, snapshot) {
+      let lastScenarioPayload = null;
+      let lastScenarioSnapshot = null;
+      let lastScenarioTrace = null;
+      let animationTimerId = 0;
+      let animationToken = 0;
+
+      function stopScenarioAnimation() {
+        if (animationTimerId) {
+          window.clearTimeout(animationTimerId);
+          animationTimerId = 0;
+        }
+        animationToken += 1;
+      }
+
+      function isAnimationEnabled() {
+        if (!scenarioAnimationToggleEl) return true;
+        return scenarioAnimationToggleEl.checked;
+      }
+
+      function drawScenarioView(payload, snapshot, trace) {
+        lastScenarioPayload = payload || null;
+        lastScenarioSnapshot = snapshot || null;
+        lastScenarioTrace = Array.isArray(trace) ? trace.slice() : null;
         const scenarioKey = payload && typeof payload.scenarioKey === "string" ? payload.scenarioKey : "";
         const tests = payload && Array.isArray(payload.tests) ? payload.tests : [];
         const scenarioText = tests.length ? String(tests[0] || "") : "";
+        stopScenarioAnimation();
+
         if (!scenarioText) {
           setScenarioError(scenarioBoardEl, scenarioMetaEl, scenarioKey, "Сценарий не задан.");
           return;
@@ -1073,7 +1203,62 @@
           setScenarioError(scenarioBoardEl, scenarioMetaEl, scenarioKey, (parsed && parsed.error) || "Некорректный сценарий.");
           return;
         }
-        renderScenario(scenarioBoardEl, scenarioMetaEl, scenarioKey, parsed.scenario, snapshot || null);
+
+        const initialState = boardStateFromScenario(parsed.scenario);
+
+        if (!snapshot) {
+          renderScenarioBoard(scenarioBoardEl, scenarioMetaEl, scenarioKey, initialState, "начальное состояние.");
+          return;
+        }
+
+        const finalState = applySnapshotToBoardState(initialState, snapshot);
+        const finalPhase = finalState.finishReached ? "после запуска: финиш достигнут." : "после запуска: финиш не достигнут.";
+        const tracePositions = normalizeTrace(trace, initialState);
+
+        if (!isAnimationEnabled() || tracePositions.length < 2) {
+          renderScenarioBoard(scenarioBoardEl, scenarioMetaEl, scenarioKey, finalState, finalPhase);
+          return;
+        }
+
+        const token = animationToken;
+        let frameIndex = 0;
+        const lastIndex = tracePositions.length - 1;
+
+        const renderNextFrame = () => {
+          if (token !== animationToken) return;
+          const frameState = cloneBoardState(initialState);
+          frameState.robot = tracePositions[frameIndex].slice();
+          frameState.finishReached = frameState.robot[0] === frameState.finish[0] && frameState.robot[1] === frameState.finish[1];
+          const phase = `анимация: шаг ${frameIndex}/${lastIndex}.`;
+          renderScenarioBoard(scenarioBoardEl, scenarioMetaEl, scenarioKey, frameState, phase);
+
+          if (frameIndex < lastIndex) {
+            frameIndex += 1;
+            animationTimerId = window.setTimeout(renderNextFrame, ANIMATION_STEP_MS);
+            return;
+          }
+
+          animationTimerId = window.setTimeout(() => {
+            if (token !== animationToken) return;
+            renderScenarioBoard(scenarioBoardEl, scenarioMetaEl, scenarioKey, finalState, finalPhase);
+            animationTimerId = 0;
+          }, ANIMATION_STEP_MS);
+        };
+
+        renderNextFrame();
+      }
+
+      if (scenarioAnimationToggleEl) {
+        try {
+          if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+            scenarioAnimationToggleEl.checked = false;
+          }
+        } catch (_) {}
+        scenarioAnimationToggleEl.addEventListener("change", () => {
+          if (lastScenarioPayload) {
+            drawScenarioView(lastScenarioPayload, lastScenarioSnapshot, lastScenarioTrace);
+          }
+        });
       }
 
       window.LovelaceLabShell.boot({
@@ -1084,14 +1269,16 @@
         subtaskTexts: ROBOT_SUBTASK_TEXTS,
         keyboardGroups: ROBOT_KEYBOARD_GROUPS,
         lineDigits: KEYCAP_DIGITS,
+        maxTracePoints: 2200,
         fixedTestsByScenario,
         onScenarioChange(payload) {
-          drawScenarioView(payload, null);
+          drawScenarioView(payload, null, null);
         },
         onRunComplete(payload) {
           const firstResult = payload && Array.isArray(payload.domainResults) ? payload.domainResults[0] : null;
           const snapshot = firstResult && firstResult.snapshot ? firstResult.snapshot : null;
-          drawScenarioView(payload, snapshot);
+          const trace = firstResult && Array.isArray(firstResult.trace) ? firstResult.trace : null;
+          drawScenarioView(payload, snapshot, trace);
         }
       });
     }

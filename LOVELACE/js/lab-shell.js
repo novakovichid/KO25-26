@@ -193,6 +193,7 @@
     const testInputPlaceholder = typeof config.testInputPlaceholder === "string" ? config.testInputPlaceholder : "";
     const hardStepLimit = Number.isInteger(config.hardStepLimit) && config.hardStepLimit > 0 ? config.hardStepLimit : DEFAULT_HARD_STEP_LIMIT;
     const yieldEvery = Number.isInteger(config.yieldEvery) && config.yieldEvery > 0 ? config.yieldEvery : DEFAULT_YIELD_EVERY;
+    const maxTracePoints = Number.isInteger(config.maxTracePoints) && config.maxTracePoints > 0 ? config.maxTracePoints : 2000;
 
     let lastFocusedField = codeInputEl;
     let selectedExampleIndex = -1;
@@ -719,6 +720,7 @@
           const domainResult = await domain.executeProgram(parsedProgram, safeTests[i], {
             hardStepLimit,
             yieldEvery,
+            maxTracePoints,
             splitGraphemes,
             makeError
           });

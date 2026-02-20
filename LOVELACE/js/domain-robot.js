@@ -476,7 +476,8 @@
         status: "error",
         steps: 0,
         output: parsed.error,
-        snapshot: null
+        snapshot: null,
+        trace: []
       };
     }
 
@@ -493,10 +494,21 @@
 
     const hardStepLimit = Number.isInteger(runtimeCtx.hardStepLimit) ? runtimeCtx.hardStepLimit : 200000;
     const yieldEvery = Number.isInteger(runtimeCtx.yieldEvery) ? runtimeCtx.yieldEvery : 1500;
+    const maxTracePoints = Number.isInteger(runtimeCtx.maxTracePoints) && runtimeCtx.maxTracePoints > 0
+      ? runtimeCtx.maxTracePoints
+      : 2000;
 
     const loopCountState = new Map();
+    const trace = [[state.x, state.y]];
     let steps = 0;
     let pc = 0;
+
+    function pushTracePoint(x, y) {
+      if (trace.length >= maxTracePoints) return;
+      const last = trace[trace.length - 1];
+      if (last && last[0] === x && last[1] === y) return;
+      trace.push([x, y]);
+    }
 
     while (pc < instructions.length) {
       if (steps >= hardStepLimit) {
@@ -505,7 +517,8 @@
           status: "limit",
           steps,
           output: buildOutput(state, checkLimit),
-          snapshot: buildSnapshot(state, scenario)
+          snapshot: buildSnapshot(state, scenario),
+          trace: trace.slice()
         };
       }
 
@@ -518,6 +531,7 @@
         if (isBlockedOrOutside(state, nx, ny)) throw makeError("runtime", ins.line, "Недопустимый шаг.");
         state.x = nx;
         state.y = ny;
+        pushTracePoint(state.x, state.y);
         pc += 1;
       } else if (ins.type === "paint") {
         state.cells[state.y][state.x].color = ins.color;
@@ -561,7 +575,8 @@
       status: check.ok ? "ok" : "warn",
       steps,
       output: buildOutput(state, check),
-      snapshot: buildSnapshot(state, scenario)
+      snapshot: buildSnapshot(state, scenario),
+      trace: trace.slice()
     };
   }
 
