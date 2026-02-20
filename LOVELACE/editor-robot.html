@@ -374,10 +374,11 @@
       padding: 10px;
       min-height: 150px;
       overflow: hidden;
-      display: grid;
+      display: flex;
+      flex-wrap: wrap;
       gap: 10px;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
       align-items: start;
+      align-content: flex-start;
     }
 
     .scenario-card {
@@ -387,7 +388,9 @@
       padding: 8px;
       display: grid;
       gap: 8px;
-      min-width: 0;
+      min-width: fit-content;
+      width: fit-content;
+      flex: 0 0 auto;
     }
 
     .scenario-card-meta {
@@ -401,11 +404,13 @@
       min-height: 70px;
       overflow: hidden;
       padding-bottom: 2px;
+      width: fit-content;
+      max-width: 100%;
     }
 
     .scenario-grid {
       display: grid;
-      --scenario-unit: 38px;
+      --scenario-unit: 26px;
       --scenario-gap: 4px;
       gap: var(--scenario-gap);
       width: fit-content;
@@ -1353,31 +1358,6 @@
       return out;
     }
 
-    function computeScenarioCellSize(boardEl, width, height) {
-      const cols = Math.max(2, Math.trunc(width) + 1);
-      const rows = Math.max(2, Math.trunc(height) + 1);
-      const gap = 4;
-      const minUnit = 12;
-      const maxUnit = 38;
-      const fallbackWidth = cols * maxUnit + (cols - 1) * gap;
-      const measuredWidth = boardEl
-        ? Math.max(
-            Number(boardEl.clientWidth) || 0,
-            Number(boardEl.getBoundingClientRect && boardEl.getBoundingClientRect().width) || 0
-          )
-        : 0;
-      const availableWidth = Math.max(140, Math.floor(measuredWidth || fallbackWidth));
-      const sizeByWidth = Math.floor((availableWidth - gap * (cols - 1)) / cols);
-      const maxRowsToKeepReadable = 9;
-      const sizeByRows = rows > maxRowsToKeepReadable
-        ? Math.floor((maxRowsToKeepReadable * maxUnit + (maxRowsToKeepReadable - 1) * gap) / rows)
-        : maxUnit;
-      let unit = Math.min(maxUnit, sizeByWidth, sizeByRows);
-      if (!Number.isFinite(unit)) unit = maxUnit;
-      if (unit < minUnit) unit = minUnit;
-      return { unit, gap };
-    }
-
     function renderScenarioBoard(boardEl, metaEl, boardTitle, boardState, phaseText, showControlMarks = true, showFinishMarker = true) {
       if (!boardEl || !metaEl) return;
       boardEl.textContent = "";
@@ -1398,11 +1378,8 @@
       if (phaseText) metaParts.push(String(phaseText));
       metaEl.textContent = metaParts.join(" · ");
 
-      const cellSize = computeScenarioCellSize(boardEl, width, height);
       const gridEl = document.createElement("div");
       gridEl.className = "scenario-grid";
-      gridEl.style.setProperty("--scenario-unit", `${cellSize.unit}px`);
-      gridEl.style.setProperty("--scenario-gap", `${cellSize.gap}px`);
       gridEl.style.gridTemplateColumns = `repeat(${width + 1}, var(--scenario-unit))`;
 
       const cornerEl = document.createElement("div");
