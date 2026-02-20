@@ -374,6 +374,33 @@
       padding: 10px;
       min-height: 150px;
       overflow: auto;
+      display: grid;
+      gap: 10px;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      align-items: start;
+    }
+
+    .scenario-card {
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      background: #ffffff;
+      padding: 8px;
+      display: grid;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    .scenario-card-meta {
+      font-size: 12px;
+      font-weight: 700;
+      color: #334155;
+      min-height: 16px;
+    }
+
+    .scenario-card-board {
+      min-height: 70px;
+      overflow: auto;
+      padding-bottom: 2px;
     }
 
     .scenario-grid {
@@ -867,11 +894,11 @@
     const COLOR_CSS_BY_CODE = { red: "color-red", yellow: "color-yellow", green: "color-green", purple: "color-purple" };
 
     const ROBOT_EXAMPLES = [
-      { label: "Пример №1", code: ["🚶🚠", "🚶🚠", "🚶🚇", "🚶🚇", "🚶🚜"].join("\n") },
+      { label: "Пример №1", code: ["🚶🚠", "🚶🚇", "🚶🚇"].join("\n") },
       { label: "Пример №2", code: ["🚶🚠", "🚶🚇", "🎨🌹", "🚶🚠", "🎨🍀"].join("\n") },
-      { label: "Пример №3", code: ["🤔🧱🚠", "🚶🚇", "😐", "🚶🚠", "🎨🌻"].join("\n") },
-      { label: "Пример №4", code: ["🔂4️⃣", "🚶🚠", "😐", "🚶🚇", "🎨🍇"].join("\n") },
-      { label: "Пример №5", code: ["🔁🛤🚠", "🚶🚠", "😐", "🚶🚇", "🎨🍀"].join("\n") }
+      { label: "Пример №3", code: ["🤔🧱🚠", "🚶🚇", "😐", "🤔🛤🚠", "🚶🚠", "😐", "🎨🌻"].join("\n") },
+      { label: "Пример №4", code: ["🔂4️⃣", "🚶🚠", "😐", "🎨🍀", "🤔🎯🍀", "🚶🚇", "😐", "🤔🏁", "🎨🍇", "😐"].join("\n") },
+      { label: "Пример №5", code: ["🤔🌡🧊🟰1️⃣0️⃣", "🎨🌹", "😐", "🤔🎯🌹", "🔁🛤🚇", "🚶🚇", "😐", "😐", "🤔🌡🔥1️⃣0️⃣", "🔁🛤✈️", "🚶✈️", "😐", "😐", "🔁🛤🚠", "🚶🚠", "😐", "🎨🍀"].join("\n") }
     ];
 
     const ROBOT_SUBTASK_PRESETS = Object.freeze({
@@ -988,9 +1015,9 @@
         { "seed": 4087913838, "blob": "FdejhvicJqmNBFRDN+0O6ErkUotwsw+Riv2Vqxg3FcVnZhgtGEKSn0cANLVojaPYtcCkPcjyqe9kjg3LtgI+8fVoPA2nQTS2dQmajdEjCrIQrBNXwKz1gI5obOVA5c6eK3mSKQs3jYDe3je7JVMuwTyVdS1ChVEh+1A=" }
       ],
       "example:5": [
-        { "seed": 712426997, "blob": "jvKc64NhsexmTltenAC5TfFBjSarbviW4fjaFnMawmB8A2cAI/+GWmxFuyiDoNS9zqV70JOvnmrPC8K2HW/plG5NA+BcPKNzHsyVkHpOvRerCUz6m/GChWVto1iryJk7MJxtBDCKmsX1G7gmTn7ZJMdnLVeMWiH7UA==" },
-        { "seed": 205758160, "blob": "q83xkH729AcjQEb1cbcc9lSeIP12mf385LZnfV7NZ3sZfEo7nuhFcSrKJsOu17HGq3qWi86YHdlElocsMOnNUHxDsRt+iEtRmtLScQm4CudaRLCv/Y2PfmCVH/DfgysxknUWK5GWmr8+viRIf5NdimwwQMsOIeFfzYJ0kyF2" },
-        { "seed": 1333060591, "blob": "lKCKbemzH0IsUu0ZxhKnU4sz+yCBnJb6qwoMUIlofB5mUXGGiS1oNKZXze7ZssqjdJfN1vkdtl6L6ixB54xWdUOuSmbpTSCUlc95HL4dsUIF6evyiohke68o9N2IJjDUbVgtlobTsXqxI09liHambzNdmxY5pEragn/ffnaT" }
+        { "seed": 2867345121, "blob": "mu7It9+lPcjyw+9zsESFqQV9udoXKnTyFXaOOl/e3sRoH7Nc/zsJvvnJz8RvZKgZ+tmPbG/rEk57h5ba8Sv1cHp32WbHOm8ey00hvB+ExW7UMXvMT2FafySoMTPFiJKJNY4hxSfGFrxgp0t0KClk0rSYCbThgvrHtQZVn7PxZOIiI1cxV2KlUE4GJqMDylon" },
+        { "seed": 904733842, "blob": "6evnipxoKv0hp5DfE3mSPBY4loeUpwPmZhBR1zyDaTFbmlwhvHadyynscCmMGT8MaRzgMWzmpdvIIsl30naCRYly9lsEd3krmKjeEb+50vvH9FQRzOXlSqZDKUMuQCPrUBMPYaAEhk4pmc4uT9b4yiab/ifkiF0bCOeFNZc2iPx9JXsRRLeqIIh0WQXsqE0=" },
+        { "seed": 1946207755, "blob": "cMwGORVnW75IbpHNqsZj32/fd9Rd6FLmDxYQZCXcuJJC/f3StfmuCAer8bp15g4vUDtBYqUpdFhhpQiESynTphBVl+iNeIvoce/fAgcGo5g+kzXChSN5aT5Kr+0/inRfH+zvS+2EsAoaRXWKMqvC5B76R7qrwBzRryTLQQnzQrTIAZm/naDDJvSkWB0ZSLxR" }
       ],
       "task:1.1": [{ "seed": 2850069356, "blob": "F/kNrBpasPPP1so+VetY4siKPCGSdTlpyMPrsXqxI09liHbHOgQAxQVeqg/Ki3XSN26KV2o0X1WmcDPRlITIe/dGkifFB6Jst1cEdzMl3LiSQv39ourD+kxWkv+iY/gUKRd8VS/sG10dLKhP0nxo3a0WU8g=" }],
       "task:1.2": [{ "seed": 2286936027, "blob": "oFy2CUX366640yE7mlazz58vJ8RtWALU34bAdPUsSGKSbY0iZWnaGDLbAYqFdt4/YIsRclVZJKgxNdiUm5ljlkDjKYIaqnmxQFJvcnyYt5VF5+aY3cf4R1uTubot/hM5XnIHJvYcQAcrhQKESCjTpmlJx/XKLJu5Lg==" }],
@@ -1088,6 +1115,12 @@
       return "Сценарий";
     }
 
+    function visibleScenarioCountForKey(scenarioKey, totalCount) {
+      const total = Math.max(0, Math.trunc(Number(totalCount) || 0));
+      if (scenarioKey === "task:4.1" && total > 3) return 3;
+      return total;
+    }
+
     function toKeycapNumberText(value) {
       const safe = Math.max(0, Math.trunc(Number(value) || 0));
       const text = String(safe);
@@ -1110,9 +1143,9 @@
       return Math.max(0, Math.min(maxValue, n));
     }
 
-    function setScenarioError(boardEl, metaEl, scenarioKey, message) {
+    function setScenarioError(boardEl, metaEl, title, message) {
       if (!boardEl || !metaEl) return;
-      metaEl.textContent = `${scenarioLabelFromKey(scenarioKey)}: ошибка сценария.`;
+      metaEl.textContent = String(title || "Сценарий");
       boardEl.textContent = "";
       const errorEl = document.createElement("div");
       errorEl.className = "scenario-error";
@@ -1228,7 +1261,7 @@
       return out;
     }
 
-    function renderScenarioBoard(boardEl, metaEl, scenarioKey, boardState, phaseText) {
+    function renderScenarioBoard(boardEl, metaEl, boardTitle, boardState, phaseText) {
       if (!boardEl || !metaEl) return;
       boardEl.textContent = "";
 
@@ -1239,7 +1272,7 @@
       const robot = boardState.robot;
       const blockedSet = boardState.blockedSet;
       const cells = boardState.cells;
-      metaEl.textContent = `${scenarioLabelFromKey(scenarioKey)}: поле ${width}x${height}, ${phaseText}`;
+      metaEl.textContent = `${String(boardTitle || "Сценарий")}: поле ${width}x${height}, ${phaseText}`;
 
       const gridEl = document.createElement("div");
       gridEl.className = "scenario-grid";
@@ -1319,15 +1352,24 @@
       const ANIMATION_STEP_MS = 120;
 
       let lastScenarioPayload = null;
-      let lastScenarioSnapshot = null;
-      let lastScenarioTrace = null;
-      let animationTimerId = 0;
+      let lastScenarioDomainResults = null;
+      let animationTimerIds = [];
       let animationToken = 0;
 
+      function scheduleScenarioFrame(callback, delayMs) {
+        const timerId = window.setTimeout(() => {
+          animationTimerIds = animationTimerIds.filter((id) => id !== timerId);
+          callback();
+        }, delayMs);
+        animationTimerIds.push(timerId);
+      }
+
       function stopScenarioAnimation() {
-        if (animationTimerId) {
-          window.clearTimeout(animationTimerId);
-          animationTimerId = 0;
+        if (animationTimerIds.length) {
+          for (const timerId of animationTimerIds) {
+            window.clearTimeout(timerId);
+          }
+          animationTimerIds = [];
         }
         animationToken += 1;
       }
@@ -1337,71 +1379,104 @@
         return scenarioAnimationToggleEl.checked;
       }
 
-      function drawScenarioView(payload, snapshot, trace) {
+      function drawScenarioView(payload, domainResults) {
         lastScenarioPayload = payload || null;
-        lastScenarioSnapshot = snapshot || null;
-        lastScenarioTrace = Array.isArray(trace) ? trace.slice() : null;
+        lastScenarioDomainResults = Array.isArray(domainResults) ? domainResults.slice() : null;
         const scenarioKey = payload && typeof payload.scenarioKey === "string" ? payload.scenarioKey : "";
         const tests = payload && Array.isArray(payload.tests) ? payload.tests : [];
-        const scenarioText = tests.length ? String(tests[0] || "") : "";
+        const scenarioTitle = scenarioLabelFromKey(scenarioKey);
         stopScenarioAnimation();
+        scenarioBoardEl.textContent = "";
 
-        if (!scenarioText) {
-          setScenarioError(scenarioBoardEl, scenarioMetaEl, scenarioKey, "Сценарий не задан.");
+        if (!tests.length) {
+          setScenarioError(scenarioBoardEl, scenarioMetaEl, `${scenarioTitle}: ошибка сценария.`, "Сценарий не задан.");
           return;
         }
         if (typeof robotDomain.parseScenario !== "function") {
-          setScenarioError(scenarioBoardEl, scenarioMetaEl, scenarioKey, "Парсер сценария недоступен.");
-          return;
-        }
-        const parsed = robotDomain.parseScenario(scenarioText);
-        if (!parsed || !parsed.ok) {
-          setScenarioError(scenarioBoardEl, scenarioMetaEl, scenarioKey, (parsed && parsed.error) || "Некорректный сценарий.");
+          setScenarioError(scenarioBoardEl, scenarioMetaEl, `${scenarioTitle}: ошибка сценария.`, "Парсер сценария недоступен.");
           return;
         }
 
-        const initialState = boardStateFromScenario(parsed.scenario);
-
-        if (!snapshot) {
-          renderScenarioBoard(scenarioBoardEl, scenarioMetaEl, scenarioKey, initialState, "начальное состояние.");
+        const totalCount = tests.length;
+        const visibleCount = visibleScenarioCountForKey(scenarioKey, totalCount);
+        const shownCount = Math.max(0, Math.min(totalCount, visibleCount));
+        if (shownCount < 1) {
+          setScenarioError(scenarioBoardEl, scenarioMetaEl, `${scenarioTitle}: ошибка сценария.`, "Нет доступных полей.");
           return;
         }
 
-        const finalState = applySnapshotToBoardState(initialState, snapshot);
-        const finalPhase = finalState.finishReached ? "после запуска: финиш достигнут." : "после запуска: финиш не достигнут.";
-        const tracePositions = normalizeTrace(trace, initialState);
-
-        if (!isAnimationEnabled() || tracePositions.length < 2) {
-          renderScenarioBoard(scenarioBoardEl, scenarioMetaEl, scenarioKey, finalState, finalPhase);
-          return;
-        }
-
+        scenarioMetaEl.textContent = shownCount < totalCount
+          ? `${scenarioTitle}: отображено полей ${shownCount} из ${totalCount}.`
+          : `${scenarioTitle}: отображено полей ${shownCount}.`;
         const token = animationToken;
-        let frameIndex = 0;
-        const lastIndex = tracePositions.length - 1;
 
-        const renderNextFrame = () => {
-          if (token !== animationToken) return;
-          const frameState = cloneBoardState(initialState);
-          frameState.robot = tracePositions[frameIndex].slice();
-          frameState.finishReached = frameState.robot[0] === frameState.finish[0] && frameState.robot[1] === frameState.finish[1];
-          const phase = `анимация: шаг ${frameIndex}/${lastIndex}.`;
-          renderScenarioBoard(scenarioBoardEl, scenarioMetaEl, scenarioKey, frameState, phase);
+        for (let i = 0; i < shownCount; i++) {
+          const cardEl = document.createElement("section");
+          cardEl.className = "scenario-card";
+          const cardMetaEl = document.createElement("div");
+          cardMetaEl.className = "scenario-card-meta";
+          const cardBoardEl = document.createElement("div");
+          cardBoardEl.className = "scenario-card-board";
+          cardEl.appendChild(cardMetaEl);
+          cardEl.appendChild(cardBoardEl);
+          scenarioBoardEl.appendChild(cardEl);
 
-          if (frameIndex < lastIndex) {
-            frameIndex += 1;
-            animationTimerId = window.setTimeout(renderNextFrame, ANIMATION_STEP_MS);
-            return;
+          const boardTitle = `${scenarioTitle} · поле ${i + 1}/${totalCount}`;
+          const scenarioText = String(tests[i] || "");
+          if (!scenarioText) {
+            setScenarioError(cardBoardEl, cardMetaEl, `${boardTitle}: ошибка сценария.`, "Сценарий не задан.");
+            continue;
           }
 
-          animationTimerId = window.setTimeout(() => {
-            if (token !== animationToken) return;
-            renderScenarioBoard(scenarioBoardEl, scenarioMetaEl, scenarioKey, finalState, finalPhase);
-            animationTimerId = 0;
-          }, ANIMATION_STEP_MS);
-        };
+          const parsed = robotDomain.parseScenario(scenarioText);
+          if (!parsed || !parsed.ok) {
+            setScenarioError(cardBoardEl, cardMetaEl, `${boardTitle}: ошибка сценария.`, (parsed && parsed.error) || "Некорректный сценарий.");
+            continue;
+          }
 
-        renderNextFrame();
+          const initialState = boardStateFromScenario(parsed.scenario);
+          const result = Array.isArray(domainResults) ? domainResults[i] : null;
+          const snapshot = result && result.snapshot ? result.snapshot : null;
+          const trace = result && Array.isArray(result.trace) ? result.trace : null;
+
+          if (!snapshot) {
+            renderScenarioBoard(cardBoardEl, cardMetaEl, boardTitle, initialState, "начальное состояние.");
+            continue;
+          }
+
+          const finalState = applySnapshotToBoardState(initialState, snapshot);
+          const finalPhase = finalState.finishReached ? "после запуска: финиш достигнут." : "после запуска: финиш не достигнут.";
+          const tracePositions = normalizeTrace(trace, initialState);
+
+          if (!isAnimationEnabled() || tracePositions.length < 2) {
+            renderScenarioBoard(cardBoardEl, cardMetaEl, boardTitle, finalState, finalPhase);
+            continue;
+          }
+
+          let frameIndex = 0;
+          const lastIndex = tracePositions.length - 1;
+          const renderNextFrame = () => {
+            if (token !== animationToken) return;
+            const frameState = cloneBoardState(initialState);
+            frameState.robot = tracePositions[frameIndex].slice();
+            frameState.finishReached = frameState.robot[0] === frameState.finish[0] && frameState.robot[1] === frameState.finish[1];
+            const phase = `анимация: шаг ${frameIndex}/${lastIndex}.`;
+            renderScenarioBoard(cardBoardEl, cardMetaEl, boardTitle, frameState, phase);
+
+            if (frameIndex < lastIndex) {
+              frameIndex += 1;
+              scheduleScenarioFrame(renderNextFrame, ANIMATION_STEP_MS);
+              return;
+            }
+
+            scheduleScenarioFrame(() => {
+              if (token !== animationToken) return;
+              renderScenarioBoard(cardBoardEl, cardMetaEl, boardTitle, finalState, finalPhase);
+            }, ANIMATION_STEP_MS);
+          };
+
+          renderNextFrame();
+        }
       }
 
       if (scenarioAnimationToggleEl) {
@@ -1412,7 +1487,7 @@
         } catch (_) {}
         scenarioAnimationToggleEl.addEventListener("change", () => {
           if (lastScenarioPayload) {
-            drawScenarioView(lastScenarioPayload, lastScenarioSnapshot, lastScenarioTrace);
+            drawScenarioView(lastScenarioPayload, lastScenarioDomainResults);
           }
         });
       }
@@ -1428,13 +1503,11 @@
         maxTracePoints: 2200,
         fixedTestsByScenario,
         onScenarioChange(payload) {
-          drawScenarioView(payload, null, null);
+          drawScenarioView(payload, null);
         },
         onRunComplete(payload) {
-          const firstResult = payload && Array.isArray(payload.domainResults) ? payload.domainResults[0] : null;
-          const snapshot = firstResult && firstResult.snapshot ? firstResult.snapshot : null;
-          const trace = firstResult && Array.isArray(firstResult.trace) ? firstResult.trace : null;
-          drawScenarioView(payload, snapshot, trace);
+          const domainResults = payload && Array.isArray(payload.domainResults) ? payload.domainResults : null;
+          drawScenarioView(payload, domainResults);
         }
       });
     }
