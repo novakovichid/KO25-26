@@ -427,6 +427,10 @@
     .scenario-axis.corner {
       border-style: solid;
       background: #e2e8f0;
+      font-family: "Segoe UI", "Noto Sans", sans-serif;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.02em;
     }
 
     .scenario-cell {
@@ -1280,6 +1284,7 @@
 
       const cornerEl = document.createElement("div");
       cornerEl.className = "scenario-axis corner";
+      cornerEl.textContent = "x/y";
       gridEl.appendChild(cornerEl);
       for (let x = 0; x < width; x++) {
         const xEl = document.createElement("div");
