@@ -2206,7 +2206,9 @@
         setStatus("ok", `Готово: все ${okCount} тест(а/ов) выполнены успешно.`);
       }
 
-      if (solvedByRule && selectedSubtaskKey) {
+      if (task4Mode && solvedByTask4) {
+        showCodePhrasePanel(getTask4Phrase());
+      } else if (solvedByRule && selectedSubtaskKey) {
         const rule = CODE_PHRASE_UNLOCK_RULES[selectedSubtaskKey];
         const phrase = decodeUnlockPhrase(selectedSubtaskKey, rule);
         showCodePhrasePanel(phrase);
