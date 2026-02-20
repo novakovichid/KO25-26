@@ -1358,7 +1358,7 @@
       return out;
     }
 
-    function renderScenarioBoard(boardEl, metaEl, boardTitle, boardState, phaseText, showControlMarks = true, showFinishMarker = true) {
+    function renderScenarioBoard(boardEl, metaEl, boardTitle, boardState, phaseText, showControlMarks = true) {
       if (!boardEl || !metaEl) return;
       boardEl.textContent = "";
 
@@ -1438,7 +1438,7 @@
             cellEl.appendChild(startEl);
           }
 
-          if (showFinishMarker && x === finish[0] && y === finish[1]) {
+          if (x === finish[0] && y === finish[1]) {
             cellEl.classList.add("finish");
             const finishEl = document.createElement("span");
             finishEl.className = "scenario-marker finish";
@@ -1536,7 +1536,6 @@
         lastScenarioDomainResults = Array.isArray(domainResults) ? domainResults.slice() : null;
         const scenarioKey = payload && typeof payload.scenarioKey === "string" ? payload.scenarioKey : "";
         const showControlMarks = !isTaskOneScenarioKey(scenarioKey) || task1ControlMarksRevealed;
-        const showFinishMarker = scenarioKey !== "task:4.1";
         const tests = payload && Array.isArray(payload.tests) ? payload.tests : [];
         const scenarioTitle = scenarioLabelFromKey(scenarioKey);
         stopScenarioAnimation();
@@ -1594,7 +1593,7 @@
           const trace = result && Array.isArray(result.trace) ? result.trace : null;
 
           if (!snapshot) {
-            renderScenarioBoard(cardBoardEl, cardMetaEl, boardTitle, initialState, "старт", showControlMarks, showFinishMarker);
+            renderScenarioBoard(cardBoardEl, cardMetaEl, boardTitle, initialState, "старт", showControlMarks);
             continue;
           }
 
@@ -1603,7 +1602,7 @@
           const tracePositions = normalizeTrace(trace, initialState);
 
           if (!isAnimationEnabled() || tracePositions.length < 2) {
-            renderScenarioBoard(cardBoardEl, cardMetaEl, boardTitle, finalState, finalPhase, showControlMarks, showFinishMarker);
+            renderScenarioBoard(cardBoardEl, cardMetaEl, boardTitle, finalState, finalPhase, showControlMarks);
             continue;
           }
 
@@ -1615,7 +1614,7 @@
             frameState.robot = tracePositions[frameIndex].slice();
             frameState.finishReached = frameState.robot[0] === frameState.finish[0] && frameState.robot[1] === frameState.finish[1];
             const phase = `${frameIndex}/${lastIndex}`;
-            renderScenarioBoard(cardBoardEl, cardMetaEl, boardTitle, frameState, phase, showControlMarks, showFinishMarker);
+            renderScenarioBoard(cardBoardEl, cardMetaEl, boardTitle, frameState, phase, showControlMarks);
 
             if (frameIndex < lastIndex) {
               frameIndex += 1;
@@ -1625,7 +1624,7 @@
 
             scheduleScenarioFrame(() => {
               if (token !== animationToken) return;
-              renderScenarioBoard(cardBoardEl, cardMetaEl, boardTitle, finalState, finalPhase, showControlMarks, showFinishMarker);
+              renderScenarioBoard(cardBoardEl, cardMetaEl, boardTitle, finalState, finalPhase, showControlMarks);
             }, ANIMATION_STEP_MS);
           };
 
