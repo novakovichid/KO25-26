@@ -513,6 +513,31 @@
       pointer-events: none;
     }
 
+    .scenario-control {
+      position: absolute;
+      left: 2px;
+      bottom: 2px;
+      width: 12px;
+      height: 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(15, 23, 42, 0.35);
+      background: #94a3b8;
+      color: #ffffff;
+      display: grid;
+      place-items: center;
+      font-family: "Segoe UI", "Noto Sans", sans-serif;
+      font-size: 8px;
+      font-weight: 900;
+      line-height: 1;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .scenario-control.color-red { background: #ef4444; }
+    .scenario-control.color-yellow { background: #f59e0b; }
+    .scenario-control.color-green { background: #22c55e; }
+    .scenario-control.color-purple { background: #a855f7; }
+
     .scenario-legend {
       display: flex;
       flex-wrap: wrap;
@@ -983,8 +1008,8 @@
     });
 
     const ROBOT_SUBTASK_TEXTS = Object.freeze({
-      "2.1": ["На каждом из 3 полей дойдите до финиша. Все клетки маршрута, по которым проходит робот, кроме стартовой, должны быть закрашены в 🌹."],
-      "2.2": ["На каждом из 3 полей дойдите до финиша. Клетки маршрута после шага вправо должны быть 🍀, после шага вниз — 🌻."],
+      "2.1": ["На каждом из 3 полей дойдите до финиша и закрасьте контрольную клетку в 🌹."],
+      "2.2": ["На каждом из 3 полей дойдите до финиша и закрасьте две контрольные клетки: одну в 🍀 и одну в 🌻."],
       "3.1": ["На каждом из 3 полей дойдите до финиша и закрасьте финишную клетку в 🍇."],
       "3.2": ["На каждом из 3 полей дойдите до финиша и закрасьте финишную клетку в 🌹."],
       "4.1": ["На каждом поле дойдите до финиша и закрасьте финишную клетку в 🌹."]
@@ -1157,6 +1182,42 @@
       return `${x}:${y}`;
     }
 
+    function normEmojiToken(value) {
+      return String(value || "").replace(/\uFE0F/g, "");
+    }
+
+    function toColorCode(value) {
+      const token = normEmojiToken(String(value || "").trim().toLowerCase());
+      if (!token) return null;
+      if (token === "red" || token === "красный") return "red";
+      if (token === "yellow" || token === "желтый" || token === "жёлтый") return "yellow";
+      if (token === "green" || token === "зеленый" || token === "зелёный") return "green";
+      if (token === "purple" || token === "фиолетовый") return "purple";
+      if (token === normEmojiToken("🌹")) return "red";
+      if (token === normEmojiToken("🌻")) return "yellow";
+      if (token === normEmojiToken("🍀")) return "green";
+      if (token === normEmojiToken("🍇")) return "purple";
+      return null;
+    }
+
+    function buildControlMarks(expectData, width, height) {
+      const out = new Map();
+      if (!expectData || typeof expectData !== "object") return out;
+      const cells = Array.isArray(expectData.cells) ? expectData.cells : [];
+      for (const item of cells) {
+        if (!item || typeof item !== "object") continue;
+        const x = Number(item.x);
+        const y = Number(item.y);
+        if (!Number.isFinite(x) || !Number.isFinite(y)) continue;
+        const nx = Math.trunc(x);
+        const ny = Math.trunc(y);
+        if (nx < 0 || nx >= width || ny < 0 || ny >= height) continue;
+        const colorCode = toColorCode(item.color);
+        out.set(keyOf(nx, ny), { colorCode });
+      }
+      return out;
+    }
+
     function clampCoord(value, maxValue) {
       const num = Number(value);
       if (!Number.isFinite(num)) return 0;
@@ -1191,6 +1252,12 @@
     }
 
     function cloneBoardState(boardState) {
+      const controlMarks = new Map();
+      if (boardState.controlMarks && typeof boardState.controlMarks.values === "function") {
+        for (const [coord, mark] of boardState.controlMarks.entries()) {
+          controlMarks.set(String(coord), { colorCode: mark && typeof mark.colorCode === "string" ? mark.colorCode : null });
+        }
+      }
       return {
         width: boardState.width,
         height: boardState.height,
@@ -1198,6 +1265,7 @@
         finish: boardState.finish.slice(),
         robot: boardState.robot.slice(),
         blockedSet: new Set(boardState.blockedSet.values()),
+        controlMarks,
         cells: cloneCells(boardState.cells, boardState.width, boardState.height),
         finishReached: Boolean(boardState.finishReached)
       };
@@ -1218,6 +1286,7 @@
         finish,
         robot,
         blockedSet,
+        controlMarks: buildControlMarks(scenarioData.expect, width, height),
         cells: cloneCells(scenarioData.cells, width, height),
         finishReached: robot[0] === finish[0] && robot[1] === finish[1]
       };
@@ -1292,6 +1361,9 @@
       const finish = boardState.finish;
       const robot = boardState.robot;
       const blockedSet = boardState.blockedSet;
+      const controlMarks = boardState.controlMarks && typeof boardState.controlMarks.get === "function"
+        ? boardState.controlMarks
+        : new Map();
       const cells = boardState.cells;
       const metaParts = [];
       if (boardTitle) metaParts.push(String(boardTitle));
@@ -1338,6 +1410,17 @@
               tempEl.className = "scenario-temp";
               tempEl.textContent = String(temp);
               cellEl.appendChild(tempEl);
+            }
+
+            const controlMark = controlMarks.get(keyOf(x, y));
+            if (controlMark) {
+              const controlEl = document.createElement("span");
+              controlEl.className = "scenario-control";
+              if (controlMark.colorCode && COLOR_CSS_BY_CODE[controlMark.colorCode]) {
+                controlEl.classList.add(COLOR_CSS_BY_CODE[controlMark.colorCode]);
+              }
+              controlEl.textContent = "●";
+              cellEl.appendChild(controlEl);
             }
           }
 
