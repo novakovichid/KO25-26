@@ -1351,7 +1351,7 @@
       return out;
     }
 
-    function renderScenarioBoard(boardEl, metaEl, boardTitle, boardState, phaseText) {
+    function renderScenarioBoard(boardEl, metaEl, boardTitle, boardState, phaseText, showControlMarks = true) {
       if (!boardEl || !metaEl) return;
       boardEl.textContent = "";
 
@@ -1361,7 +1361,7 @@
       const finish = boardState.finish;
       const robot = boardState.robot;
       const blockedSet = boardState.blockedSet;
-      const controlMarks = boardState.controlMarks && typeof boardState.controlMarks.get === "function"
+      const controlMarks = showControlMarks && boardState.controlMarks && typeof boardState.controlMarks.get === "function"
         ? boardState.controlMarks
         : new Map();
       const cells = boardState.cells;
@@ -1469,6 +1469,11 @@
       let lastScenarioDomainResults = null;
       let animationTimerIds = [];
       let animationToken = 0;
+      let task1ControlMarksRevealed = false;
+
+      function isTaskOneScenarioKey(scenarioKey) {
+        return /^task:1\./.test(String(scenarioKey || ""));
+      }
 
       function scheduleScenarioFrame(callback, delayMs) {
         const timerId = window.setTimeout(() => {
@@ -1523,6 +1528,7 @@
         lastScenarioPayload = payload || null;
         lastScenarioDomainResults = Array.isArray(domainResults) ? domainResults.slice() : null;
         const scenarioKey = payload && typeof payload.scenarioKey === "string" ? payload.scenarioKey : "";
+        const showControlMarks = !isTaskOneScenarioKey(scenarioKey) || task1ControlMarksRevealed;
         const tests = payload && Array.isArray(payload.tests) ? payload.tests : [];
         const scenarioTitle = scenarioLabelFromKey(scenarioKey);
         stopScenarioAnimation();
@@ -1580,7 +1586,7 @@
           const trace = result && Array.isArray(result.trace) ? result.trace : null;
 
           if (!snapshot) {
-            renderScenarioBoard(cardBoardEl, cardMetaEl, boardTitle, initialState, "старт");
+            renderScenarioBoard(cardBoardEl, cardMetaEl, boardTitle, initialState, "старт", showControlMarks);
             continue;
           }
 
@@ -1589,7 +1595,7 @@
           const tracePositions = normalizeTrace(trace, initialState);
 
           if (!isAnimationEnabled() || tracePositions.length < 2) {
-            renderScenarioBoard(cardBoardEl, cardMetaEl, boardTitle, finalState, finalPhase);
+            renderScenarioBoard(cardBoardEl, cardMetaEl, boardTitle, finalState, finalPhase, showControlMarks);
             continue;
           }
 
@@ -1601,7 +1607,7 @@
             frameState.robot = tracePositions[frameIndex].slice();
             frameState.finishReached = frameState.robot[0] === frameState.finish[0] && frameState.robot[1] === frameState.finish[1];
             const phase = `${frameIndex}/${lastIndex}`;
-            renderScenarioBoard(cardBoardEl, cardMetaEl, boardTitle, frameState, phase);
+            renderScenarioBoard(cardBoardEl, cardMetaEl, boardTitle, frameState, phase, showControlMarks);
 
             if (frameIndex < lastIndex) {
               frameIndex += 1;
@@ -1611,7 +1617,7 @@
 
             scheduleScenarioFrame(() => {
               if (token !== animationToken) return;
-              renderScenarioBoard(cardBoardEl, cardMetaEl, boardTitle, finalState, finalPhase);
+              renderScenarioBoard(cardBoardEl, cardMetaEl, boardTitle, finalState, finalPhase, showControlMarks);
             }, ANIMATION_STEP_MS);
           };
 
@@ -1663,13 +1669,16 @@
         maxTracePoints: 2200,
         fixedTestsByScenario,
         onScenarioChange(payload) {
+          const scenarioKey = payload && typeof payload.scenarioKey === "string" ? payload.scenarioKey : "";
+          if (isTaskOneScenarioKey(scenarioKey)) task1ControlMarksRevealed = false;
           hideRobotCodePhrase();
           drawScenarioView(payload, null);
         },
         onRunComplete(payload) {
+          const scenarioKey = payload && typeof payload.scenarioKey === "string" ? payload.scenarioKey : "";
+          if (isTaskOneScenarioKey(scenarioKey)) task1ControlMarksRevealed = true;
           const domainResults = payload && Array.isArray(payload.domainResults) ? payload.domainResults : null;
           drawScenarioView(payload, domainResults);
-          const scenarioKey = payload && typeof payload.scenarioKey === "string" ? payload.scenarioKey : "";
           const phrase = codePhraseByScenario[scenarioKey];
           if (phrase && isSuccessfulScenarioRun(payload)) showRobotCodePhrase(phrase);
           else hideRobotCodePhrase();
