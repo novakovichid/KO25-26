@@ -5,3 +5,7 @@ LOVELACE/emoji-gramming-reference.local.html
 LOVELACE/etalon-solutions.local.txt
 dev/
 AGENTS.md
+.githooks/
+scripts/
+**/md-todo.md
+VIGENERE/draft/
