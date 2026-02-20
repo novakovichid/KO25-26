@@ -4,41 +4,41 @@
   const CONFIG = {
     // marker: path segments that identify the section root in window.location.pathname (file:// or http(s)://)
     // indexFile: entry point that contains the lock UI (authLock + sectionContent)
-    LOMONOSOV: { salt: "s_lomonosov_v1", hash: "76876a82c1a2193bbb514e439a5c6acc4edd270a0ea3a708c58dae44d6cc0a0a", marker: ["LOMONOSOV"], indexFile: "index.html" },
-    ARKHIMED: { salt: "s_arkhimed_v1", hash: "9e68bcf260f75d7be26cad204c5af765fa293139fa1d4f63aba3a3689e4b2a83", marker: ["ARKHIMED"], indexFile: "index.html" },
+    LOMONOSOV: { salt: "s_lomonosov_v1", hash: "41f609863324376ab6903709b8d34c7a2545c8e1ecfdb7f6f027a0395b9f190f", marker: ["LOMONOSOV"], indexFile: "index.html" },
+    ARKHIMED: { salt: "s_arkhimed_v1", hash: "249873d862a29184b673a82fe5de54d5e83f191b2d633ec5e88dfcb6a71e80f3", marker: ["ARKHIMED"], indexFile: "index.html" },
     LOVELACE: {
       salt: "s_lovelace_v1",
-      hash: "3ef559236925c7dd31680ef8069454457c7b93d67aa5b299141d1167009521ee",
+      hash: "b8b38f933c4865894a20c8604360582f0c2c0f9443252b2c11a18a2e3e53129d",
       hashes: [
-        "3ef559236925c7dd31680ef8069454457c7b93d67aa5b299141d1167009521ee", // CLASSIC
-        "a979532a9907bd50efe3889af617237cf2e09a4d82f9f5ab735f191fbb9bd4d1"  // ROBOT
+        "b8b38f933c4865894a20c8604360582f0c2c0f9443252b2c11a18a2e3e53129d", // CLASSIC
+        "290933324e4f2eaa40870e3a38d2cecc2f287aa2e97f4979e732a690c33b3485"  // ROBOT
       ],
       profileByHash: {
-        "3ef559236925c7dd31680ef8069454457c7b93d67aa5b299141d1167009521ee": "CLASSIC",
-        "a979532a9907bd50efe3889af617237cf2e09a4d82f9f5ab735f191fbb9bd4d1": "ROBOT"
+        "b8b38f933c4865894a20c8604360582f0c2c0f9443252b2c11a18a2e3e53129d": "CLASSIC",
+        "290933324e4f2eaa40870e3a38d2cecc2f287aa2e97f4979e732a690c33b3485": "ROBOT"
       },
       defaultProfile: "CLASSIC",
       marker: ["LOVELACE"],
       indexFile: "index.html"
     },
-    MORSE: { salt: "s_morse_v1", hash: "aaa6d1d79cfd0899326ff54752a2896b93c08f80770654ff570d48be04c2b280", marker: ["MORSE"], indexFile: "index.html" },
+    MORSE: { salt: "s_morse_v1", hash: "501b82131479165ce6d6b688cccf9daf9ccb7316dda002ab036405390778ef09", marker: ["MORSE"], indexFile: "index.html" },
     VIGENERE: {
       salt: "s_vigenere_v1",
-      hash: "993ebbd35915333f33acf92556e5dbf8a8e98f48472468772dbcdcdec86df5b0",
+      hash: "56d0c5cd83703859ed05c79543136917494c5ba44c347c3a9d20fdecf8fd4d56",
       hashes: [
-        "993ebbd35915333f33acf92556e5dbf8a8e98f48472468772dbcdcdec86df5b0", // AB password
-        "da1254614341001b0de039b977a7a13a70072b0dddd8a53de27ee10135822bce"  // M password
+        "56d0c5cd83703859ed05c79543136917494c5ba44c347c3a9d20fdecf8fd4d56", // AB password
+        "122fcd11013ec158645764b92150a5b4b73944354f30935f9aa34211b5d99a76"  // M password
       ],
       profileByHash: {
-        "993ebbd35915333f33acf92556e5dbf8a8e98f48472468772dbcdcdec86df5b0": "AB",
-        "da1254614341001b0de039b977a7a13a70072b0dddd8a53de27ee10135822bce": "M"
+        "56d0c5cd83703859ed05c79543136917494c5ba44c347c3a9d20fdecf8fd4d56": "AB",
+        "122fcd11013ec158645764b92150a5b4b73944354f30935f9aa34211b5d99a76": "M"
       },
       defaultProfile: "AB",
       marker: ["VIGENERE"],
       indexFile: "index.html"
     },
-    DA_VINCI: { salt: "s_da_vinci_v1", hash: "d23bc498afd2261ad2d685cd450b5046b16ae95e0ba2bd1897715255665a2440", marker: ["DA_VINCI"], indexFile: "index.html" },
-    DEV: { salt: "s_dev_v1", hash: "d57653dca1fb1c9b4f3121f357a198dfea6a67430c6012b92a2e699da47af8a9", marker: ["dev", "morse"], indexFile: "editor.html" }
+    DA_VINCI: { salt: "s_da_vinci_v1", hash: "1e03b7eb7a3fa616d53595bd24a40dd4a6afd27879025d78f5ca8a25461d2d6f", marker: ["DA_VINCI"], indexFile: "index.html" },
+    DEV: { salt: "s_dev_v1", hash: "fb7c16cd406fd6339ae022a82ad6001aa112fd1ed4a28d9063c27438f808e65a", marker: ["dev", "morse"], indexFile: "editor.html" }
   };
 
   function storageKey(sectionId) {
