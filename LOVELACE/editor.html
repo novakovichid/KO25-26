@@ -756,6 +756,11 @@
 
     const HARD_STEP_LIMIT = 200000;
     const YIELD_EVERY = 1500;
+    const TASK4_SUBTASK_KEY = "4.1";
+    const TASK4_DATA_BLOB = Object.freeze({
+      seed: 3067421989,
+      blob: "XmL8E1oRMORXs1x4mPI7W8GylWCN5GG2zhgGCrXMas5nzJ13MWQGBfntI9grHlrs+RK5i6oNEVp4+m2+0/ke40n7/dsHxPZyjxJFrxHtq1/V4s+w2Tez7h9UVQ+5XP5d8UWbcLN2k4Th6vFTIhXJYnBSNVZr0dYLcWO1Y4+8zqqH+j3BicPjc81Qh+hBPueMUGhfp1owtnJfgpWbI0D5CKwTVvCl8cHceXqyH+yQkGw83j8XLcbJlKt442oVLM8+0SBrEt0UMbIPhMV/ySxujQE1CyBDpiJ0kdqBgzLFedJggkW0aLhQQzBkfJi4klv74dK1gK8EB9bpuCOqVWwPfhFgrUELWGGjFZhCOYX5LwyPsp9gleYl/45RVUbkzmGYJIzMdzQ4GETk5jePZR5R7OIQ/8LpREMWLfhn6pGsS75VovOQDMzzY85cAv4T5qlf1/zN9JB3+rRRHVVQp033TeBd0ymrPc3WuLylAHNIizc1QS8XOZGTR2Q6uyiEtMu7xrR6lovO4XbPRIWsGG+izFl1DfhfJb9lGMWb0SMFtQ6wFB2o66zD1S0+50ixjct3dYRvV3nU04WtevtoRHSLe4Z0OlbLDiG3D4TFbNgvYowZNU04H+V/JdiF25FjxXXOcNRd6CvhAxd9aDWK8c8brqHAr5epBALC5Lo7qAQ0SztGNPoWC05h9k/EBSyY7yJM2fWNeN+lP+WYRRtRo4U1jjCUnShrJkNftKh22iAMW+z5EqqaqQEQQni8dfCDvVmyR/a2wQDW72OPEgH7Xa/uE6j8zfKRdvKlWFpNSJJZ1hNVjS7QWeRzHf0YOur1rBBvxcMtXw=="
+    });
     const CODE_PHRASE_UNLOCK_RULES = Object.freeze({
       "2.1": Object.freeze({
         tests: Object.freeze(["1", "14", "27"]),
@@ -782,9 +787,63 @@
         blob: Object.freeze([37264, 4005, 1987, 52465, 36364, 3812, 59268, 23946, 37264, 4664, 40513, 44019])
       })
     });
+    const TASK4_DATA = (() => {
+      const empty = Object.freeze({ cases: Object.freeze([]), phrase: "" });
+      const entry = TASK4_DATA_BLOB;
+      if (!entry || typeof entry !== "object") return empty;
+      const blob = String(entry.blob || "");
+      const seed = Number(entry.seed) >>> 0;
+      if (!blob) return empty;
+
+      let encoded = "";
+      try {
+        encoded = atob(blob);
+      } catch (_) {
+        return empty;
+      }
+
+      const bytes = new Uint8Array(encoded.length);
+      let state = seed;
+      for (let i = 0; i < encoded.length; i++) {
+        bytes[i] = (encoded.charCodeAt(i) & 0xff) ^ (state & 0xff);
+        state = (state * 1664525 + 1013904223) >>> 0;
+      }
+
+      let text = "";
+      try {
+        text = new TextDecoder("utf-8").decode(bytes);
+      } catch (_) {
+        for (let i = 0; i < bytes.length; i++) text += String.fromCharCode(bytes[i]);
+      }
+
+      try {
+        const raw = JSON.parse(text);
+        const rawCases = Array.isArray(raw && raw.cases) ? raw.cases : [];
+        const cases = [];
+        for (let i = 0; i < rawCases.length; i++) {
+          const item = rawCases[i];
+          const input = String(item && item.input || "").trim();
+          const expected = String(item && item.expected || "").trim();
+          if (!input || (expected !== "0" && expected !== "1")) continue;
+          cases.push(Object.freeze({
+            input,
+            expected,
+            visible: Boolean(item && item.visible)
+          }));
+        }
+        const phrase = String(raw && raw.phrase || "");
+        return Object.freeze({
+          cases: Object.freeze(cases),
+          phrase
+        });
+      } catch (_) {
+        return empty;
+      }
+    })();
     const TASK_SUBTASK_COUNTS = Object.freeze({
       "2": 2,
-      "3": 2
+      "3": 2,
+      "4": 1
     });
     const SUBTASK_PRESETS = Object.freeze({
       "1.1": {
@@ -870,7 +929,7 @@
       },
       "4.1": {
         code: "",
-        tests: [""]
+        tests: []
       }
     });
     const SUBTASK_TEXTS = Object.freeze({
@@ -907,7 +966,9 @@
         "Для значения 8 нужно получить значение 16."
       ]),
       "4.1": Object.freeze([
-        "Решить задачу «второй максимум» или аналог. Тестов 10. Открыто только 3 теста, остальные скрыты визуально, но имеются фактически (значения нельзя нигде увидеть, даже в коде страницы)."
+        "Вход: N, затем N чисел, затем эталон T.",
+        "Выход: 1, если сумма N чисел равна T, иначе 0.",
+        "Проверка выполняется по 10 тестам, из них открыты 3."
       ])
     });
 
@@ -947,6 +1008,33 @@
     let selectedTaskKey = "";
     let selectedSubtaskKey = "";
     let codeInputResizeObserver = null;
+
+    function isTask4Subtask(subtaskKey = selectedSubtaskKey) {
+      return String(subtaskKey || "") === TASK4_SUBTASK_KEY;
+    }
+
+    function getTask4Cases() {
+      const cases = TASK4_DATA && Array.isArray(TASK4_DATA.cases) ? TASK4_DATA.cases : [];
+      return cases;
+    }
+
+    function getTask4VisibleCases() {
+      return getTask4Cases().filter((item) => item && item.visible);
+    }
+
+    function getTask4VisibleInputs() {
+      return getTask4VisibleCases().map((item) => String(item.input || ""));
+    }
+
+    function getTask4Phrase() {
+      return TASK4_DATA && typeof TASK4_DATA.phrase === "string" ? TASK4_DATA.phrase : "";
+    }
+
+    function syncTask4TestsUi() {
+      const lockTests = isTask4Subtask();
+      if (addTestBtn) addTestBtn.hidden = lockTests;
+      if (resetTestsBtn) resetTestsBtn.hidden = lockTests;
+    }
 
     function makeError(kind, line, message) {
       const err = new Error(message);
@@ -1254,7 +1342,11 @@
       if (!preset || typeof preset !== "object") return;
       codeInputEl.value = String(preset.code || "");
       refreshCodeLineNumbers();
-      const tests = Array.isArray(preset.tests) && preset.tests.length ? preset.tests : [""];
+      let tests = Array.isArray(preset.tests) && preset.tests.length ? preset.tests : [""];
+      if (isTask4Subtask(subtaskKey)) {
+        const visibleInputs = getTask4VisibleInputs();
+        tests = visibleInputs.length ? visibleInputs : [""];
+      }
       setTestsToUi(tests);
       resetResultPanels();
     }
@@ -1272,6 +1364,7 @@
       taskSubtasksEl.textContent = "";
       taskSubtasksEl.hidden = true;
       setTaskText("");
+      syncTask4TestsUi();
     }
 
     function renderSubtasks(taskKey) {
@@ -1399,6 +1492,34 @@
       return true;
     }
 
+    function pickTask4VisibleResults(cases, results) {
+      if (!Array.isArray(cases) || !Array.isArray(results)) return [];
+      const out = [];
+      for (let i = 0; i < cases.length; i++) {
+        if (!cases[i] || !cases[i].visible) continue;
+        const result = results[i];
+        if (!result) continue;
+        out.push(result);
+      }
+      return out;
+    }
+
+    function countTask4Matches(cases, results) {
+      if (!Array.isArray(cases) || !Array.isArray(results) || results.length !== cases.length) return 0;
+      let matched = 0;
+      for (let i = 0; i < cases.length; i++) {
+        const result = results[i];
+        const expected = normalizeUnlockToken(cases[i] && cases[i].expected);
+        if (!result || result.kind !== "ok" || result.source !== "runtime") continue;
+        if (normalizeUnlockToken(result.value) === expected) matched += 1;
+      }
+      return matched;
+    }
+
+    function isTask4Solved(cases, results) {
+      return Array.isArray(cases) && cases.length > 0 && countTask4Matches(cases, results) === cases.length;
+    }
+
     function setScenarioKey(key) {
       currentScenarioKey = String(key || "");
       hideCodePhrasePanel();
@@ -1427,6 +1548,7 @@
       removeBtn.textContent = "Удалить";
       removeBtn.dataset.testRemove = "1";
       removeBtn.addEventListener("click", () => {
+        if (isTask4Subtask()) return;
         wrap.remove();
         renumberTests();
         resetResultPanels();
@@ -1450,6 +1572,7 @@
 
     function renumberTests() {
       const tests = Array.from(testListEl.querySelectorAll(".test-item"));
+      const lockTests = isTask4Subtask();
       if (!tests.length) {
         testListEl.appendChild(createTestItem(""));
         return renumberTests();
@@ -1458,9 +1581,15 @@
         const item = tests[i];
         const label = item.querySelector("[data-test-label]");
         const removeBtn = item.querySelector("[data-test-remove]");
+        const input = item.querySelector("[data-test-input]");
         if (label) label.textContent = `Тест ${i + 1}`;
-        if (removeBtn) removeBtn.disabled = tests.length === 1;
+        if (removeBtn) {
+          removeBtn.disabled = lockTests || tests.length === 1;
+          removeBtn.hidden = lockTests;
+        }
+        if (input) input.readOnly = lockTests;
       }
+      syncTask4TestsUi();
     }
 
     function getTestsFromUi() {
@@ -1960,10 +2089,20 @@
       setStatus("", "Парсинг программы...");
       stepCountEl.textContent = "Суммарные шаги: 0";
       const runNonce = createRunNonce();
+      const task4Mode = isTask4Subtask();
+      const task4Cases = task4Mode ? getTask4Cases() : [];
+      if (task4Mode && !task4Cases.length) {
+        renderOutputs([]);
+        setStatus("error", "Ошибка.");
+        runBtn.disabled = false;
+        return;
+      }
 
-      const tests = getTestsFromUi();
+      const tests = task4Mode
+        ? task4Cases.map((item) => String(item.input || ""))
+        : getTestsFromUi();
       const hasAtLeastOneTest = tests.length > 0;
-      if (!hasAtLeastOneTest) {
+      if (!hasAtLeastOneTest && !task4Mode) {
         setTestsToUi([""]);
       }
       const safeTests = hasAtLeastOneTest ? tests : [""];
@@ -1980,7 +2119,10 @@
           source: "runtime",
           proof: ""
         }));
-        renderOutputs(failResults);
+        const displayFailResults = task4Mode
+          ? pickTask4VisibleResults(task4Cases, failResults)
+          : failResults;
+        renderOutputs(displayFailResults);
         setStatus("error", msg);
         runBtn.disabled = false;
         return;
@@ -2039,16 +2181,25 @@
         }
       }
 
-      renderOutputs(results);
+      const displayResults = task4Mode
+        ? pickTask4VisibleResults(task4Cases, results)
+        : results;
+      renderOutputs(displayResults);
       stepCountEl.textContent = `Суммарные шаги: ${totalSteps}`;
       const hasUnlockRule = Boolean(selectedSubtaskKey && CODE_PHRASE_UNLOCK_RULES[selectedSubtaskKey]);
       const solvedByRule = hasUnlockRule
         ? isCodePhraseSolved(selectedSubtaskKey, safeTests, results, runNonce)
         : false;
+      const solvedByTask4 = task4Mode
+        ? isTask4Solved(task4Cases, results)
+        : false;
       if (errCount > 0) {
         setStatus("error", `Готово: успех ${okCount}, предупреждения ${warnCount}, ошибки ${errCount}.`);
       } else if (warnCount > 0) {
         setStatus("warn", `Готово: успех ${okCount}, предупреждения ${warnCount}.`);
+      } else if (task4Mode && !solvedByTask4) {
+        const matched = countTask4Matches(task4Cases, results);
+        setStatus("warn", `Готово: совпало с эталоном ${matched} из ${task4Cases.length} тест(а/ов).`);
       } else if (hasUnlockRule && !solvedByRule) {
         setStatus("warn", `Готово: все ${okCount} тест(а/ов) выполнены, но эталон не совпал.`);
       } else {
@@ -2109,11 +2260,13 @@
       exampleButtons[i].addEventListener("click", () => applyExample(i));
     }
     addTestBtn.addEventListener("click", () => {
+      if (isTask4Subtask()) return;
       testListEl.appendChild(createTestItem(""));
       renumberTests();
       resetResultPanels();
     });
     resetTestsBtn.addEventListener("click", () => {
+      if (isTask4Subtask()) return;
       setTestsToUi([""]);
       resetResultPanels();
     });
