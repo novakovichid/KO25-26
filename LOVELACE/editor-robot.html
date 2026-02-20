@@ -330,32 +330,153 @@
       margin-top: 6px;
     }
 
-    .tests-toolbar {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      align-items: center;
-    }
-
-    .test-list {
+    .scenario-wrap {
       display: grid;
       gap: 10px;
     }
 
-    .test-item {
-      border: 1px solid #dbeafe;
-      background: #f8fafc;
-      border-radius: 10px;
-      padding: 10px;
-      display: grid;
-      gap: 8px;
+    .scenario-meta {
+      font-size: 13px;
+      font-weight: 700;
+      color: #334155;
+      min-height: 18px;
     }
 
-    .test-head {
+    .scenario-board {
+      border: 1px solid #dbeafe;
+      border-radius: 10px;
+      background: #f8fafc;
+      padding: 10px;
+      min-height: 150px;
+      overflow: auto;
+    }
+
+    .scenario-grid {
+      display: grid;
+      gap: 4px;
+      width: max-content;
+    }
+
+    .scenario-cell {
+      width: 38px;
+      height: 38px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      background: #ffffff;
+      position: relative;
+      display: grid;
+      place-items: center;
+      font-family: var(--emoji-font);
+      font-size: 18px;
+      line-height: 1;
+    }
+
+    .scenario-cell.color-red { background: #fee2e2; }
+    .scenario-cell.color-yellow { background: #fef9c3; }
+    .scenario-cell.color-green { background: #dcfce7; }
+    .scenario-cell.color-purple { background: #f3e8ff; }
+
+    .scenario-cell.blocked {
+      background: #e5e7eb;
+      border-color: #94a3b8;
+      color: #334155;
+      font-size: 17px;
+    }
+
+    .scenario-cell.finish {
+      box-shadow: inset 0 0 0 2px #2563eb;
+    }
+
+    .scenario-marker {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      pointer-events: none;
+      font-family: var(--emoji-font);
+      font-size: 18px;
+      line-height: 1;
+    }
+
+    .scenario-marker.start {
+      font-size: 12px;
+      font-weight: 900;
+      color: #0f172a;
+      font-family: "Segoe UI", "Noto Sans", sans-serif;
+      place-items: start;
+      padding-top: 2px;
+      padding-left: 4px;
+      justify-items: start;
+      align-items: start;
+    }
+
+    .scenario-marker.finish {
+      font-size: 12px;
+      font-weight: 900;
+      color: #1d4ed8;
+      font-family: "Segoe UI", "Noto Sans", sans-serif;
+      place-items: end;
+      padding-bottom: 2px;
+      padding-right: 4px;
+      justify-items: end;
+      align-items: end;
+    }
+
+    .scenario-temp {
+      position: absolute;
+      right: 3px;
+      top: 2px;
+      font-family: "Segoe UI", "Noto Sans", sans-serif;
+      font-size: 10px;
+      font-weight: 800;
+      color: #475569;
+      line-height: 1;
+      pointer-events: none;
+    }
+
+    .scenario-legend {
       display: flex;
-      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px 14px;
       align-items: center;
-      gap: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #334155;
+    }
+
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .legend-chip {
+      width: 16px;
+      height: 16px;
+      border-radius: 4px;
+      border: 1px solid #94a3b8;
+      display: inline-grid;
+      place-items: center;
+      font-size: 12px;
+      line-height: 1;
+      font-family: var(--emoji-font);
+    }
+
+    .legend-chip.red { background: #fee2e2; }
+    .legend-chip.yellow { background: #fef9c3; }
+    .legend-chip.green { background: #dcfce7; }
+    .legend-chip.purple { background: #f3e8ff; }
+    .legend-chip.blocked { background: #e5e7eb; }
+
+    .scenario-error {
+      color: #991b1b;
+      font-weight: 700;
+      font-size: 14px;
+      padding: 8px;
+      border: 1px dashed #fca5a5;
+      border-radius: 8px;
+      background: #fef2f2;
+      width: fit-content;
     }
 
     .test-label {
@@ -644,12 +765,21 @@
       </section>
 
       <section class="panel">
-        <h2 class="block-title"><span class="block-num">3</span>Тесты</h2>
-        <div class="tests-toolbar">
-          <button id="addTestBtn" type="button">Добавить тест</button>
-          <button id="resetTestsBtn" type="button">Сбросить тесты</button>
+        <h2 class="block-title"><span class="block-num">3</span>Поле сценария</h2>
+        <div class="scenario-wrap">
+          <div id="scenarioMeta" class="scenario-meta"></div>
+          <div id="scenarioBoard" class="scenario-board"></div>
+          <div class="scenario-legend">
+            <span class="legend-item"><span class="legend-chip">🤖</span>Робот</span>
+            <span class="legend-item"><span class="legend-chip blocked">■</span>Стена</span>
+            <span class="legend-item"><span class="legend-chip">S</span>Старт</span>
+            <span class="legend-item"><span class="legend-chip">F</span>Финиш</span>
+            <span class="legend-item"><span class="legend-chip red"></span>🌹</span>
+            <span class="legend-item"><span class="legend-chip yellow"></span>🌻</span>
+            <span class="legend-item"><span class="legend-chip green"></span>🍀</span>
+            <span class="legend-item"><span class="legend-chip purple"></span>🍇</span>
+          </div>
         </div>
-        <div id="testList" class="test-list"></div>
       </section>
 
       <section class="panel">
@@ -663,7 +793,7 @@
       </section>
 
       <section class="panel">
-        <h2 class="block-title"><span class="block-num">5</span>Выходные данные по тестам</h2>
+        <h2 class="block-title"><span class="block-num">5</span>Выходные данные</h2>
         <div id="testOutputs" class="test-output-grid"></div>
       </section>
 
@@ -684,88 +814,31 @@
   </main>
 
   <script src="./js/lab-shell.js"></script>
-  <script src="./js/domain-classic.js"></script>
   <script src="./js/domain-robot.js"></script>
   <script>
-    function scenario(input) {
-      return JSON.stringify(input, null, 2);
-    }
-
     const KEYCAP_DIGITS = ["0️⃣", "1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣"];
+    const COLOR_CSS_BY_CODE = { red: "color-red", yellow: "color-yellow", green: "color-green", purple: "color-purple" };
 
     const ROBOT_EXAMPLES = [
-      {
-        label: "Пример №1",
-        code: [
-          "🚶🚠",
-          "🚶🚇"
-        ].join("\n"),
-        tests: [
-          scenario({ size: [3, 3], start: [0, 0], finish: [1, 1], blocked: [], cells: [], expect: { position: [1, 1], finishReached: true } }),
-          scenario({ size: [4, 3], start: [1, 0], finish: [2, 1], blocked: [], cells: [], expect: { position: [2, 1], finishReached: true } }),
-          scenario({ size: [3, 4], start: [0, 1], finish: [1, 2], blocked: [], cells: [], expect: { position: [1, 2], finishReached: true } })
-        ]
-      },
-      {
-        label: "Пример №2",
-        code: [
-          "🎨🌹"
-        ].join("\n"),
-        tests: [
-          scenario({ size: [3, 3], start: [0, 0], finish: [2, 2], blocked: [], cells: [], expect: { currentColor: "🌹" } }),
-          scenario({ size: [3, 3], start: [1, 1], finish: [2, 2], blocked: [], cells: [], expect: { currentColor: "🌹" } }),
-          scenario({ size: [4, 2], start: [3, 1], finish: [0, 0], blocked: [], cells: [{ x: 3, y: 1, color: "🍀", temp: 10 }], expect: { currentColor: "🌹" } })
-        ]
-      },
-      {
-        label: "Пример №3",
-        code: [
-          "🤔🧱🚠",
-          "🎨🌻",
-          "😐"
-        ].join("\n"),
-        tests: [
-          scenario({ size: [2, 1], start: [1, 0], finish: [1, 0], blocked: [], cells: [], expect: { currentColor: "🌻" } }),
-          scenario({ size: [3, 1], start: [1, 0], finish: [2, 0], blocked: [], cells: [], expect: { currentColor: null } }),
-          scenario({ size: [3, 1], start: [1, 0], finish: [1, 0], blocked: [[2, 0]], cells: [], expect: { currentColor: "🌻" } })
-        ]
-      },
-      {
-        label: "Пример №4",
-        code: [
-          "🔂3️⃣",
-          "🚶🚠",
-          "😐"
-        ].join("\n"),
-        tests: [
-          scenario({ size: [5, 1], start: [0, 0], finish: [3, 0], blocked: [], cells: [], expect: { position: [3, 0], finishReached: true } }),
-          scenario({ size: [6, 1], start: [1, 0], finish: [4, 0], blocked: [], cells: [], expect: { position: [4, 0], finishReached: true } }),
-          scenario({ size: [7, 1], start: [2, 0], finish: [5, 0], blocked: [], cells: [], expect: { position: [5, 0], finishReached: true } })
-        ]
-      },
-      {
-        label: "Пример №5",
-        code: [
-          "🔁🛤🚠",
-          "🚶🚠",
-          "😐"
-        ].join("\n"),
-        tests: [
-          scenario({ size: [5, 1], start: [0, 0], finish: [4, 0], blocked: [], cells: [], expect: { position: [4, 0], finishReached: true } }),
-          scenario({ size: [6, 1], start: [2, 0], finish: [5, 0], blocked: [], cells: [], expect: { position: [5, 0], finishReached: true } }),
-          scenario({ size: [5, 1], start: [0, 0], finish: [2, 0], blocked: [[3, 0]], cells: [], expect: { position: [2, 0], finishReached: true } })
-        ]
-      }
+      { label: "Пример №1", code: ["🚶🚠", "🚶🚇"].join("\n") },
+      { label: "Пример №2", code: ["🎨🌹"].join("\n") },
+      { label: "Пример №3", code: ["🤔🧱🚠", "🎨🌻", "😐"].join("\n") },
+      { label: "Пример №4", code: ["🔂3️⃣", "🚶🚠", "😐"].join("\n") },
+      { label: "Пример №5", code: ["🔁🛤🚠", "🚶🚠", "😐"].join("\n") }
     ];
 
     const ROBOT_SUBTASK_PRESETS = Object.freeze({
-      "1.1": { code: ROBOT_EXAMPLES[0].code, tests: ROBOT_EXAMPLES[0].tests },
-      "1.2": { code: ROBOT_EXAMPLES[1].code, tests: ROBOT_EXAMPLES[1].tests },
-      "1.3": { code: ROBOT_EXAMPLES[2].code, tests: ROBOT_EXAMPLES[2].tests },
-      "1.4": { code: ROBOT_EXAMPLES[3].code, tests: ROBOT_EXAMPLES[3].tests },
-      "2.1": { code: "", tests: [scenario({ size: [5, 1], start: [0, 0], finish: [4, 0], blocked: [], cells: [], expect: { position: [4, 0], finishReached: true } })] },
-      "2.2": { code: "", tests: [scenario({ size: [4, 4], start: [0, 0], finish: [3, 3], blocked: [[1, 0], [1, 1], [2, 1]], cells: [], expect: { finishReached: true } })] },
-      "4.1": { code: "", tests: [""] }
+      "1.1": { code: ROBOT_EXAMPLES[0].code },
+      "1.2": { code: ROBOT_EXAMPLES[1].code },
+      "1.3": { code: ROBOT_EXAMPLES[2].code },
+      "1.4": { code: ROBOT_EXAMPLES[3].code },
+      "2.1": { code: "" },
+      "2.2": { code: "" },
+      "3.1": { code: "" },
+      "3.2": { code: "" },
+      "3.3": { code: "" },
+      "3.4": { code: "" },
+      "4.1": { code: "" }
     });
 
     const ROBOT_SUBTASK_TEXTS = Object.freeze({
@@ -773,7 +846,7 @@
       "1.2": ["Проверить перекраску текущей клетки через растения-цвета."],
       "1.3": ["Проверить условный блок с предикатом стены/свободы."],
       "1.4": ["Проверить цикл по счетчику с keycap-числом."],
-      "2.1": ["Соберите программу, которая проходит сценарии с препятствиями."],
+      "2.1": ["Соберите программу, которая проходит сценарий с препятствиями."],
       "2.2": ["Соберите программу с условиями/циклами и проверкой финиша."],
       "4.1": ["Решить задачу «второй максимум» или аналог. Тестов 10. Открыто только 3 теста, остальные скрыты визуально, но имеются фактически (значения нельзя нигде увидеть, даже в коде страницы)."]
     });
@@ -784,27 +857,242 @@
       ["🟰", "🚫", "🔥", "🧊", "🔥🟰", "🧊🟰", "0️⃣", "1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣"]
     ];
 
-    const ROBOT_TEST_PLACEHOLDER = [
-      '{',
-      '  "size": [5, 5],',
-      '  "start": [0, 0],',
-      '  "finish": [4, 4],',
-      '  "blocked": [],',
-      '  "cells": [],',
-      '  "expect": { "finishReached": true }',
-      '}'
-    ].join("\n");
+    const ROBOT_SCENARIO_BLOBS = Object.freeze({
+      "example:1": [{ "seed": 495056334, "blob": "tfdDppi8RkltKPRjl42uCOoE8quQU++yKpx1S7hXteUHhrjNuKI2v+RgVFUIrUP4VeBE3WjSCY+Erq3rViJekVVIXC1HYdTWFSk6rXHDvNStzLR2ncfW+R3fRJWHXT6tx1t5XKprIbJ1Fd3TiDsYqQugHUI=" }],
+      "example:2": [{ "seed": 3149492103, "blob": "/BgiFdFrN0pUFjWQ7lp/a+Nrk7iZ5P7yM8D02OEghAbOqRk+8fUHPB2fFWaxehLb3M9lTuElmEwd8az4j5UvMpwBs8TJdGecbRt73sGavzu4Jk5+2STHZy1XjFohqg/cgnfBfjHZCA1DIBz8YzPejNXQOo54y3fSGrx9l0xKIjolgPOOTuq33K3B7FZBk7PsQ+8MPBlkEmy9FEAaKrUFukI7kvQuSpeq2zDMoS7r" }],
+      "example:3": [{ "seed": 1508960576, "blob": "O70BQA4m5FezFHbAwWcMxuTOMM3mac3PFAd3rc49lyuJzHprLjhUobga1jNeB6G2W6qG+14oazH6NK/N4Ai8X9uCnkvR+3bISxO4C6epDYCineeXcNC5URcFSPsO4lvpTJAlq3iBwKSm7kk5Ls5vdhhqRjuexwQofep3" }],
+      "example:4": [{ "seed": 4163396345, "blob": "gibgv0cdVVCaG7cP2AzdIf010dLv8twLfUz2IjcWZkxw19tUZ0OjJtGRl/zHrHCRwpGnZNcz+vZTf67CWWMN+GIZ/zQYwMfPYhj5RL5CT/26/ZePYmblQMqIx34InG0EMIqaxfUKsitCZJ56xzorQJxRfvs=" }],
+      "example:5": [{ "seed": 2522864818, "blob": "yUvH6nzICl3BBvC6M9nynPaYduf0ByNGRvFxtxzjSZE7+jyBnJb9qwoMUIlseR9sSXzAkUwGQ6Em0ZHm8oejep7Fh+F8tjWL+BRku8tWZA34QmajeQ7Rw8NuAvlEnlUTopS4wYBkZq4J+e6OLzbYKgZ73ofE6D2qNw==" }],
+      "task:1.1": [{ "seed": 882333291, "blob": "EOymWbWH+14oBTHrCuaD/w//F/T9iDKErzbwBEX8WLLiHZ3y1dnIKKKLEVoVBq5P8FvhAsUJ1HiBxaik60lzRvBTOVJqWmnB0AJ/IuwokaPIt9GpcJyLzph3wVn69lN6osBcY0eQXCWwfhjclZB1Hq4buB0=" }],
+      "task:1.2": [{ "seed": 3536769060, "blob": "XxGFtOJyqFsXD3IWHbNQWgAitBnKHQHAsHpzmbLJK9etIP7fAmwbrd0G0meC030qfwYCr7Icpz0eCKu5XLzA4z8IFGX6bfuNrgK8X7HzkArb72nfCl24SLnnApqnza7bcPa7TVpNWbxxtxzgWI836iCBnLbq5E8jDs5gYTNgTnbWkUx/avJuw+CZvdCybZfHgJcjgBiF4EIw6chcfkaxURa2dx7Q0s4jVq8MsAVC7w==" }],
+      "task:1.3": [{ "seed": 1896237533, "blob": "prpk4xspGWR+crNDdFhhtRmJVS7TphAfmaDybpuiOviUS18Iu7dq0nW9kzAreAwF5u0j2CtnNuL3U6qOtRdRDEaFe+jE9Av7BvT9iBKW4HPfWgL0RZ/kApqizbjbffa6URcASO0O/VfrSYw62zHCxaWt4xhrCNl7cA1y" }],
+      "task:1.4": [{ "seed": 255706006, "blob": "7d9LXlDkzmGlcMyOT2U2EBLs+jPYK2db4uVt48C/DR1fbrB18Pq/V644rP3QBdvgbchMRaBqgadMlrWD7oomqY1gVFUPuVz+XfECxSmrJMzVpLzuVT9ekVUmXD9/NYbVHzNx5GKzqdq9zaV70JOAsTOIFdo=" }],
+      "task:2.1": [{ "seed": 2910141775, "blob": "NEAqjYnTv2KMfw0/pjLHcytTm0AhvHaYyyrscCmIHD4GcRGmKQ2J1MW3bY550mrDFLdt9hl9FnkriozQcL+5wdKOwhcfx4DFO6gCKVcyVmKlKVJWO+RX3At4iL5xHJmyzC3VqyG0xxpOT+2ANIlnzJ1mLHkTRLe5Oqc9Hg62pVWslvteCBR7sTmj0uQp+wTjt9cNlrly310CthO64gCco4fBlmj8pB9CVQ2zSf5Qp12C" }],
+      "task:2.2": [{ "seed": 1269610248, "blob": "c+UJ+MaObG/re05tud+U7iy2OFUuwUXVLGxvxRZl70PBlHKTZlDdWWAyLlvmfznek5KOY5ZA5TSMTY8ljxIKfBUr4ePQGtPI3K3B/Ehfhf+iTPFDNBlkFmy9CwtOc+pPi0g2nu5pFJfpyi7VqyS00RpDT+ycecR1neI+a3EbFujrM9grR0movF6mkbE2Fld+sDKug7YP7BDl85AP3e1v3kAk9V2z+UzP8p/3i3T/sx8FCg==" }],
+      "task:3.1": [{ "seed": 3924046017, "blob": "ug7oV/9F3WjSYI+UkOSlSSUd2Xo3SlQSNZTuWn9+/mSIv9P8n5ss3pip72SPBMi5GnmvjA9LdPMVdI5LUZrUz20AqFz/O2K+6/Gblmhrs1irx8koPN4mETG2ltf+MLIuAzaPbJBlIk8=" }],
+      "task:3.2": [{ "seed": 2283514490, "blob": "AbPPgjQwknU5bcjB67F6pD5Afo8831tvHthpL6RLwYlzwjQp1C5jQzIkqDE00ZeUgSTIOYRe+03+OIl+Cm8rYta9jwm0zq2jgPxcQ5O+7DWwGm5dN0sp7Bp7ESKlBY1DeMvoOVvQ7dI=" }],
+      "task:3.3": [{ "seed": 642982963, "blob": "SNSu8W3vQ3Zgawlywl4LBzenH5wFYKqtZx/ovI0k0Ko65ZUaDXG1wGujacLdfiZ3CAPpqn2hSg5H/ogclND1VS5rMfo0r83gCLxf24KeS9H7dshLE7gLp6kInL6G8ZFW9rdeEBIO4xbvTPBFgi8=" }],
+      "task:3.4": [{ "seed": 3297418732, "blob": "l3mNLJraMHNPVkq+1WvYYkgKvKES9bnpSEFrMfoxo8/lCPZHuoSGRYTeKo9KC/VSt+4K1+q02cgooosRI0VG8HG3ZbYMzg/UeIHFqKTrSXNG8FM5UmpaacHQAn8i7CiHpdW31qhNl8iXqyOJSp2uA2mu00g=" }],
+      "task:4.1": [{ "seed": 1656887205, "blob": "3uJsm9OR4Xy2XovpLDDp3UFxXbYbfogmUYjqhiMKshCsE1ew88/Wyj9V61jz0IQtPtUrQGO/qISxaIpmej7XL7gsBADFBl7bAYqEf90weMxPCzIuW+FrJtibg8h71znYbM4WoWGGRkcuIGLe88Zf/OCV8t8=" }],
+      "*": [{ "seed": 16355678, "blob": "JQcz9ghMVnmdXMQWB92+OFrU4ttgg59jus1lGwjnhTWXNoidKBIkT1bQpGWYfVMIpbBU7diCOV8Ufr07ptKuQcU4rP3XEcTmZdkKXeETuuIAnKOH0Jxl8L5YHFVQtV7uW/hd" }]
+    });
+
+    function decodeScenarioBlob(entry) {
+      if (!entry || typeof entry !== "object") return "";
+      const blob = String(entry.blob || "");
+      const seed = Number(entry.seed) >>> 0;
+      let encoded = "";
+      try {
+        encoded = atob(blob);
+      } catch (_) {
+        return "";
+      }
+
+      const bytes = new Uint8Array(encoded.length);
+      let state = seed;
+      for (let i = 0; i < encoded.length; i++) {
+        const cipher = encoded.charCodeAt(i) & 0xff;
+        bytes[i] = cipher ^ (state & 0xff);
+        state = (state * 1664525 + 1013904223) >>> 0;
+      }
+
+      try {
+        return new TextDecoder("utf-8").decode(bytes);
+      } catch (_) {
+        let fallback = "";
+        for (let i = 0; i < bytes.length; i++) fallback += String.fromCharCode(bytes[i]);
+        return fallback;
+      }
+    }
+
+    function decodeScenarioMap(blobMap) {
+      const out = {};
+      const source = blobMap && typeof blobMap === "object" ? blobMap : {};
+      const keys = Object.keys(source);
+      for (const key of keys) {
+        const encodedList = Array.isArray(source[key]) ? source[key] : [];
+        const decoded = encodedList.map((entry) => decodeScenarioBlob(entry)).filter((text) => text.length > 0);
+        if (decoded.length) out[key] = decoded;
+      }
+      return out;
+    }
+
+    function scenarioLabelFromKey(scenarioKey) {
+      const key = String(scenarioKey || "");
+      if (key.startsWith("example:")) {
+        const n = key.slice("example:".length);
+        return `Пример №${n}`;
+      }
+      if (key.startsWith("task:")) {
+        const n = key.slice("task:".length);
+        return `Подзадача ${n}`;
+      }
+      return "Сценарий";
+    }
+
+    function keyOf(x, y) {
+      return `${x}:${y}`;
+    }
+
+    function setScenarioError(boardEl, metaEl, scenarioKey, message) {
+      if (!boardEl || !metaEl) return;
+      metaEl.textContent = `${scenarioLabelFromKey(scenarioKey)}: ошибка сценария.`;
+      boardEl.textContent = "";
+      const errorEl = document.createElement("div");
+      errorEl.className = "scenario-error";
+      errorEl.textContent = String(message || "Сценарий недоступен.");
+      boardEl.appendChild(errorEl);
+    }
+
+    function cloneCells(cells, width, height) {
+      const out = [];
+      for (let y = 0; y < height; y++) {
+        const row = [];
+        for (let x = 0; x < width; x++) {
+          const cell = cells && cells[y] && cells[y][x] ? cells[y][x] : null;
+          row.push({
+            color: cell && typeof cell.color === "string" ? cell.color : null,
+            temp: cell && Number.isFinite(Number(cell.temp)) ? Math.trunc(Number(cell.temp)) : 0
+          });
+        }
+        out.push(row);
+      }
+      return out;
+    }
+
+    function renderScenario(boardEl, metaEl, scenarioKey, scenarioData, snapshot) {
+      if (!boardEl || !metaEl) return;
+      boardEl.textContent = "";
+
+      const width = scenarioData.width;
+      const height = scenarioData.height;
+      const start = scenarioData.start.slice();
+      const finish = scenarioData.finish.slice();
+      const blockedSet = new Set();
+      for (const item of scenarioData.blocked.values()) blockedSet.add(String(item));
+      let robot = start.slice();
+      let cells = cloneCells(scenarioData.cells, width, height);
+
+      if (snapshot && typeof snapshot === "object") {
+        if (Array.isArray(snapshot.robot) && snapshot.robot.length === 2) {
+          robot = [Math.trunc(Number(snapshot.robot[0])) || 0, Math.trunc(Number(snapshot.robot[1])) || 0];
+        }
+        if (Array.isArray(snapshot.blocked)) {
+          blockedSet.clear();
+          for (const pair of snapshot.blocked) {
+            if (!Array.isArray(pair) || pair.length !== 2) continue;
+            const x = Math.trunc(Number(pair[0]));
+            const y = Math.trunc(Number(pair[1]));
+            if (Number.isFinite(x) && Number.isFinite(y)) blockedSet.add(keyOf(x, y));
+          }
+        }
+        if (Array.isArray(snapshot.cells)) {
+          cells = cloneCells(snapshot.cells, width, height);
+        }
+      }
+
+      const isFinishReached = robot[0] === finish[0] && robot[1] === finish[1];
+      const phaseText = snapshot ? (isFinishReached ? "после запуска: финиш достигнут." : "после запуска: финиш не достигнут.") : "начальное состояние.";
+      metaEl.textContent = `${scenarioLabelFromKey(scenarioKey)}: поле ${width}x${height}, ${phaseText}`;
+
+      const gridEl = document.createElement("div");
+      gridEl.className = "scenario-grid";
+      gridEl.style.gridTemplateColumns = `repeat(${width}, 38px)`;
+
+      for (let y = 0; y < height; y++) {
+        for (let x = 0; x < width; x++) {
+          const cellEl = document.createElement("div");
+          cellEl.className = "scenario-cell";
+          const blocked = blockedSet.has(keyOf(x, y));
+          if (blocked) {
+            cellEl.classList.add("blocked");
+            cellEl.textContent = "■";
+          } else {
+            const cell = cells[y][x];
+            if (cell && cell.color && COLOR_CSS_BY_CODE[cell.color]) {
+              cellEl.classList.add(COLOR_CSS_BY_CODE[cell.color]);
+            }
+            const temp = cell && Number.isFinite(Number(cell.temp)) ? Math.trunc(Number(cell.temp)) : 0;
+            if (temp !== 0) {
+              const tempEl = document.createElement("span");
+              tempEl.className = "scenario-temp";
+              tempEl.textContent = String(temp);
+              cellEl.appendChild(tempEl);
+            }
+          }
+
+          if (x === start[0] && y === start[1]) {
+            const startEl = document.createElement("span");
+            startEl.className = "scenario-marker start";
+            startEl.textContent = "S";
+            cellEl.appendChild(startEl);
+          }
+
+          if (x === finish[0] && y === finish[1]) {
+            cellEl.classList.add("finish");
+            const finishEl = document.createElement("span");
+            finishEl.className = "scenario-marker finish";
+            finishEl.textContent = "F";
+            cellEl.appendChild(finishEl);
+          }
+
+          if (x === robot[0] && y === robot[1]) {
+            const robotEl = document.createElement("span");
+            robotEl.className = "scenario-marker";
+            robotEl.textContent = "🤖";
+            cellEl.appendChild(robotEl);
+          }
+
+          gridEl.appendChild(cellEl);
+        }
+      }
+
+      boardEl.appendChild(gridEl);
+    }
 
     if (window.LovelaceLabShell && window.LovelaceDomains && typeof window.LovelaceDomains.createRobotDomain === "function") {
+      const robotDomain = window.LovelaceDomains.createRobotDomain();
+      const fixedTestsByScenario = decodeScenarioMap(ROBOT_SCENARIO_BLOBS);
+      const scenarioMetaEl = document.getElementById("scenarioMeta");
+      const scenarioBoardEl = document.getElementById("scenarioBoard");
+
+      function drawScenarioView(payload, snapshot) {
+        const scenarioKey = payload && typeof payload.scenarioKey === "string" ? payload.scenarioKey : "";
+        const tests = payload && Array.isArray(payload.tests) ? payload.tests : [];
+        const scenarioText = tests.length ? String(tests[0] || "") : "";
+        if (!scenarioText) {
+          setScenarioError(scenarioBoardEl, scenarioMetaEl, scenarioKey, "Сценарий не задан.");
+          return;
+        }
+        if (typeof robotDomain.parseScenario !== "function") {
+          setScenarioError(scenarioBoardEl, scenarioMetaEl, scenarioKey, "Парсер сценария недоступен.");
+          return;
+        }
+        const parsed = robotDomain.parseScenario(scenarioText);
+        if (!parsed || !parsed.ok) {
+          setScenarioError(scenarioBoardEl, scenarioMetaEl, scenarioKey, (parsed && parsed.error) || "Некорректный сценарий.");
+          return;
+        }
+        renderScenario(scenarioBoardEl, scenarioMetaEl, scenarioKey, parsed.scenario, snapshot || null);
+      }
+
       window.LovelaceLabShell.boot({
-        domain: window.LovelaceDomains.createRobotDomain(),
+        domain: robotDomain,
         examples: ROBOT_EXAMPLES,
         taskSubtaskCounts: { "2": 2, "4": 1 },
         subtaskPresets: ROBOT_SUBTASK_PRESETS,
         subtaskTexts: ROBOT_SUBTASK_TEXTS,
         keyboardGroups: ROBOT_KEYBOARD_GROUPS,
         lineDigits: KEYCAP_DIGITS,
-        testInputPlaceholder: ROBOT_TEST_PLACEHOLDER
+        fixedTestsByScenario,
+        onScenarioChange(payload) {
+          drawScenarioView(payload, null);
+        },
+        onRunComplete(payload) {
+          const firstResult = payload && Array.isArray(payload.domainResults) ? payload.domainResults[0] : null;
+          const snapshot = firstResult && firstResult.snapshot ? firstResult.snapshot : null;
+          drawScenarioView(payload, snapshot);
+        }
       });
     }
   </script>

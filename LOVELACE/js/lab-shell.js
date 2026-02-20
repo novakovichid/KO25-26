@@ -151,6 +151,7 @@
     const resetTestsBtn = document.getElementById("resetTestsBtn");
     const testListEl = document.getElementById("testList");
     const testOutputsEl = document.getElementById("testOutputs");
+    const testsPanelEl = document.getElementById("testsPanel");
     const taskButtonsEl = document.getElementById("taskButtons");
     const taskSubtasksEl = document.getElementById("taskSubtasks");
     const taskTextWrapEl = document.getElementById("taskTextWrap");
@@ -160,8 +161,18 @@
     const emojiKeyboardEl = document.getElementById("emojiKeyboard");
     const codePhrasePanelEl = document.getElementById("codePhrasePanel");
 
-    if (!codeInputEl || !runBtn || !resetBtn || !addTestBtn || !resetTestsBtn || !testListEl || !testOutputsEl || !taskButtonsEl || !taskSubtasksEl || !taskTextWrapEl || !taskTextEl || !statusBoxEl || !stepCountEl || !emojiKeyboardEl) {
+    const fixedTestsByScenario = (config.fixedTestsByScenario && typeof config.fixedTestsByScenario === "object")
+      ? config.fixedTestsByScenario
+      : null;
+    const useFixedTests = Boolean(fixedTestsByScenario);
+    const onScenarioChange = typeof config.onScenarioChange === "function" ? config.onScenarioChange : null;
+    const onRunComplete = typeof config.onRunComplete === "function" ? config.onRunComplete : null;
+
+    if (!codeInputEl || !runBtn || !resetBtn || !testOutputsEl || !taskButtonsEl || !taskSubtasksEl || !taskTextWrapEl || !taskTextEl || !statusBoxEl || !stepCountEl || !emojiKeyboardEl) {
       throw new Error("LovelaceLabShell: missing required DOM elements");
+    }
+    if (!useFixedTests && (!addTestBtn || !resetTestsBtn || !testListEl)) {
+      throw new Error("LovelaceLabShell: missing test controls");
     }
 
     const exampleButtons = [
@@ -188,6 +199,7 @@
     let selectedTaskKey = "";
     let selectedSubtaskKey = "";
     let codeInputResizeObserver = null;
+    let currentScenarioKey = "";
 
     function hideCodePhrasePanel() {
       if (!codePhrasePanelEl) return;
@@ -285,6 +297,32 @@
       taskTextWrapEl.hidden = false;
     }
 
+    function setCurrentScenarioKey(nextKey) {
+      currentScenarioKey = String(nextKey || "");
+    }
+
+    function resolveFixedTestsForScenario() {
+      if (!useFixedTests) return [];
+      const list = fixedTestsByScenario[currentScenarioKey] || fixedTestsByScenario["*"];
+      if (!Array.isArray(list) || !list.length) return [""];
+      return list.map((item) => String(item || ""));
+    }
+
+    function currentTestsSnapshot() {
+      if (useFixedTests) return resolveFixedTestsForScenario();
+      return getTestsFromUi();
+    }
+
+    function emitScenarioChange() {
+      if (!onScenarioChange) return;
+      try {
+        onScenarioChange({
+          scenarioKey: currentScenarioKey,
+          tests: currentTestsSnapshot()
+        });
+      } catch (_) {}
+    }
+
     function resetResultPanels() {
       hideCodePhrasePanel();
       setStatus("", "Ожидание запуска.");
@@ -293,6 +331,7 @@
     }
 
     function createTestItem(inputText = "") {
+      if (!testListEl) return null;
       const wrap = document.createElement("section");
       wrap.className = "test-item";
 
@@ -331,9 +370,11 @@
     }
 
     function renumberTests() {
+      if (!testListEl) return;
       const tests = Array.from(testListEl.querySelectorAll(".test-item"));
       if (!tests.length) {
-        testListEl.appendChild(createTestItem(""));
+        const item = createTestItem("");
+        if (item) testListEl.appendChild(item);
         return renumberTests();
       }
       for (let i = 0; i < tests.length; i++) {
@@ -346,19 +387,25 @@
     }
 
     function getTestsFromUi() {
+      if (!testListEl) return [""];
       const fields = Array.from(testListEl.querySelectorAll("[data-test-input]"));
       return fields.map((field) => String(field.value || ""));
     }
 
     function setTestsToUi(inputs) {
+      if (!testListEl) return;
       testListEl.textContent = "";
       const list = Array.isArray(inputs) && inputs.length ? inputs : [""];
-      for (const text of list) testListEl.appendChild(createTestItem(text));
+      for (const text of list) {
+        const item = createTestItem(text);
+        if (item) testListEl.appendChild(item);
+      }
       renumberTests();
     }
 
     function renderOutputs(results) {
       testOutputsEl.textContent = "";
+      const itemLabel = useFixedTests ? "Сценарий" : "Тест";
       for (let i = 0; i < results.length; i++) {
         const result = results[i];
         const card = document.createElement("section");
@@ -366,7 +413,7 @@
 
         const title = document.createElement("div");
         title.className = "test-label";
-        title.textContent = `Тест ${i + 1}`;
+        title.textContent = `${itemLabel} ${i + 1}`;
 
         const meta = document.createElement("div");
         meta.className = "test-output-meta";
@@ -389,23 +436,29 @@
       if (!preset || typeof preset !== "object") return;
       codeInputEl.value = String(preset.code || "");
       refreshCodeLineNumbers();
-      const tests = Array.isArray(preset.tests) && preset.tests.length ? preset.tests : [""];
-      setTestsToUi(tests);
+      if (!useFixedTests) {
+        const tests = Array.isArray(preset.tests) && preset.tests.length ? preset.tests : [""];
+        setTestsToUi(tests);
+      }
       resetResultPanels();
     }
 
     function selectSubtask(subtaskKey) {
       selectedSubtaskKey = subtaskKey;
+      setCurrentScenarioKey(`task:${subtaskKey}`);
       syncSubtaskButtons();
       setTaskText(subtaskKey);
       applySubtaskPreset(subtaskKey);
+      emitScenarioChange();
     }
 
     function clearSubtasks() {
       selectedSubtaskKey = "";
+      setCurrentScenarioKey("");
       taskSubtasksEl.textContent = "";
       taskSubtasksEl.hidden = true;
       setTaskText("");
+      emitScenarioChange();
     }
 
     function renderSubtasks(taskKey) {
@@ -631,9 +684,9 @@
       setStatus("", "Парсинг программы...");
       stepCountEl.textContent = "Суммарные шаги: 0";
 
-      const tests = getTestsFromUi();
+      const tests = useFixedTests ? resolveFixedTestsForScenario() : getTestsFromUi();
       const hasAtLeastOneTest = tests.length > 0;
-      if (!hasAtLeastOneTest) setTestsToUi([""]);
+      if (!hasAtLeastOneTest && !useFixedTests) setTestsToUi([""]);
       const safeTests = hasAtLeastOneTest ? tests : [""];
 
       let parsedProgram = null;
@@ -655,6 +708,7 @@
       setStatus("", `Инструкций: ${Array.isArray(parsedProgram) ? parsedProgram.length : 0}. Выполнение тестов...`);
 
       const results = [];
+      const domainResults = [];
       let totalSteps = 0;
       let okCount = 0;
       let warnCount = 0;
@@ -662,16 +716,17 @@
 
       for (let i = 0; i < safeTests.length; i++) {
         try {
-          const result = await domain.executeProgram(parsedProgram, safeTests[i], {
+          const domainResult = await domain.executeProgram(parsedProgram, safeTests[i], {
             hardStepLimit,
             yieldEvery,
             splitGraphemes,
             makeError
           });
-          const steps = Number.isInteger(result && result.steps) ? result.steps : 0;
+          domainResults.push(domainResult);
+          const steps = Number.isInteger(domainResult && domainResult.steps) ? domainResult.steps : 0;
           totalSteps += steps;
-          const status = result && typeof result.status === "string" ? result.status : "ok";
-          const output = result && typeof result.output === "string" ? result.output : "";
+          const status = domainResult && typeof domainResult.status === "string" ? domainResult.status : "ok";
+          const output = domainResult && typeof domainResult.output === "string" ? domainResult.output : "";
 
           if (status === "ok") {
             okCount += 1;
@@ -684,6 +739,7 @@
             results.push({ kind: "error", meta: "Ошибка", value: output || "Ошибка." });
           }
         } catch (err) {
+          domainResults.push(null);
           errCount += 1;
           const msg = formatLineOnlyError(err);
           results.push({ kind: "error", meta: "Ошибка", value: msg });
@@ -692,12 +748,24 @@
 
       renderOutputs(results);
       stepCountEl.textContent = `Суммарные шаги: ${totalSteps}`;
+      const noun = useFixedTests ? "сценарий(ев)" : "тест(а/ов)";
       if (errCount > 0) {
         setStatus("error", `Готово: успех ${okCount}, предупреждения ${warnCount}, ошибки ${errCount}.`);
       } else if (warnCount > 0) {
         setStatus("warn", `Готово: успех ${okCount}, предупреждения ${warnCount}.`);
       } else {
-        setStatus("ok", `Готово: все ${okCount} тест(а/ов) выполнены успешно.`);
+        setStatus("ok", `Готово: все ${okCount} ${noun} выполнены успешно.`);
+      }
+
+      if (onRunComplete) {
+        try {
+          onRunComplete({
+            scenarioKey: currentScenarioKey,
+            tests: safeTests.slice(),
+            outputResults: results.slice(),
+            domainResults: domainResults.slice()
+          });
+        } catch (_) {}
       }
 
       runBtn.disabled = false;
@@ -712,12 +780,16 @@
       syncExampleButtons();
       syncTaskButtons();
       clearSubtasks();
+      setCurrentScenarioKey(`example:${index + 1}`);
       codeInputEl.value = String(item.code || "");
       refreshCodeLineNumbers();
-      setTestsToUi(Array.isArray(item.tests) && item.tests.length ? item.tests : [""]);
+      if (!useFixedTests) {
+        setTestsToUi(Array.isArray(item.tests) && item.tests.length ? item.tests : [""]);
+      }
       codeInputEl.focus();
       updateFocusTarget(codeInputEl);
       resetResultPanels();
+      emitScenarioChange();
     }
 
     function initExamples() {
@@ -775,22 +847,28 @@
 
     resetBtn.addEventListener("click", resetResultPanels);
 
-    addTestBtn.addEventListener("click", () => {
-      testListEl.appendChild(createTestItem(""));
-      renumberTests();
-      resetResultPanels();
-    });
+    if (useFixedTests) {
+      if (testsPanelEl) testsPanelEl.hidden = true;
+    } else {
+      addTestBtn.addEventListener("click", () => {
+        if (!testListEl) return;
+        const item = createTestItem("");
+        if (item) testListEl.appendChild(item);
+        renumberTests();
+        resetResultPanels();
+      });
 
-    resetTestsBtn.addEventListener("click", () => {
-      setTestsToUi([""]);
-      resetResultPanels();
-    });
+      resetTestsBtn.addEventListener("click", () => {
+        setTestsToUi([""]);
+        resetResultPanels();
+      });
+    }
 
     renderKeyboard();
     initExamples();
     initTasks();
     if (examples.length > 0) applyExample(0);
-    else setTestsToUi([""]);
+    else if (!useFixedTests) setTestsToUi([""]);
     resetResultPanels();
     refreshCodeLineNumbers();
     codeInputEl.focus();

@@ -299,6 +299,35 @@
     };
   }
 
+  function cloneCells(cells) {
+    return cells.map((row) => row.map((cell) => ({ color: cell.color, temp: cell.temp })));
+  }
+
+  function setToBlockedList(blockedSet) {
+    const out = [];
+    for (const key of blockedSet.values()) {
+      const parts = String(key).split(":");
+      const x = Number(parts[0]);
+      const y = Number(parts[1]);
+      if (Number.isFinite(x) && Number.isFinite(y)) out.push([x, y]);
+    }
+    return out;
+  }
+
+  function buildSnapshot(state, scenario) {
+    const finishReached = state.x === state.finish[0] && state.y === state.finish[1];
+    return {
+      width: state.width,
+      height: state.height,
+      start: scenario.start.slice(),
+      finish: scenario.finish.slice(),
+      robot: [state.x, state.y],
+      finishReached,
+      blocked: setToBlockedList(state.blocked),
+      cells: cloneCells(state.cells)
+    };
+  }
+
   function isBlockedOrOutside(state, x, y) {
     if (x < 0 || x >= state.width || y < 0 || y >= state.height) return true;
     return state.blocked.has(keyOf(x, y));
@@ -446,7 +475,8 @@
       return {
         status: "error",
         steps: 0,
-        output: parsed.error
+        output: parsed.error,
+        snapshot: null
       };
     }
 
@@ -470,10 +500,12 @@
 
     while (pc < instructions.length) {
       if (steps >= hardStepLimit) {
+        const checkLimit = { ok: false, issues: ["limit"] };
         return {
           status: "limit",
           steps,
-          output: buildOutput(state, { ok: false, issues: ["limit"] })
+          output: buildOutput(state, checkLimit),
+          snapshot: buildSnapshot(state, scenario)
         };
       }
 
@@ -522,10 +554,14 @@
     }
 
     const check = evaluateExpect(state, scenario.expect);
+    const finishReached = state.x === state.finish[0] && state.y === state.finish[1];
+    if (!finishReached) check.issues.unshift("finishRequired");
+    check.ok = check.ok && finishReached;
     return {
       status: check.ok ? "ok" : "warn",
       steps,
-      output: buildOutput(state, check)
+      output: buildOutput(state, check),
+      snapshot: buildSnapshot(state, scenario)
     };
   }
 
@@ -533,6 +569,7 @@
     return {
       parseProgram,
       executeProgram,
+      parseScenario,
       digits: KEYCAP_DIGITS.slice()
     };
   }
