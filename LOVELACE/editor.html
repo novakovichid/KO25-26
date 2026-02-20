@@ -759,7 +759,7 @@
     const TASK4_SUBTASK_KEY = "4.1";
     const TASK4_DATA_BLOB = Object.freeze({
       seed: 3067421989,
-      blob: "XmL8E1oRMORXs1x4mPI7W8GylWCN5GG2zhgGCrXMas5nzJ13MWQGBfntI9grHlrs+RK5i6oNEVp4+m2+0/ke40n7/dsHxPZyjxJFrxHtq1/V4s+w2Tez7h9UVQ+5XP5d8UWbcLN2k4Th6vFTIhXJYnBSNVZr0dYLcWO1Y4+8zqqH+j3BicPjc81Qh+hBPueMUGhfp1owtnJfgpWbI0D5CKwTVvCl8cHceXqyH+yQkGw83j8XLcbJlKt442oVLM8+0SBrEt0UMbIPhMV/ySxujQE1CyBDpiJ0kdqBgzLFedJggkW0aLhQQzBkfJi4klv74dK1gK8EB9bpuCOqVWwPfhFgrUELWGGjFZhCOYX5LwyPsp9gleYl/45RVUbkzmGYJIzMdzQ4GETk5jePZR5R7OIQ/8LpREMWLfhn6pGsS75VovOQDMzzY85cAv4T5qlf1/zN9JB3+rRRHVVQp033TeBd0ymrPc3WuLylAHNIizc1QS8XOZGTR2Q6uyiEtMu7xrR6lovO4XbPRIWsGG+izFl1DfhfJb9lGMWb0SMFtQ6wFB2o66zD1S0+50ixjct3dYRvV3nU04WtevtoRHSLe4Z0OlbLDiG3D4TFbNgvYowZNU04H+V/JdiF25FjxXXOcNRd6CvhAxd9aDWK8c8brqHAr5epBALC5Lo7qAQ0SztGNPoWC05h9k/EBSyY7yJM2fWNeN+lP+WYRRtRo4U1jjCUnShrJkNftKh22iAMW+z5EqqaqQEQQni8dfCDvVmyR/a2wQDW72OPEgH7Xa/uE6j8zfKRdvKlWFpNSJJZ1hNVjS7QWeRzHf0YOur1rBBvxcMtXw=="
+      blob: "XmL8E1oRMORXs1x4mPI7W8GylWCI9HOk3QsXG6HYe85nzJ13MWQGBfntI9grHlrs+RK5i6oNEVp4+m2+0/ke40n7/dsHxPZyjxJFohHtq1/V4s+w2Tez5h9UVQ+5XP5d8UWbcLN2k4Th6vFTIhXJYnBSNVZr0dYLcWO1Y4+8zqqH+j3AmdT0ZthIn/pBPueMUGhfp1owtnJfgpWbI0D5CKwTVvCl8cHceXqyH+yQkGw83j8XLcbJlK9s934BONsqxTR/BskAI7YPhMV/ySxujQE1CyBDpiJ0kdqBgzLFedJggkW0aLhQQzBkfJi4klv74dK1gKsXE8L9rDe+QXgbagV0v0ILWGGjFZhCOYX5LwyPsp9gleYl/45RVUbkzmGYJIzMdzQ4GETk5jePZR5R7OUQ/8D1RhZObb00vsToWaRHsf2eS8LqdcRKC/8T5u0PmaOK/9V/sb9TCAIe4xa5D7wAxnK4dJaG+Oi3GH1eznZlFWxWfMCRTH8otSbDutKtzKJzl4vOpSeBG8KnXWfpx1tgWrYbfvElTZiEijdM6V70QAay/bTWxj0q61j0xJsrNsQqBnve0Ye/dPU8SH+SfIllfQiPVW/1SNXLYZM1ZZ4AJE04W7Unb53Jx8pznDuNNYBL4inhEwZ9aiuYtIRb6/aE6sa7HhHG/7Q1/Ag/UjxJJb1ITxUvtQiVCyHT9SVewOSNeJv1Y6bdAQ4KsMxr3GnC2mo5cQAS6OxlwDMNSeL3RqaRsAYfUz/iMavN/x7jOKz9wgHG4nXICl24YqnGQyV9PgAptENtDajKumX8IF9Vk90v"
     });
     const CODE_PHRASE_UNLOCK_RULES = Object.freeze({
       "2.1": Object.freeze({
@@ -966,9 +966,9 @@
         "Для значения 8 нужно получить значение 16."
       ]),
       "4.1": Object.freeze([
-        "Необходимо для N чисел посчитать их сумму, а затем сравнить с эталоном E.",
-        "Если сумма равна эталону - вывести 1. Иначе - вывести 0.",
-        "С клавиатуры сперва вводится N, затем N чисел, после них - значение эталона E."
+        "Вводится эталон E, затем вводятся числа, пока не будет введён ноль.",
+        "Нужно посчитать сумму введённых после эталона чисел и сравнить с эталоном.",
+        "Если сумма равна эталону - вывести 1. Иначе - вывести 0."
       ])
     });
 
