@@ -466,6 +466,10 @@
       taskSubtasksEl.textContent = "";
       const rawCount = taskSubtaskCounts[taskKey];
       const count = Number.isInteger(rawCount) && rawCount > 0 ? rawCount : 4;
+      if (count === 1) {
+        taskSubtasksEl.hidden = true;
+        return;
+      }
       for (let i = 1; i <= count; i++) {
         const subtaskKey = `${taskKey}.${i}`;
         const btn = document.createElement("button");
