@@ -1015,7 +1015,7 @@
       "2.2": ["На каждом из 3 полей дойдите до финиша и закрасьте две контрольные клетки: одну в 🍀 и одну в 🌻."],
       "3.1": ["На каждом из 3 полей: если температура стартовой клетки выше 1️⃣0️⃣, закрасьте стартовую клетку в 🌹, а соседнюю справа в 🍀; иначе наоборот. После этого дойдите до финиша."],
       "3.2": ["На каждом из 3 полей: если температура стартовой клетки не ниже 1️⃣5️⃣, стартовая клетка должна быть 🌻, а финишная 🌹; иначе стартовая 🍇, а финишная 🍀. Дойдите до финиша."],
-      "4.1": ["На каждом из 10 полей-лабиринтов дойдите до финиша и закрасьте в 🌹 контрольные точки поворота."]
+      "4.1": ["На каждом из 10 полей найдите финиш по температуре и дойдите до него."]
     });
 
     const ROBOT_KEYBOARD_GROUPS = [
@@ -1079,16 +1079,16 @@
         { "seed": 3284517773, "blob": "9qo0k2tZSfSOCePVhEhRRWm5Jb6DtiCtSbCCnkvS6mjEWw+4C4ezQsONw6CbaPy1Vh0TSPt3xhKnQ5o+5SeBnJazpUJzRpgiNwktGCmIkQI4deco2/XG8t7iZ9CTzO9klEqd7F0+v8tYYA34DzmOOl/dz9pkD69c/xsd9KD6ipVlWqIb8tSOKneKOxAsgd+U+zG5I1JkuHGJby0Q0xZk9EjNiTidfmiLGTwcIEPfaHTF2s3ZbY5inD+QU/Bqu09JP2o9mKGJWf75la3fxFlO" }
       ],
       "task:4.1": [
-        { "seed": 3184501721, "blob": "okYAX2e9dfD6tFeoOKz9wR3V8XKPEjyvHezWQte2huyQd/v0ByNARvRxtxznTJAx4jHHhPeT3Ax9TPYiTkYjE0SI6EBxKsomuv6X7vjsRMGFxJ5qtlmL6CwwkJwZI3LuYnT/IiDlm4hkFKsbphQdqLK2gINhZLRYq+eQbC2SdVd1xoqUp2j7aEJjl3GXImUQm1FnpFCEnDjJfjHbWXIWIEO2P3Tel5uFM44hnHfFG/B0+FgENWo9jf3eUqyvw6OA+ktfma+6LagTKV98WGzkUFFWefFByl54y6hnDNb/wy3L5mm0j11TCPyxJoM=" },
-        { "seed": 918273645, "blob": "FspUM4v5aRTuqYN05Ohx5YlZRV6j1gDIadDiPmtyCgjk+y/YK2dT4uBt48C7CBxVdr0z6JvXIKlJsIKeMoOvN/AEPKsd7NZCruLDsqQoyOURSSpGmh23DdgMpGClZ/6KlvyrDgxQ8Ds5RFJ/NYbWDi199H7D9sD8xqVzntrW+R2WSt/4SyrnjEwyFfIVZrB5EdfFiDtOqRuhQkK+srabxDc+61jontF/eZIsDTWLgZSneqUvRS6GMp4iJxDTDC+kVIrdKJ1+aIEZPx0gQ6ZhM9naisY6jmOcP5hT8HD2GRJhamTVvZNZrK/S/cf9Bk6roOU=" },
-        { "seed": 2516384907, "blob": "8EyGuZXn2z7I5w1UQTftDuhK5FKLcLMPlYr9lasYNxXFZ2YYLRhCnZ9DADS1aI2j2LXApD3I8q/0at01i4FGMPrzGUsY7gsZ/01MlIf3LTfpUvU9E8n6uNO7IVP2VqPhxxVmnH0/db/HmqkF+xEUIM9DuCx9V5FEZuVZit1hkz9ughkjTTgi/zEun8LBxmPVOYQ1jF2xZrhMVG9yJci0mAnzuYut2rseBdr/4TWwU2AZPUos8AALTmG0CIwFJ93naVaXqpZum71xrM4UFUnugDSMZ9qdYCxwQRuh82WCMwZS4vdJ7djtSFFVcrQ4uIO2WewA5P3PNMn+" },
-        { "seed": 1739205641, "blob": "cvZQTzctJYCKxQe5yNyt0e1FQYL/oky+TX1mcgcm9hxAByvkV7MfdsfBZwzX/MAh0qE3tMdjbB+t3QbSHtWTIBQ4OFehuBrWSg5H/ogclNP1VS4aRul7+PygIKxJtIKeMoevMvAEPK4d6dZCrubDsqQoyOERSSo37Q7+RvVFnCarbtiErq3rViJekVVuUncAI5CfVCQ6rTvN7tixya9t0JPWsSOJStr2Cj6zjA8kA+BAZukkUZrUxW0DqVz/Qk33rbaeynYqv1irhMdsLJJ1UXXGkNnxN6VoGy6Je4EiIh6SFnukF5DLOMh+MdtZcgxtFethdIfahY8ljmbjeN0=" },
-        { "seed": 406128733, "blob": "JjrkY5upmeT+8S/enqnvZJ4cxqgFPvH1ADwfnxVmtX8T0cTCI1aAR+lWYr7r9o+JbmOiHrOGsBVjnH8/db/FmqwF+xEQIMtDyVttHtlpL90ehNdHnQc6wkcNQ1lLqCELkaPExnLxN+UxjEyPJY8TCngVK+Hg0B7Tuau4jqx5btr//W/6BC9PfB87vRFMGC+1T9J8IdPkaRSAvI07m/5jut9bWEbunnnEZ5LadmtpTx2v8GXAJBBJt/cK/s77Bxxacqp18IP+HvpH/fPJS8yhPJQEReMT5rlC17OA7pZ2sewfChIO41G3RadY3WiweIHf7/KyFnMfxGJ6Ai0YO9bWEn9lynec" },
-        { "seed": 2941765201, "blob": "Kl7YZ28VLRhCnJ9BADS1eZWtyaqH+kTGhcSeas8OzrQYb6OMD0sY7g8Z/zQf1NjJagm/XP87ZKflpL7KVj3rS8yQsHt5ghJOAtXfhsB0jHgNPaYyvjFzAbQYWLQBnLo26m8n2yh8NDJVsk4LkdqSkjHJeMonmgTwarFPSj5qPeGq3lOsr8SjgOAGCcbxunTlDSNJfB9i7RdNVj7qFspfeMuoZwzMspVwleYw+ZFXRQi7zimbIcLCPjI2G0S3v2vYaB5R/fkSrI21CwEUJ/olr8WuBrIeoqeQU4OvJNQKXa8d/ugBmb+doMMm4bNZWgo3vFE=" },
-        { "seed": 1264098753, "blob": "ug7oV/9F3WjSbY+QkOSlSSUd2Xo3SlQWNZTuWn9+/mSIv9P8n5sn3pyp72SPBMi5GnmvjA9LdPcVdI46Jo2bm1xAgE7pUGK+kqXP1lAknEi9jrZiDoBjUQTIqIexbIpmejrXKrhdcxCMTHPjTtzFIMp+aIsZPBwgQ99odMXazd5tjmKcP5BT8Gq7T0k/aj2Yo5lPrOjc9IDhBgnC8bpuqFt9F3xGL/MdW1Z55B+NQ3iMsDAMzbKVepXmKrTHChsI4oM3kTfChTA7cQdE8KQ82GkeUfb5ErbA41BfFH63O6XTrkG8F+W7kBTp/ns=" },
-        { "seed": 389172064, "blob": "Gx3hoO6GxDdT8Fam4cdsJsQuEC3Gye2udOcXDS6dd4tpLFrLDliwAZ66NpM+Z4EWOwpmW75IDYnUx7dt9y+SNP1TiT34EXthEzOW4qEH1aXcvv+1fwLa7MU70VBgDgMJG61eHCke6k+NXyqU/z8Mj+uNIdyoP+XfAmxRo5R5xHbMnWtrLlNKr+soln5OSfT3QqqG+xlfTT+gdfCSoFnnR7rtnkvX7GrCWkWgE67uCtetw/nbfLHsDlRVE+MWqBKnQ5A+5iaBnO+64l5zAYd1NwgtGC+IkQ9/IqMmw6/UssqyPciLhqYizxWLoVNk6ZQDPA27G37mOl/b2MZuHvlE5xJa9uvpvptw" },
-        { "seed": 2109876431, "blob": "tMCqDQlTP+IM+5GgTcNJoqzGCMb3JJdzUrYAgadMk7mB64pssexmQVtfnAC5XOlPnDnsMIGclpOxFmAhh1UjXD1/Nf+CWm1Fu1HT4IuDiZss3pip7x3cRJSHXUf5ggFNA5kNaOdLUeOAhjExhlLnBUfirPeXxDdz5Rn00Ic9d4oUGXuc0YyodPUzAzbKMsdjMF6GRiG8D9qCfpMhJ5VXKE04TKgxL5/CxcZjz3TSatJd6CumRkJvNSvB84QJtKzcrdu7HgDa//t45g4+GWQHMvoWCwlvvU+QBWDIsGlXl6qbbpunPPqSShUQo54+mmed4m80" },
-        { "seed": 3571904286, "blob": "ZcdzNkiMFjndHJjLLexwKZ0BMR12W75IY5HIqsZjynLQbNMX8DOPGgp7FSuYs5BE7f6V64Cjf2jA8ahKpjp6F294bMRKBUYe6jbQC2mssBAfmaDybuL2f6agFGwZrdwG0h7RkyAUODhUoboa1koPR/2IHJTW9VcuGkboe//8oCCsSbWCnjKCrzDwdUu4VKT7C5akzbiCJvCzURQESPt34Bz9AsVnpXbahPf5qxgyE8dhZ1I1AGvB11QgNOwome6B6YniZtCTxu9kjgfLtQM+8YxHdUvgRGioNAWajZ0tTqJc/1MTsKr7j4l/Kv1Y49mPbCicNEAhxsmPsXquaBs41zyGbzNdmxY5pF/NgzjMcHDMDXJVO1WmanSHzdvIIsN30XeCRfB7sUcEMBV6xw==" }
+        { "seed": 3369442101, "blob": "TjJcq0Mh8Swmj5udXED5DbEBTebrrrjQITiaVrPagiA8wydAY7/Bmq8F+2hDYJR9jmU7ENNvWLIBnro26m4n2Ch8NDdVsE565sjb3ByAQI0plSL+UuQPFxBkXIz9yHaizsGjkMR5H9S+/XvmEm4BBV5i51ATQm/kFModat2+P0vY4I14iLl/7d9AFRC0wHmHZ9qPPmtgBgv9qn3LbBAQ7K0S9db1RgoUJ+h76NXpFu5Huu7PRc+hfo8SVLYTpalUxfzN9pxp4/QHSQpGug7jHL8S03DwdpmW4erzXzwMiTQnDSNZO9yRTG80tXPD9oryh7R6n9nW+XSQRNz4CT7xnBkyVuADdv80Cd3a2iNW4gPpGx3q667Vyi9x5UCgkMk6MN0/QGPVjprmeq9oGzrXPJwiZQDFFnfjQNjFIIMhJ5VXKE04SqgxL5/Cw8Zj2H7TdYJF4XT4WAQ1aj2P/d5SrK/Eo4DtQV6G/6Ij9003GSYHeq1eCw1h/F7EBS6U8TsMj6XSH5XmNu6NXVReo9Yg3COJ0Xs6fDED7Osvn3UeUbqnRaqfpA==" },
+        { "seed": 918662407, "blob": "fJiilVHrt8rUlbUTbtr/62PrEzgZZH52s0N0WGGgBIZOKZm+cXWGvJ0fleYx+pJbXE/lzmGlHtWTIBQ4OFOhuBrWSg9H/ogclNb1VC4aRul7+/ygIK9JtIKeMoavM/AEPKwd6dYz2fKM55Vo4PQHIwxIuQ6hCKkChnCzZY+Eua3qSnNGmnM5Cy1aO56GWn9htTDQ4JmqwK1v0JPFvmqWSt/4SyjnjEwyFfMVZqdzEMiVkDAR9wXnGB2o+rjBny8y9lazyI4jJZJ1UCTIiJTleu15DS6CPN8ycxCdUW72D5LeZ50nKZZXalsuW/0xbIvU1Z4kwWucP5IC/nL2WwR3fSuYqN4RvrnS+8f0VBHM7uU78UM0GWQTbL0LC05x6k+cQjeBvnEayLzUYMHmaaPRGk4Iu9533DGF0mJrLlYbofNlgjMGWuL3Se3Y7UhRQni1J+ibugbDSaK6yhnR4HKPEhy4V7XlB4a4veeYZ/uzWVpNHrNZ/kP4" },
+        { "seed": 1510683271, "blob": "/BgiFdFrN0pUFTWT7lp/a+Nrk7iZ5P72M8D02OEghAbOqRk+8fUBPB2fFWaxehLb3M9lTuElnlATppS4uNQhOZpWyo3HfQicFFd11a6axmz7fHwgoC7JMwIesgAvt3CEvCmdbFazWXIMZxXoYHSHo4zIOY4hiCmCBvAz5g8EOS1qyvPGGvO5i63aux4G2v/hNbBTYBkqQC3vUBNFPuoWyl94y6hnDMyylXCV5ifzkEgVELiRd4VnmJ0oeDhBH6+yc9YzSA6jpRL10aRICBRl+m3/ja4CvF+z85Ad0e52jxJT5x2nqRbX6tyu232x7AxUVR6kQescvxWCfvJ224T3/asYKF6RODlSe0d01JFMa2W7ccO0meSV7D2Li87zas8cwrcBPvGZSE0D4Fw8o3MezJWQek69F6sJTPqb8YKFZW2jWKvImTswzTI=" },
+        { "seed": 2445579001, "blob": "gibgv0cdVVCaG7cJ2AzdIf010dLv8twMfU/2IjcWZkxw19tUZ0OlJtKRl/zHrHCRwpGnZNcz/O5dKZaCbiQD8mRoiCZRi+qGWlr3S5hMZKTlpL7KVjjrT8yQsH15gBJOAtffgMAF+2hCaZdyliJlaZIWe6QXnss4yH4x3VlyG2cU9DFsjIXbkWPUOYQwjF2rK+4QCm88Yteh3hG/6Nz0gOEGCcLxum6oW38XfFEl8gILTnK7QZMFItOmeAKX6Y14iuhx4phVRwi73SbSPsLHMHMmT0T0qn3JPR4fq7hA7djgGV9NP6B18JOgWedHuu6eS8Dma90KXa5M8PBMjfLVstUm6vQHTVtItUn2Tqcayi+lL4He7/KxFnMFiTQnXC1WfMnDVGcu6iaa7sP8n/Qz0NDW+XfBStO/HGzplAJtA7kbPPEsTJSV0yNW71LnFFr/ubbZ13BV61j0xJsrNsRtWCLGld/zMaQic2mafY1lOxDTQHHzSNWa" },
+        { "seed": 39223481, "blob": "wuYg/4ddFRDa23fJGMydYT11ERKvshzMPQg24vdWpoywFxsUJ4Nk5pLRV7wH7LDRAtHnJJdzPKod6tZCrubDsqQoyOIRSCpGmhm3DtgMpGalYv6KlvirCwxQ8Ds5RlIOQpKfRABFuyiCqdey1uIlqdLWu2TXXov4CD7xmhkyW6dUNPEsTMWb0SMU+UTwTB3r667Xyi98ohfhntF/KJw0QCHGyYKxeq5oGzjXPJFlMkLLDjL7AdPFYpNmOMJXKU04TagxItiVh8h7mGaSfoIH8DPnDwQ0aj2J/d5f6/iArZigWR+N/+A1sFNgGScHeqxeCwAmqx3KHW+MsDAMzbKVc5XmKrTHCRsI9Yk2jmfaiW9lb0Eer7J31jNFSfTgHO2WvAkDFCfvKubargO8X7DzkBCWuTSBChP/XKypVMStw/nbfLHsCVRVE+MWrRKnVJo/+XaZlLCVqxg0BNtrdgQtGGKG1R8zceRis6navc2le9CTgLEziBXa" },
+        { "seed": 2863197749, "blob": "TjJcq0Mh8Swmj5udXED5DbEBTebrrrjTITiaVrPagiA8wydAY7/Hmq4F+2hDYJR9jmU7ENNvWLIBnro26mwn3ih8NDRVt0565svb3ByAQIgpkiL+UuEPFRBkXIr9zXaizsSjl8R5H9S+/XvmEm4BBV5i51ATQW/kFModat2+P0vY4I14iLl/7d9AFRC1wHmHZ9qPPmtgBgv9qn3IbBAQ7K0S9db1RgoUJ+l76NXpFu5Huu3PRc+hfo8SU7YTpalUx/zN9pxp4/QHSgpGug7jHL8U03DwdpmV4erzXzwMiTQsDSNZO9yRTGw0tXPD9onyh7R6n9nW+XCQRNz4CT7xmBkyVuADdP80Cd3a2iNW7APpGx3q667Xyi9x5UClkMk6MN0/QGPVjprmeq9oGz3XPJwiZQLFFnfjQNjFIIMhJ5VXKE04TKgxL5/CxsZj2H7TdYJF4XSJDwQoMHffsogJtO7S6cv3TUCej/126QkpX3wfNO0HTAk+" },
+        { "seed": 1200345523, "blob": "yFQuce1vw/bg6Yn3Qt6Lh7cnnxyF4Cop559oPA2kUCq6ZRWajfEzQO8j6UJd/qb3iINpKv0hyonHegicFFJ11q6axmj7fnwgoC/JNgIesgUvtnCEvCydaFbCLmNDMiSoSGKRyKq3bY5422nMDPAzj1gENWo9j/3eUqyvwaOA7UFehv+iJvdNNxkmB3qrXgsNYfxcxAUulPE7DI+h0m7C5iu0xwsbCPjOYc9pwst3JGRBXLz1a4EzREn05xztm/teQho/rDKn0a5BrBispJARlrk0gQoeuAvup0yBtYLy2z6hqxEDVRLjFqkSp1ndaLp4gdKopfcYa07WIm5SdwAjlp9UJDqtPs3uz7vIsD3IkInvPc8QheBAMOnXFyoZ7hswtnsNmo2dfECgXL1CBabltprENzvrWOXZhj53in4fdZ/Rzr9i4WYDddkk0Sx9RoxZc6QXmpo2yn5zzE9gQyAApilmkdqDjyzcOYQ23VOpK6wBHH1kJcPzxhiit4Tqz+kGCcKgxTuoBDRLO0Y0vUhSViWvA4FUMqP5Kk3d9ctgg7Ah45hFSg==" },
+        { "seed": 409352177, "blob": "ir44R8/1jXji83+hoBQVWfWNKYpn2uQnZSY+Sq/uLpR4TwPs72v8zu05XxR/tDipyukfvF/bhINFgN4q9h1Lrmzw0FjZ5LKuojS/4GBULFjtHMYS3hbTYNR4+JXh+doWCk6HO0gtIwB6wd8aLjqtUZruw/yf9TPQ0Nb5dMFK078cbOmUBG0DuRs88SxJlJXTI1bpUucUWv+5ttnXcCS8WOme0X15kjZAY9bflOk9ujoDNsljyXt9SssOMKoP0cUggnApmhA9HyBDtm56xtqPyHufN5x8gkXmJfZXQyA4JYDogQf1t4itmK0IEY//oiemQzheM1VipUNUWDjkFcodad2+MgyPpYNgzaE+5t8CBVetl3mGZ9qPPmttQVy4pGWOdFEb7O8Dss6iRgsUJ+x76NiuQapJoqvXBMShPJlVS+ETpKlUxPzN+9s+ovofDBIHsQ6hC/h903DsLNPDrrylACpezWd7GXxKS8HSFTV98yjbuMmrwL1i" },
+        { "seed": 1729084103, "blob": "vFji1ZErd4oUVXXTrpq/K6MrU3jZJL41cwG0GCHgRMaOadl+MbVBfFtfVaZxOtKbnI8ljiHlXpNT51T4eBJheVqWiswHvcjc1JO1FW7ahqk7uDxgYGsJdsJeckRv8DDEfGvdqBZzmbLMJ9WoILTHY0wI+c5hy2nCxjBzJ09E+e0qijMGWrP5S+2a+15HGj+hdfCSoFnqAO2vkFOG/irWCh+4C+inTIzy1bbVJuezUAhVUPhRt0WnWN1ouHiB3+/ysxZzCM5jZVI1EGSIyFQlOq0/ze7C/J/xM9Ddka42z1KUp11n6dYXKhruGz3xLEuUld5kAatc/1RCvrK2m8Q3OOtY6J7ReHmSOwc0lNGMqCX7MQN02STXLH1Lyw43qg/cgnfBfjHYCA1DIBz8YzPejNXQOo5912vJDLpbsUJFJS1jmOuIWfvwjfI=" },
+        { "seed": 3581407061, "blob": "LpI8CyOB0YzGb/t9fCDZbZFhLUbLDlizAZy6NpM6YoAcIwcgQ98geo6l28gjwHTdbsUb8DOPeBdheVqWis0HvMjc1JK1Em7ahqg7ujxgYG8JdMJeckZv8DDEfG/drhYC7qaDdOSZf7SeXVtG8s5hpT7CxzBzIU9E9Kp9zj0eH6u4QO3Y6BlfTT+gdfCVoFnnR7rrnkvA5mvdCl2rTPDwTI3y1bHVJur0B0xbSLVJ9k6nGssvpS+B3u/ytBZzBYk0JlwtVnzJw1RnIeommu7D/J/yM9DQ1vl1wUrTvxxs6ZQGbQO5GzzxLE+UldMjVulS5xRa/7m22dJwJLxY6Z7Rf3mSNkBj19+U6T26OgM2zmPJe31Kyw4yqg/RxSCAcCmaED0fIEOybnrG2o/Ie5o3nHyCReMl9ldDIDglgOaBdqK3lffS/EdH1OfjNewIIlItTRL6E0ocJqJP0lMohPk2Uw==" }
       ],
       "*": [{ "seed": 16355678, "blob": "JQcz9ghMVnmdXMQWB92+OFrU4ttgg59jus1lGwjnhTWXNoidKBIkT1bQpGWYfVMIpbBU7diCOV8Ufr07ptKuQcU4rP3XEcTmZdkKXeETuuIAnKOH0Jxl8L5YHFVQtV7uW/hd" }]
     });
@@ -1378,7 +1378,7 @@
       return { unit, gap };
     }
 
-    function renderScenarioBoard(boardEl, metaEl, boardTitle, boardState, phaseText, showControlMarks = true) {
+    function renderScenarioBoard(boardEl, metaEl, boardTitle, boardState, phaseText, showControlMarks = true, showFinishMarker = true) {
       if (!boardEl || !metaEl) return;
       boardEl.textContent = "";
 
@@ -1461,7 +1461,7 @@
             cellEl.appendChild(startEl);
           }
 
-          if (x === finish[0] && y === finish[1]) {
+          if (showFinishMarker && x === finish[0] && y === finish[1]) {
             cellEl.classList.add("finish");
             const finishEl = document.createElement("span");
             finishEl.className = "scenario-marker finish";
@@ -1559,6 +1559,7 @@
         lastScenarioDomainResults = Array.isArray(domainResults) ? domainResults.slice() : null;
         const scenarioKey = payload && typeof payload.scenarioKey === "string" ? payload.scenarioKey : "";
         const showControlMarks = !isTaskOneScenarioKey(scenarioKey) || task1ControlMarksRevealed;
+        const showFinishMarker = scenarioKey !== "task:4.1";
         const tests = payload && Array.isArray(payload.tests) ? payload.tests : [];
         const scenarioTitle = scenarioLabelFromKey(scenarioKey);
         stopScenarioAnimation();
@@ -1616,7 +1617,7 @@
           const trace = result && Array.isArray(result.trace) ? result.trace : null;
 
           if (!snapshot) {
-            renderScenarioBoard(cardBoardEl, cardMetaEl, boardTitle, initialState, "старт", showControlMarks);
+            renderScenarioBoard(cardBoardEl, cardMetaEl, boardTitle, initialState, "старт", showControlMarks, showFinishMarker);
             continue;
           }
 
@@ -1625,7 +1626,7 @@
           const tracePositions = normalizeTrace(trace, initialState);
 
           if (!isAnimationEnabled() || tracePositions.length < 2) {
-            renderScenarioBoard(cardBoardEl, cardMetaEl, boardTitle, finalState, finalPhase, showControlMarks);
+            renderScenarioBoard(cardBoardEl, cardMetaEl, boardTitle, finalState, finalPhase, showControlMarks, showFinishMarker);
             continue;
           }
 
@@ -1637,7 +1638,7 @@
             frameState.robot = tracePositions[frameIndex].slice();
             frameState.finishReached = frameState.robot[0] === frameState.finish[0] && frameState.robot[1] === frameState.finish[1];
             const phase = `${frameIndex}/${lastIndex}`;
-            renderScenarioBoard(cardBoardEl, cardMetaEl, boardTitle, frameState, phase, showControlMarks);
+            renderScenarioBoard(cardBoardEl, cardMetaEl, boardTitle, frameState, phase, showControlMarks, showFinishMarker);
 
             if (frameIndex < lastIndex) {
               frameIndex += 1;
@@ -1647,7 +1648,7 @@
 
             scheduleScenarioFrame(() => {
               if (token !== animationToken) return;
-              renderScenarioBoard(cardBoardEl, cardMetaEl, boardTitle, finalState, finalPhase, showControlMarks);
+              renderScenarioBoard(cardBoardEl, cardMetaEl, boardTitle, finalState, finalPhase, showControlMarks, showFinishMarker);
             }, ANIMATION_STEP_MS);
           };
 
