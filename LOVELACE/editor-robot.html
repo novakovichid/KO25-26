@@ -1275,7 +1275,11 @@
       const robot = boardState.robot;
       const blockedSet = boardState.blockedSet;
       const cells = boardState.cells;
-      metaEl.textContent = `${String(boardTitle || "Сценарий")}: поле ${width}x${height}, ${phaseText}`;
+      const metaParts = [];
+      if (boardTitle) metaParts.push(String(boardTitle));
+      metaParts.push(`${width}x${height}`);
+      if (phaseText) metaParts.push(String(phaseText));
+      metaEl.textContent = metaParts.join(" · ");
 
       const gridEl = document.createElement("div");
       gridEl.className = "scenario-grid";
@@ -1411,8 +1415,8 @@
         }
 
         scenarioMetaEl.textContent = shownCount < totalCount
-          ? `${scenarioTitle}: отображено полей ${shownCount} из ${totalCount}.`
-          : `${scenarioTitle}: отображено полей ${shownCount}.`;
+          ? `${scenarioTitle}: ${shownCount}/${totalCount}`
+          : `${scenarioTitle}: ${shownCount}`;
         const token = animationToken;
 
         for (let i = 0; i < shownCount; i++) {
@@ -1426,7 +1430,7 @@
           cardEl.appendChild(cardBoardEl);
           scenarioBoardEl.appendChild(cardEl);
 
-          const boardTitle = `${scenarioTitle} · поле ${i + 1}/${totalCount}`;
+          const boardTitle = `${i + 1}/${shownCount}`;
           const scenarioText = String(tests[i] || "");
           if (!scenarioText) {
             setScenarioError(cardBoardEl, cardMetaEl, `${boardTitle}: ошибка сценария.`, "Сценарий не задан.");
@@ -1445,12 +1449,12 @@
           const trace = result && Array.isArray(result.trace) ? result.trace : null;
 
           if (!snapshot) {
-            renderScenarioBoard(cardBoardEl, cardMetaEl, boardTitle, initialState, "начальное состояние.");
+            renderScenarioBoard(cardBoardEl, cardMetaEl, boardTitle, initialState, "старт");
             continue;
           }
 
           const finalState = applySnapshotToBoardState(initialState, snapshot);
-          const finalPhase = finalState.finishReached ? "после запуска: финиш достигнут." : "после запуска: финиш не достигнут.";
+          const finalPhase = finalState.finishReached ? "финиш" : "не финиш";
           const tracePositions = normalizeTrace(trace, initialState);
 
           if (!isAnimationEnabled() || tracePositions.length < 2) {
@@ -1465,7 +1469,7 @@
             const frameState = cloneBoardState(initialState);
             frameState.robot = tracePositions[frameIndex].slice();
             frameState.finishReached = frameState.robot[0] === frameState.finish[0] && frameState.robot[1] === frameState.finish[1];
-            const phase = `анимация: шаг ${frameIndex}/${lastIndex}.`;
+            const phase = `${frameIndex}/${lastIndex}`;
             renderScenarioBoard(cardBoardEl, cardMetaEl, boardTitle, frameState, phase);
 
             if (frameIndex < lastIndex) {
