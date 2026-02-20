@@ -1065,6 +1065,14 @@
       "*": [{ "seed": 16355678, "blob": "JQcz9ghMVnmdXMQWB92+OFrU4ttgg59jus1lGwjnhTWXNoidKBIkT1bQpGWYfVMIpbBU7diCOV8Ufr07ptKuQcU4rP3XEcTmZdkKXeETuuIAnKOH0Jxl8L5YHFVQtV7uW/hd" }]
     });
 
+    const ROBOT_CODE_PHRASE_BLOBS = Object.freeze({
+      "task:2.1": { "seed": 311769112, "blob": "yAXaUR07DhaAUd95SBLFPd/FlqGmGx4YQg==" },
+      "task:2.2": { "seed": 2048129377, "blob": "Ii1Pc/XbT8cZpPz2vVP21rWxGQ==" },
+      "task:3.1": { "seed": 985441263, "blob": "PyQpvENs7eNUOOz8JO4w8X1lWc9yKeCa" },
+      "task:3.2": { "seed": 3770266941, "blob": "bxc1BbUKS6xVmC7QuYQZn+Ca" },
+      "task:4.1": { "seed": 1266015570, "blob": "AfwZjnZgGQXq4awQPsXN34bJH9Km7iKtW9ahiZCdsivfeW8T+D3bd2IazHt+qiD+QAmUaVdQ/NLGdQ2DR/xRHMCh+9bLXw==" }
+    });
+
     function decodeScenarioBlob(entry) {
       if (!entry || typeof entry !== "object") return "";
       const blob = String(entry.blob || "");
@@ -1101,6 +1109,16 @@
         const encodedList = Array.isArray(source[key]) ? source[key] : [];
         const decoded = encodedList.map((entry) => decodeScenarioBlob(entry)).filter((text) => text.length > 0);
         if (decoded.length) out[key] = decoded;
+      }
+      return out;
+    }
+
+    function decodeSecretMap(secretMap) {
+      const out = {};
+      const source = secretMap && typeof secretMap === "object" ? secretMap : {};
+      for (const key of Object.keys(source)) {
+        const value = decodeScenarioBlob(source[key]);
+        if (value) out[key] = value;
       }
       return out;
     }
@@ -1355,9 +1373,13 @@
     if (window.LovelaceLabShell && window.LovelaceDomains && typeof window.LovelaceDomains.createRobotDomain === "function") {
       const robotDomain = window.LovelaceDomains.createRobotDomain();
       const fixedTestsByScenario = decodeScenarioMap(ROBOT_SCENARIO_BLOBS);
+      const codePhraseByScenario = decodeSecretMap(ROBOT_CODE_PHRASE_BLOBS);
       const scenarioMetaEl = document.getElementById("scenarioMeta");
       const scenarioBoardEl = document.getElementById("scenarioBoard");
       const scenarioAnimationToggleEl = document.getElementById("scenarioAnimationToggle");
+      const codePhrasePanelEl = document.getElementById("codePhrasePanel");
+      const codePhraseInputEl = document.getElementById("codePhraseInput");
+      const copyCodePhraseBtn = document.getElementById("copyCodePhraseBtn");
       const ANIMATION_STEP_MS = 120;
 
       let lastScenarioPayload = null;
@@ -1386,6 +1408,32 @@
       function isAnimationEnabled() {
         if (!scenarioAnimationToggleEl) return true;
         return scenarioAnimationToggleEl.checked;
+      }
+
+      function hideRobotCodePhrase() {
+        if (!codePhrasePanelEl) return;
+        codePhrasePanelEl.hidden = true;
+        if (codePhraseInputEl) codePhraseInputEl.value = "";
+      }
+
+      function showRobotCodePhrase(phrase) {
+        if (!codePhrasePanelEl || !codePhraseInputEl) return;
+        const text = String(phrase || "");
+        if (!text) {
+          hideRobotCodePhrase();
+          return;
+        }
+        codePhraseInputEl.value = text;
+        codePhrasePanelEl.hidden = false;
+      }
+
+      function isSuccessfulScenarioRun(payload) {
+        const results = payload && Array.isArray(payload.outputResults) ? payload.outputResults : [];
+        if (!results.length) return false;
+        for (const item of results) {
+          if (!item || item.kind !== "ok") return false;
+        }
+        return true;
       }
 
       function drawScenarioView(payload, domainResults) {
@@ -1501,6 +1549,26 @@
         });
       }
 
+      if (copyCodePhraseBtn) {
+        copyCodePhraseBtn.addEventListener("click", async () => {
+          const text = codePhraseInputEl ? String(codePhraseInputEl.value || "") : "";
+          if (!text) return;
+          try {
+            if (navigator.clipboard && typeof navigator.clipboard.writeText === "function") {
+              await navigator.clipboard.writeText(text);
+              return;
+            }
+          } catch (_) {}
+          try {
+            if (codePhraseInputEl) {
+              codePhraseInputEl.focus();
+              codePhraseInputEl.select();
+              document.execCommand("copy");
+            }
+          } catch (_) {}
+        });
+      }
+
       window.LovelaceLabShell.boot({
         domain: robotDomain,
         examples: ROBOT_EXAMPLES,
@@ -1512,11 +1580,16 @@
         maxTracePoints: 2200,
         fixedTestsByScenario,
         onScenarioChange(payload) {
+          hideRobotCodePhrase();
           drawScenarioView(payload, null);
         },
         onRunComplete(payload) {
           const domainResults = payload && Array.isArray(payload.domainResults) ? payload.domainResults : null;
           drawScenarioView(payload, domainResults);
+          const scenarioKey = payload && typeof payload.scenarioKey === "string" ? payload.scenarioKey : "";
+          const phrase = codePhraseByScenario[scenarioKey];
+          if (phrase && isSuccessfulScenarioRun(payload)) showRobotCodePhrase(phrase);
+          else hideRobotCodePhrase();
         }
       });
     }
