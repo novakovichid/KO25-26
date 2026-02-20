@@ -855,27 +855,89 @@
     ];
 
     const ROBOT_SUBTASK_PRESETS = Object.freeze({
-      "1.1": { code: ROBOT_EXAMPLES[0].code },
-      "1.2": { code: ROBOT_EXAMPLES[1].code },
-      "1.3": { code: ROBOT_EXAMPLES[2].code },
-      "1.4": { code: ROBOT_EXAMPLES[3].code },
+      "1.1": {
+        code: [
+          "🚶🚠",
+          "🚶🚠",
+          "🚶🚇"
+        ].join("\n")
+      },
+      "1.2": {
+        code: [
+          "🚶🚠",
+          "🚶🚠",
+          "🚶🚠",
+          "🚶🚇",
+          "🎨🍀"
+        ].join("\n")
+      },
+      "1.3": {
+        code: [
+          "🤔🧱🚠",
+          "🚶🚇",
+          "😐",
+          "🤔🛤🚠",
+          "🚶🚠",
+          "😐",
+          "🎨🌻"
+        ].join("\n")
+      },
+      "1.4": {
+        code: [
+          "🔂4️⃣",
+          "🚶🚠",
+          "😐",
+          "🚶🚇",
+          "🎨🍇"
+        ].join("\n")
+      },
       "2.1": { code: "" },
       "2.2": { code: "" },
-      "3.1": { code: "" },
-      "3.2": { code: "" },
-      "3.3": { code: "" },
-      "3.4": { code: "" },
+      "3.1": {
+        code: [
+          "🔂2️⃣",
+          "🤔🛤🚠",
+          "🚶🚠",
+          "😐",
+          "😐",
+          "🤔🛤🚇",
+          "🚶🚇",
+          "😐",
+          "🤔🏁",
+          "🎨🍇",
+          "😐"
+        ].join("\n")
+      },
+      "3.2": {
+        code: [
+          "🔁🛤🚇",
+          "🚶🚇",
+          "😐",
+          "🔁🛤🚠",
+          "🚶🚠",
+          "😐",
+          "🤔🏁",
+          "🎨🌹",
+          "😐"
+        ].join("\n")
+      },
       "4.1": { code: "" }
     });
 
     const ROBOT_SUBTASK_TEXTS = Object.freeze({
-      "1.1": ["Базовое движение по полю. Проверить прохождение до финиша."],
-      "1.2": ["Проверить перекраску текущей клетки через растения-цвета."],
-      "1.3": ["Проверить условный блок с предикатом стены/свободы."],
-      "1.4": ["Проверить цикл по счетчику с keycap-числом."],
-      "2.1": ["Соберите программу, которая проходит сценарий с препятствиями."],
-      "2.2": ["Соберите программу с условиями/циклами и проверкой финиша."],
-      "4.1": ["Решить задачу «второй максимум» или аналог. Тестов 10. Открыто только 3 теста, остальные скрыты визуально, но имеются фактически (значения нельзя нигде увидеть, даже в коде страницы)."]
+      "1.1": ["Дойти до финиша на поле."],
+      "1.2": ["Дойти до финиша и покрасить финиш в 🍀."],
+      "1.3": ["Пройти поле с развилкой и покрасить финиш в 🌻."],
+      "1.4": ["Использовать цикл по счетчику, дойти до финиша и покрасить его в 🍇."],
+      "2.1": ["Для каждого поля дойти до финиша и покрасить финиш в 🌹."],
+      "2.2": ["Для каждого поля покрасить старт в 🍀, дойти до финиша и покрасить финиш в 🌻."],
+      "3.1": ["Изменить программу так, чтобы все 3 поля проходились успешно."],
+      "3.2": ["Изменить программу так, чтобы все 3 поля проходились успешно."],
+      "4.1": [
+        "На каждом поле дойти до финиша и покрасить финиш в 🌹.",
+        "Проверка идет по 10 полям.",
+        "Открыты 3 поля, остальные скрыты."
+      ]
     });
 
     const ROBOT_KEYBOARD_GROUPS = [
@@ -890,17 +952,42 @@
       "example:3": [{ "seed": 1508960576, "blob": "O70BQA4m5FezE3bCwWcMxuTOMM3mac3MFAd3rc49lyuJzHprLjhUobka1jNeB6G2W6qG+14obS/0Z5f8oFn9AOyzwUuO2FuBCgLiQbnoGtfqlKCfbf2/ThAlD6BP81vhAsUm+yHGiu+u7lQ4D8NNehxgUDuekQ84dPtllu7Gow==" }],
       "example:4": [{ "seed": 4163396345, "blob": "gibgv0cdVVCaGrcN2AzdIf010dLv8twKfUz2IjcWZkxw19tUZ0OjJtCRl/zHrHCRwpGnZNcz+vZTf67CWWMN+GIZ/zQYwMfPYhj5RL5CWfun/ZCOX22mGfnZj2xvxD0XPMjR0PQ2vjlJT5RyinJ9CMtEdvRdxII4zCE=" }],
       "example:5": [{ "seed": 2522864818, "blob": "yUvH6nzICl3BBPC4M9nynPaYduf0ByNHRvFxtxzjSZE7+jyBnJb7qwsMUIlseR9sSXzAkUwGQ6Mm0ZHm8oejep7Fh+F8tjWL+BRku8tWZA34Qma1fxPRxMJTCbodrQVbsPPgkZNoJOUc+NKCPT3zIA42ltGMvz+lL0Ri2WOY" }],
-      "task:1.1": [{ "seed": 882333291, "blob": "EOymWbWH+14oADHtCuaD/w//F/T9iDKFrzbwBEX8WLLiHZ3y1dnLKKGLEVoVBq5P8FvhAsUJ1HiBxaik60lzRvBTOVJqWmnB0AJ/IuwokaPIt9GpcJyLzph0wVr69lN6osBcY0eQXCWwfhjclZB1Hq4buB0=" }],
-      "task:1.2": [{ "seed": 3536769060, "blob": "XxGFtOJyqFsXDnIWHbNQWgAitBnKHQHBsHtzmbLJK9etIP7fAmwYrd0G0meC030qfwYCr7Icpz0eCKu5XLzA4z8IFGX6bfuNrgK8X7HzkB3R7naPElPnHaepFtfq3a7bfbHsDFRVCa5A9EynGt0r7DjPybrqqxglGcZ+N0o2X0SIkRMlaPJple6BpYemdpzAh6sUiAnEshR46ZRBYlqnFWa1fxPRxMJCA7cRt0IFsK7mhoNjKutY8smZPDDeOzY8iYOUp2H7aEJpl3KWImVpkhZ7pBeZyzjIfjHfWXIMbRXrYXSH2oWPJY5m43jd" }],
-      "task:1.3": [{ "seed": 1896237533, "blob": "prpk4xspGWR+dLNBdFhhtRmJVS7TphAfmaDybpuiOviUS18Iu7dp0nS9kzAreAwF5u0j2CtnMPz5AJK/9UYQU3G0JOib1yayR+WnwgzX9ySXU0X8WLLiHZ2CiuOabPayH0IDGLRJtxzjSZE7+jzgyaGn9RhrXtJreRxgVTvZzg==" }],
-      "task:1.4": [{ "seed": 255706006, "blob": "7d9LXlDkzmGlc8yMT2U2EBLs+jPYK2db4uVt48C/DR1fbrB18Pq4V684rP3QBdvgbchMRaBqgadMlrWD7oomqY1gVFUPuVz+XfECxSmrMsrIpLvvaDQdyGZwFC0YbdbGE3E68WOPpci25q9zndvW+WSdHdWqHXnp00g=" }],
-      "task:2.1": [{ "seed": 2910141775, "blob": "NEAqjYnTv2KMfw0/pjLHcytTm0AhvHaYyyrscCmIHD4GcRGmKQ2J1MW3bY550mrDFLdt9hl9FnkriozQcL+5wdKOwhcfx4DFO6gCKVcyVmKlKVJWO+RX3At4iL5xHJmyzC3VqyG0xxpOT+2ANIlnzJ1mLHkTRLe5Oqc9Hg62pVWslvteCBR7sTmj0uQp+wTjt9cNlrly310CthO64gCco4fBlmj8pB9CVQ2zSf5Qp12C" }],
-      "task:2.2": [{ "seed": 1269610248, "blob": "c+UJ+MaObG/re05tud+U7iy2OFUuwUXVLGxvxRZl70PBlHKTZlDdWWAyLlvmfznek5KOY5ZA5TSMTY8ljxIKfBUr4ePQGtPI3K3B/Ehfhf+iTPFDNBlkFmy9CwtOc+pPi0g2nu5pFJfpyi7VqyS00RpDT+ycecR1neI+a3EbFujrM9grR0movF6mkbE2Fld+sDKug7YP7BDl85AP3e1v3kAk9V2z+UzP8p/3i3T/sx8FCg==" }],
-      "task:3.1": [{ "seed": 3924046017, "blob": "ug7oV/9F3WjSYI+UkOSlSSUd2Xo3SlQSNZTuWn9+/mSIv9P8n5ss3pip72SPBMi5GnmvjA9LdPMVdI5LUZrUz20AqFz/O2K+6/Gblmhrs1irx8koPN4mETG2ltf+MLIuAzaPbJBlIk8=" }],
-      "task:3.2": [{ "seed": 2283514490, "blob": "AbPPgjQwknU5bcjB67F6pD5Afo8831tvHthpL6RLwYlzwjQp1C5jQzIkqDE00ZeUgSTIOYRe+03+OIl+Cm8rYta9jwm0zq2jgPxcQ5O+7DWwGm5dN0sp7Bp7ESKlBY1DeMvoOVvQ7dI=" }],
-      "task:3.3": [{ "seed": 642982963, "blob": "SNSu8W3vQ3Zgawlywl4LBzenH5wFYKqtZx/ovI0k0Ko65ZUaDXG1wGujacLdfiZ3CAPpqn2hSg5H/ogclND1VS5rMfo0r83gCLxf24KeS9H7dshLE7gLp6kInL6G8ZFW9rdeEBIO4xbvTPBFgi8=" }],
-      "task:3.4": [{ "seed": 3297418732, "blob": "l3mNLJraMHNPVkq+1WvYYkgKvKES9bnpSEFrMfoxo8/lCPZHuoSGRYTeKo9KC/VSt+4K1+q02cgooosRI0VG8HG3ZbYMzg/UeIHFqKTrSXNG8FM5UmpaacHQAn8i7CiHpdW31qhNl8iXqyOJSp2uA2mu00g=" }],
-      "task:4.1": [{ "seed": 1656887205, "blob": "3uJsm9OR4Xy2XovpLDDp3UFxXbYbfogmUYjqhiMKshCsE1ew88/Wyj9V61jz0IQtPtUrQGO/qISxaIpmej7XL7gsBADFBl7bAYqEf90weMxPCzIuW+FrJtibg8h71znYbM4WoWGGRkcuIGLe88Zf/OCV8t8=" }],
+      "task:1.1": [{ "seed": 2850069356, "blob": "F/kNrBpasPPP1so+VetY4siKPCGSdTlpyMPrsXqxI09liHbHOgQAxQVeqg/Ki3XSN26KV2o0X1WmcDPRlITIe/dGkifFB6Jst1cEdzMl3LiSQv39ourD+kxWkv+iY/gUKRd8VS/sG10dLKhP0nxo3a0WU8g=" }],
+      "task:1.2": [{ "seed": 2286936027, "blob": "oFy2CUX366640yE7mlazz58vJ8RtWALU34bAdPUsSGKSbY0iZWnaGDLbAYqFdt4/YIsRclVZJKgxNdiUm5ljlkDjKYIaqnmxQFJvcnyYt5VF5+aY3cf4R1uTubot/hM5XnIHJvYcQAcrhQKESCjTpmlJx/XKLJu5Lg==" }],
+      "task:1.3": [{ "seed": 3625030526, "blob": "BecTVuisttm9OST0J72emDo0wjtAY7/Cmq0F+2hHZZV3lmh9CLIGL7dwhMV43TNohRA0TTgi3yF6jaWqxmPPftJp013oUokPBCgwd9+yiAm07tLpy/dNQJ6P/XbpCSlffB807QdMWGGgBIZOKZnfJELa4o14m702+pFXQAj8kQ==" }],
+      "task:1.4": [{ "seed": 2640684229, "blob": "vkJM+7PxwdxWPutJzJDJPSHRPRZ73qiGsWiKZgNqknCMczcQ0283qhz1yzjTMGSNHjULIEPfTnqfm5KGLd85hF79U/BsrFNDLjwlgKreTef7mfzKy0FSlbX9c6hbOEkrQGy9FEAaKrUFq0g2nu5pFJfg2jDJqDa0gEU=" }],
+      "task:2.1": [
+        { "seed": 3514552160, "blob": "Gx3hoO6GxDdT8Val4cdsJsQuEC3Gye2tdOcXDS6dd4tpLFrLDlizAZu6NpM+Z4EWOwpmW75IDY/Uxrdt9ymSN/1TiT34EXsQZCXZtJBH/bfK1P+1BlaOrf10/kN2QHxDKfEbWhwRowyLTz+VvnFax+XKbpuiOviUS19p7oA0jGfanWAscEEb8A==" },
+        { "seed": 1958263615, "blob": "RLC6/ZmDLzKcT72ItmJ3wzsDK5DRjMZo+3p8INl4jG42QYEWOd0ZhNRHnX5pghozBGcdpikN5snb2xyAQI0pkSL+UucPFBAVK5iymUfi5tK1+cQIEZOl6HLpFW4BJQcm9hxAByuUCIlEMpT4aRTB4tonleY1/5NRRELCgzeRN8KFMDtxB0Tw9Q==" },
+        { "seed": 227708818, "blob": "6evnipxoKv0hppDfE3mSPBY4loeUpwPnZhFR1zyDaTFbmlwhvHaeyynscCmMGT8MaRzgMWzmo8XGcPE35TGMTo8ljxcKfxUr4eTQGdPI3K3B/Ehfhf+iTNdNbl4mVSX8BgtOOOQLgUkzgvQZS9Tzxyfd5mnij01SBqOKMpAsk9dRJngMFK+yZYh0WEmzqA==" }
+      ],
+      "task:2.2": [
+        { "seed": 1465280969, "blob": "sraQj3dt5UDKisd6CJxtES2FgcK/Yox6DTymMsdmNlyAR2ukF/PSNoIBJ8wXPABhEuF3dIejrNhtnUaSXpJT4FT4eBJhelrn/d5I6/mc/ICjf27a//1v+gQvT3wfO70UQBoqtQW6QjuS9C5Kl6rbMMyhf7SbUVlD8oQYkSmPzTBzNhoD4eQojTMQSa2wXKOR+14oTT+gdfCRoFnnR7rvnkvX7GrCWkWgE7v5C5C+zf+kee4=" },
+        { "seed": 1855547540, "blob": "78GVZHKiWKvn3mJh7WNAKpCSxOl67RERIMtDySI5W4ddcO4PkrwunW9WwlcyA20a73Yyn8KssXCAKuMp+0z+OIkPfX5kNeeM0Ant8Jzj0bseaKvxunLyESlYKgd65FBPHS2vHoB1P5D/I0vRspU2y7E2ut9eXkTonzO9KozQYGsuQR/o5CuVZh5H7LZVo46qRkltZvov6Ju8V7wcouWCRZbgacFHFbgL/uwckLWBoIRZ7qs=" },
+        { "seed": 811088611, "blob": "mMR+Yb0fs4aweXmEEk57l4fX7yz1cHo81y64LH1UgFpq9UWK3UGHcDizWXINbhbneDPZ2s2xGp43j1iMJOYl5X4KFnwriIzQcLu5wtL/tQZQk7H0ZKhbF2ZyByXnAkwXN+RXkwU8mPIiXd3CyiParDby3wJDWPSJd9wjidF7OnwgCeHnNdgrHhKruVyglftIUVV4tDu5g7Yg5Uf4/YhZmKF/jxJXthO/5AKaos2422Phs1gWVRecUeY=" }
+      ],
+      "task:3.1": [
+        { "seed": 2559271654, "blob": "nS97rgD0ntEVY5x8P3XGgML8KqNoG1fLMtVdcxCPXW3vXsDFIOppJ98ofE1gFetwPdic1dAa8TecZsUTvnr2GX0QZCXfqYxO7eHStdm7QlqYtOt/2AQtWDZAJL1IXQY2o0HKQTOf9ThG9v/DLcvmabSNTUVa7Yl5gzg=" },
+        { "seed": 761306381, "blob": "diq0E+vZyXQOh2NRBMjRxek5pT4DNqAuyTACHstSauhE2484iwc9wkQNQyAb6Hw11p2TyHv3RpInwxq+ZacBHBYVK5i0hFvr9oStmOIGVZ+z8WTiMylaPU0l+1ATADGzCMQFPJjyIl3d08Au1rZxrN9IQljxgD7cOJ0=" },
+        { "seed": 1596922632, "blob": "c+UJ+MaObG/rek5qud+U7iy2OFUuwUXVLG9vxRZl70PBlHKTZlDaWWEyLlvmfznek5KOY5ZA4ymCHLdluFAEdxNalvOZU/7wk/uAo18RkLT2fvkJHl4/Rij6FgtON7QYjQt4l/UlR8b47C3VqyG0xxpHX/OcN5tnncI=" }
+      ],
+      "task:3.2": [
+        { "seed": 2053145287, "blob": "vFji1ZErd4oUVHXQrpq/K6MrU3jZJL4wcwK0GCHgRMaOadl+MbVAfFxfVaZxOtKbnI8ljiHlXpBT41SJDwQuLWvWot4R1cjcrcfhVFaVqbot8UMqUjBMM/cgTBUgrgiMBWCF7j5LmbLJK9etIP6+V1tF885h3DeF2zA0aQ==" },
+        { "seed": 2900353402, "blob": "AbPPgjQwknU5bMjG67F6pD5Afo8831tvHtlpL6RLwYlzwjQp1C5kQzYkqDE00ZeUgSTIOYRe+0/+OIl+Cm8rYta9jwm0zq2jgPxcQ5O+7DWwGm5dN0sp7Bp7ESKlBY1DeMvoOVvQvI0k0Ko65ZV7WEbunnnEZ5LadmtpHg==" },
+        { "seed": 1015939729, "blob": "6p6YJy/VbVgC09+CwHT1OVVtiWrHOgQCxQReqg/OjnTYL2PMTwtZLkrZP3TflJiJKsl/nD/7JOIl5X57YWpk372QWKyvq9KOu0FLhrj7Y6hbNxk4TC72AUEmJqcOgEI+06Y/XMD1g2DfrT3/jlB0Re2DKdx/ws13LTYeGw==" }
+      ],
+      "task:4.1": [
+        { "seed": 617863868, "blob": "x8k9PMoqQGO/xZqpBftoUniabJEiZWnZGDPbAYqBc981eIZXajQ3VbdOep+am4Uix37aJ5okjyX2QEMhJHSY66d2oreV99L8R0fU5+M17AgiUi1NEvoTShwmok/SUyiE+WcM0/nBK8qsEPmRV0UIu84pmyHCwm8=" },
+        { "seed": 3769890539, "blob": "kGwm2TUHe96ogbFsimYDf49/l3R9CLIEL7ZwhMV82DJinR1yVVlPqCALkdqVhi7PcNthgkWJUuYPFxBkXI79znbTudLsx/VIQNTnw0qmQylDLkAj61ATD2GgBIZOKZnOLk/W+Momm/4n5IhdGwjnhTWXNoj8fSV7EUS3qjWfdR4Wsw==" },
+        { "seed": 1994858318, "blob": "NXfDJhg8xsntq3TiFw0uiGqEcisQ028zqh31yzjXNWWHBjhNOCKxP2Lg1NWILcN41WDEXehSjxIKfBUr4eLQGdO5q7uOqnlu2v/7cuYNPxlkfh2zUEwMM6MOnAVgir4tR9v53CrroTL1lV1TCLuYKYsgzJ10IHoKFeXLKJZ+Tkn090KqhvsZDg==" },
+        { "seed": 1799528021, "blob": "LpI8CyOB0YzGbft/fCDZbZFhLUbLDli2AZi6NpM6YoAcIwcgQ98neoml28gjwHTdbsUb8DOPeBdhelqWis8Hv8ito4D6QV+arrot0TxgGTtdMPoRXVZ5vU+OTjSY7yN80PHMKtygcayJSkJPrc49lyuJzHoKew8J/6p92GNZD+yoTQ==" },
+        { "seed": 2956188592, "blob": "y20RMJ6WlKcD72YVUdc8lnQ+QJ0WOd0dhNdHnX5thxs5HGpbvkhhkcuqxmPOd9Fmyxq2K+54fX9kNuf9px6ip63SjrtHVpqx6zWwOhEXfEA47xdKAGH8FspBM5/1OEbn9c4h0aE3tMdMRV/kwHmYLI7WYSFXDAri+mXAM04OqvdNsg==" },
+        { "seed": 1288256335, "blob": "NEAqjYnTv2KMfA06pjLHcytTm0AhvHaYyyrscCmIHD4GcRGmKQ2I1MK3bY550mrDFLdt9hl9FnoriIzQcL25w9KOwhAfwoDFO6gCKVcyVmKlKXRYYaMVmEI5hb5xVZf2xizQtzvEmFlUQuSIecQxksp3ZTYFD+PhNJJSUwehpxL1wKsBFxRgpQ==" },
+        { "seed": 452948066, "blob": "GXuXmsz4eu0RFiDOQ8kiLEaIRnekF/PXNoEBJ8wTOQFrCuwxbObO294cgDncac8cuWywARwWEzaW4KEH1afcvP+1fwba7MVKpkMvXjJJM71Icilv5AiQVz+S6GkUzrLJK9etIP6vXVZJ6Yk/3H+UzWcsOEEA5OYuiXl/BKK6Qu3Y+xYWUj+lKg==" },
+        { "seed": 1539355737, "blob": "IsaA3+c99XB6OdcquCx9QZ1VcfIPkrwqnWxWwlc2BmwQ93t0h6PDxnLxN5xnzBCxYrFHBHcTXIj9zXbTudLsx/VIQNTnw0qmQylDLkAj61ATD2GgBIZOKZnOLk/W+Momm/4n5IhdGwjnhTWXNoj8fSV7EUS3qjWfdR4Wsw==" },
+        { "seed": 1237619172, "blob": "n9HF9CKyaBtXwjLRXXMQmkBi9FmK3UGBcDuzWXIJaxftYD6fwqzSbZ9GkifCE71qv0ZCb3Jc4eLQGtO5q7mOq3lu2v/7cuYNPxlkfh2zUEwMM6MOnAVgir4tR9v53CrroTL1lV1TCLuYKYsgzJ10IHoKFeXLKJZ+Tkn090KqhvsZDg==" },
+        { "seed": 2362389491, "blob": "iJTuMa0vAzagJsk1Ah7LR3fnX9zFIOpsJ94ofE1kEOp6JdXazbF2gC/jKYIdvma3SEMpaj3his0Hvcjc1Ja1Fm7ahq47uzwRF3xGJfMeWlZ5nTDEBT+J7C5NwbKVOZuiOviUS1945I04liCEnSg9ZhYDoaohk39VGKaWX6ONq0ZJFG+9M+jc8Q==" }
+      ],
       "*": [{ "seed": 16355678, "blob": "JQcz9ghMVnmdXMQWB92+OFrU4ttgg59jus1lGwjnhTWXNoidKBIkT1bQpGWYfVMIpbBU7diCOV8Ufr07ptKuQcU4rP3XEcTmZdkKXeETuuIAnKOH0Jxl8L5YHFVQtV7uW/hd" }]
     });
 
@@ -1264,7 +1351,7 @@
       window.LovelaceLabShell.boot({
         domain: robotDomain,
         examples: ROBOT_EXAMPLES,
-        taskSubtaskCounts: { "2": 2, "4": 1 },
+        taskSubtaskCounts: { "2": 2, "3": 2, "4": 1 },
         subtaskPresets: ROBOT_SUBTASK_PRESETS,
         subtaskTexts: ROBOT_SUBTASK_TEXTS,
         keyboardGroups: ROBOT_KEYBOARD_GROUPS,
