@@ -1046,29 +1046,41 @@
       "2.2": { code: "" },
       "3.1": {
         code: [
-          "🤔🌡🔥1️⃣0️⃣",
-          "😐",
-          "🤔🌡🧊🟰1️⃣0️⃣",
-          "😐",
-          "🔁🛤🚠",
+          "🔂2️⃣0️⃣",
+          "🤔🛤🚠",
           "🚶🚠",
           "😐",
+          "🤔🧱🚠",
           "🤔🛤🚇",
           "🚶🚇",
+          "😐",
+          "😐",
+          "😐",
+          "🤔🌡🧊1️⃣0️⃣",
+          "🎨🍀",
+          "😐",
+          "🤔🌡🔥9️⃣",
+          "🎨🌹",
           "😐"
         ].join("\n")
       },
       "3.2": {
         code: [
-          "🤔🌡🔥🟰1️⃣5️⃣",
+          "🤔🌡🧊1️⃣0️⃣",
+          "🎨🍇",
           "😐",
-          "🤔🌡🧊1️⃣5️⃣",
+          "🤔🌡🔥9️⃣",
+          "🎨🌻",
           "😐",
-          "🔁🛤🚇",
+          "🔂2️⃣0️⃣",
+          "🤔🛤🚠",
+          "🚶🚠",
+          "😐",
+          "🤔🧱🚠",
+          "🤔🛤🚇",
           "🚶🚇",
           "😐",
-          "🔁🛤🚠",
-          "🚶🚠",
+          "😐",
           "😐"
         ].join("\n")
       },
@@ -1078,8 +1090,8 @@
     const ROBOT_SUBTASK_TEXTS = Object.freeze({
       "2.1": ["На каждом из 3 полей дойдите до финиша и закрасьте контрольную клетку в 🌹."],
       "2.2": ["На каждом из 3 полей дойдите до финиша и закрасьте две контрольные клетки: одну в 🍀 и одну в 🌻."],
-      "3.1": ["На каждом из 3 полей: если температура стартовой клетки выше 1️⃣0️⃣, закрасьте стартовую клетку в 🌹, а соседнюю справа в 🍀; иначе наоборот. После этого дойдите до финиша."],
-      "3.2": ["На каждом из 3 полей: если температура стартовой клетки не ниже 1️⃣5️⃣, стартовая клетка должна быть 🌻, а финишная 🌹; иначе стартовая 🍇, а финишная 🍀. Дойдите до финиша."],
+      "3.1": ["На каждом из 3 полей дойдите до финиша, двигаясь по проверкам стен. На финише выберите цвет по температуре: ниже 1️⃣0️⃣ — 🍀, выше 9️⃣ — 🌹."],
+      "3.2": ["На каждом из 3 полей в стартовой клетке выберите цвет по температуре: ниже 1️⃣0️⃣ — 🍇, выше 9️⃣ — 🌻. Затем дойдите до финиша, двигаясь по проверкам стен."],
       "4.1": ["На каждом из 10 полей найдите финиш по температуре и дойдите до него."]
     });
 
@@ -1118,11 +1130,13 @@
       "task:1.1": [{ "seed": 2850069356, "blob": "F/kNrBpasPPP1so+VetY4siKPCGSdTlpyMPrsXqxI09liHbHOgQAxQVeqg/Ki3XSN26KV2o0X1WmcDPRlITIe/dGkifFB6Jst1cEdzMl3LiSQv39ourD+kxWkv+iY/gUKRd8RiXzHlpWeZ0Wyl94y61nDMyylXKV5jD5kVdFCLvOKZshwsJPNGk=" }],
       "task:1.2": [{ "seed": 2286936027, "blob": "oFy2CUX366640yE7mlazz58vJ8RtWALU34bAdPUsSGKSbY0iZWnaGDLbAYqFdt4/YIsRclVZJKgxNdiUm5ljlkDjKYIaqnmxQFJvcnyYt5VF5+aY3cf4R1uTubot/hM5XnIHI/oeRQdh/DaTBSLTpnkCl+mNeInocfWSVFhYo9Z5mTeF2nxraT4b8A==" }],
       "task:1.3": [
-        { "seed": 445038722, "blob": "+dt3+qxYWk0x9QCoY6kCjCboJteE95O2FmEhhyxzGWFLasyRTAYquzu84Jm8ya98mcyQ4Xy2M5X2QUGWghdzSq5VN/EsJuWbiGQUqxumFB2osraFj2NhtBLD2YotPdUrQGOQgcP4dPUpRGCXbcc6BEnLTCG8HITFY5NmO8JXMwBuFvYxbJ+BkoYtw2yceP0Crw==" },
-        { "seed": 313296377, "blob": "gibgv0cdVVCaGbcN2AzdIf010dLv8twLfU32IjcWZkxw19tUZ0OlJtCRl/zHrHCRwpGnZNcz+vZTf67CWWMN+GIZ/zQYwMfPYhj5RL5CWfun/ZCOX22mGfnZj2xvxD0XPMjR1fg0uzkDNqBlx3h9CNgYIf8PktY2kz9kghoiTThb/XY60ZeAyDzxZsM=" },
-        { "seed": 31717124, "blob": "f7GlVAISSPt3rhK2fdNw+iDC1LnqvWFgUJtTOVJpS3fNwB5/Isw7zf3m8oeic53Kn6Yiz1L8gUMw+/MZSx3uCBmOOl/b0sZtH/lEnj0TsKzsk4NufOVA6p6NJzvZPAoLgZLV9T2zaBt4iWuALH1RjFhv9Q+SvGGTJCnURHxNe1u+I3qfm5iGLt45hCfZGr5lu1QEMBV6xw==" }
+        { "seed": 445038722, "blob": "+dt3+qxYWk0x9ACvY6kCjCboJteE95O0FmMhhyxzGWFLasyRTAYsuzm84Jm8ya98mcyQ4Xy2M5P2Q0GWghdzSq5VN/EsJuWbiGQUqxumFB2osraFj2NhtBLD2YotPdUrQGOQgcP4dPUpRGCXbcc6BEnLTCG8HoTFY5NmOcJXMwBuFvYxbJ+BkoYtw2yceP0Crw==" },
+        { "seed": 313296377, "blob": "gibgv0cdVVCaGrcK2AzdIf010dLv8twJfU72IjcWZkxw19tUZ0OjJtORl/zHrHCRwpGnZNcz+vZTf67CWWMN+GIZ/zQYwMfPYhj5RL5CWfun/ZCOX22mGfnZj2xvxD0XPMjR1fg0uzkDNqBlx3h9CNoYIf8PktU2kz9kghoiTThb/XY60ZeAyDzxZsM=" },
+        { "seed": 31717124, "blob": "f7GlVAISSPt3rhKwfdNw+iDC1LnqvWFiUJlTOVJpS3fNwB5/Isw5zf/m8oeic53Kn6Yiz1L8gUUw+fMZSxvuChmOOl/b0sZtH/lEnj0TsKzsk4NufOVA6p6NJzvZPAoLgZLV9T2zaBt4iWuALH1RjFhv9Q+SvGGTJCnURnxNe1u+IXqfm5iGLt45hCfZGr5lu1QEMBV6xw==" }
       ],
-      "task:1.4": [{ "seed": 2640684229, "blob": "vkJM+7PxwdxWPutJzJDJPSHRPRZ73qiGsWiKZgNqknCMczcQ0283qhz1yzjTMGSNHjULIEPfTnqfm5KGLd85hF79U/BsrFNDLjwlgKreTef7mfzKy0FSlbX9c6hbOEkrQGy9EUwYL7VP0nwh0+RpFIe8jTub/mO631tYRu6eecRnkMpgOXgGRPDVOoc=" }],
+      "task:1.4": [
+        { "seed": 2640684229, "blob": "vkJM+7PxwdxWP+tOzJDJPSHRPRZ73qiHsWqKZgNqknCMczcQ0282qh71yzjTMGSNHjULIEPfTnqfm5KGLd85hF79U/BsrFNDLjwlgKreTef7mfzKy0FSlbX9c6hbOEkrQGy9EUwYL7VP0nwh0+RpFIa8jTub/mG631tYRu6eecRnkMpgOXgGRPDVOoc=" }
+      ],
       "task:2.1": [
         { "seed": 1107345981, "blob": "RloEA7tJuQTeFtNm1HiB1bmp9U5zRvA/OUBSDjvC2hg0a/8o25eO8padM9DLmKwlhg3D+EtHkJwZIXLuYnb/JCCU7J4tXIZSnlQToJS4uNUhOponvZ6IKzncPEBjv66avz2vOkRvjzzfe31UgFpq9UX6gnvSNG6KV2obcAzhP3TenZuGMo4h5X6CB/Az5w8ENGo9iv3eSOH5n/2AowZBk7m6atccMQ==" },
         { "seed": 358992145, "blob": "ah4Yp69V7diCUV8CQPR1udXtCepHuoSCRYXeKo9ODvRYr+NMz4vbrspZv/RfFBgJqkn/HL97pGOlZf6KlvurCwxQ8D05QlIOQpWfRQA0zD7N/uaDieJ8l8WYsGTXM/r2U3mz3lBzW+ADP/FwFNbe2Wk+vh+mCFr2666XlHht61jy2YciJpJ1OSLGi5SnavtoWC7BLMkiPF2FW3GkF4qVf9V+drMILQ==" },
@@ -1134,14 +1148,14 @@
         { "seed": 305419896, "blob": "A1UZqFb+HL97yH69CY+EvrzmSCVekVUkXD5/NYbVHzNx5GLD9uDoifNC3ouWrymOA8K+UyaQ9Qc8Hp8VH+c6TOWb8TVA6SPpOwq++8nPvT8k9CfMkMktMNwjEXveqOuxerIyUWmYasc6JBCPXW3vXsC1f9A/Y4sRclV2C/F2ep+bkoYt3zmEXttdqivuEApvMSWA49AJ7fqc4NC7HhGRr/1y5EMxFyUHOL1IGFhhv0/SFXbT/yRC2uKNeJu9NvqRV0AI/LEmgw==" }
       ],
       "task:3.1": [
-        { "seed": 914230517, "blob": "jvKc64NhsexmTFtYnAC5TfFBjSarbviX4fjaFnMawmB8A2cAI/+AWmxFuyiDoNS9zqV70JOvnmrPC8K2HW/plG5rDbobfuI6X8GVkDFA+QqgDU+w86XXm1Ak5R/pzI4tIZJ1GXuCmtj0K78YRG2YdoBkfQidRnbjAYqEf90weMxPCxQgAaYpZ5Hajsh7nDecZs8TvXv2GQQ/LWOYrNBQrO3StZC1BkrU56g7qAIjVzFXYqVQTgYmowPKWgeM4Q==" },
-        { "seed": 2749103821, "blob": "tur0UysZiTRORSMRRIiRBSl55X7D9uDuifBC3ouSqiiEG8/4S0f/ggRNA+BbKLx1Ft3TiDs3hlLnA1r+pefB3FZz5QKzhttid8ltWGnI0cL4NadoGzqGQ8kiOkqZUWDyD5KcONc1ZYcGOD1nGOd7M9nazZ4z2X6SJ8MavmWnARwWMyXC88YboreJrZipCBGVsvR4+EN2GTlXJfocCwlvvU+QBWDAsGlXl6qfbpunPPqSShUQo54+mmed4m80" },
-        { "seed": 1604331287, "blob": "bKgSJUE7B3rERAVAHupPm1M7g+hpFO6ig3Lk6HHwlFZeWenOYaVwzI5PZTYBCuLrLJ91HlGViBztgbwIH0U/4gyxg/RZpFes/ctLjrMqj1wC90H+sV/ErbKu22HrplgbA0j7V7lY7E6WIeEGxseuoOJec0bffGAVIwB6wd8aLjqtUZruw/yf8jPQ0Nb5dsFKxLUdc7mMDzJdp11mrjoGms+IO1/3XLxCBaLltoCJYWe1WKuejDww1SFAJLmOyw==" }
+        { "seed": 914230517, "blob": "jvKc64NhsexmTFtYnAC5TfFBjSarbviW4fjaFnMawmB8A2cAI/+AWmxFuyiDoNS9zqV70JOvnmrPC8K2HW/plG5rDbobfuA6X8GVkDBA+QqgDU+w86KeuyEqogLh2Yg6d4o0QD+Nnd/uMIUvQG+Te4EiZUabQWaqD86OdNgvY60aPABwW74xMc+dkoRj0WY=" },
+        { "seed": 2749103821, "blob": "tur0UysZiTRORSMRRIiRBSl55X7D9uDvifBC3ouSqiiEG8/4S0f/ggdNA+BbKLx1Ft3TiDs3hlLnA1r+pefB3FZz5QKzht9id8ltWGvI0cL4NadoGz3IY7gsfVeRRGblWYrdYZM6YoAcIwdQHOVwPtic1dA13m7bKYIZu2e9UE4OJ2vVo94RrOeV64DkWQ==" },
+        { "seed": 1604331287, "blob": "bKgSJUE7B3rERAVAHupPm1M7g+hpFO6ig3Lk6HHwlFZeWenOYaVwzIxPZTYBCuLrLJ91HlGViBztgbwIH0U/4gyxg/RZpFCs/ctLjrAqj1wC90H+sVaIjcOgnHzjs14MVVC6Dv1X60mMOtsxwsWlreMYawjZe3BcLURwytoFNVv4Zo6+meSHp22XzJrhO5A=" }
       ],
       "task:3.2": [
-        { "seed": 420198337, "blob": "ug7oV/9F3WjSY4+TkOSlSSUd2Xo3SlQTNZTuWn9+/mSIv9P8n5sp3p2p72SPBMi5GnmvjA9Lcu4bJ7Z6EcuVkFoX+QbnWg6+6+3B3D0k5Q700Ztsb4F9H3Wf0c6/YuFmA3XZJNEsfUaMWXOkF5CaR51+bpYFNQx2W75odNuRmYMyxEnbZMMXt232GVI/PWKW85pC4PyD5+H2SFyE/6I17RMpXjAHbL0RTBgvtU/SfCHT5GkUhLyNO5v+Y7rfW1hG7p55xGeQymA5eAZE8NU6hw==" },
-        { "seed": 1997300441, "blob": "okYAX2e9dfD6tFeoOKz9wR3V8XKPEjyoHezWQte2huyQd/v0ByNARvRxtxznTJAx4jHHhPeT2hZzH85ieQMtGELfkQ5/IqUmw7WZ5JXsPYbMmbNk11mQp11n6dYXKhjuGz3xLEiUld5kAatc/1IN75S4wYN1eKIZ5Z7RNXfWJgwwl5vk+Dm0IkRo2SSRcipXxRZl70PBlHLyM2eBB3JVIAvhd3SR2pSPLcBonD/7BPBx9hkUYWp+mOvMB6z2n+PN6wYJ1KT9e+YOOxkjeD3i" },
-        { "seed": 3284517773, "blob": "9qo0k2tZSfSOCePVhEhRRWm5Jb6DtiCtSbCCnkvS6mjEWw+4C4ezQsONw6CbaPy1Vh0TSPt3xhKnQ5o+5SeBnJazpUJzRpgiNwktGCmIkQI4deco2/XG8t7iZ9CTzO9klEqd7F0+v8tYYA34DzmOOl/dz9pkD69c/xsd9KD6ipVlWqIb8tSOKneKOxAsgd+U+zG5I1JkuHGJby0Q0xZk9EjNiTidfmiLGTwcIEPfaHTF2s3ZbY5inD+QU/Bqu09JP2o9mKGJWf75la3fxFlO" }
+        { "seed": 420198337, "blob": "ug7oV/9F3WjSY4+TkOSlSSUd2Xo3SlQTNZTuWn9+/mSIv9P8n5sp3p2p72SPBMi5GnmvjA9Lcu4bJ7Z6EcuVkFoX+QbnWg6+6+3B3D0k5Q700Ztsb4cyP3XGls7tPbQ+AzaAPINpMVuaXFHjTMuPf9V+MZoHJQouW+d2OtGL1dAa1znGJ5pO/iutARx9ZCXZvpBE/LfKrdLsVkOauLpq1xwx" },
+        { "seed": 1997300441, "blob": "okYAX2e9dfD6tFeoOKz9wR3V8XKPEjyoHezWQte2huyQd/v0ByNARvRxtxznTJAx4jHHhPeT2hZzH85ieQMtGELfkQ5/IqUmw7WZ5JXsPYbMmbNk11mVpyww6ctNYEqhTWbpbV/e3sRoH7MsoAFc+qzwwdx5erIfvZ6IKzncPEBjv4iU5XrteA0ugjzfMHMQiltv6V+K3TjIOWeCGidNfyT5bg==" },
+        { "seed": 3284517773, "blob": "9qo0k2tZSfSOCePVhEhRRWm5Jb6DtiCtSbCCnkvS6mjEWw+4C4ezQsONw6CbaPy1Vh0TSPt3xhKnQ5o+5SeBnJazpUJzRpgiNwktGCmIkQI4deco2/nGg4nieorZkaAyz1Lc+Bd1pcdGeH2nWCe7cxmajd5zGb5S5wNa/qXnwdxWc+UCs4bYYnfJbVhpyNHV8jS4OAM22W6Qci9ejBZ+21DV" }
       ],
       "task:4.1": [
         { "seed": 3369442101, "blob": "TjJcq0Mh8Swmj5udXED5DbEBTebrrrjQITiaVrPagiA8wydAY7/Bmq8F+2hDYJR9jmU7ENNvWLIBnro26m4n2Ch8NDdVsE565sjb3ByAQI0plSL+UuQPFxBkXIz9yHaizsGjkMR5H9S+/XvmEm4BBV5i51ATRG/kFModat2+P0vY4I14jLl/7d9AFRCwwHmHZ9qPPmtgBgv9qn3ObBAQ7K0S9dD1RgoUJ+h76NXpFu5HuuzPRc+hfo8SVLYTpalUxfzN9pxp4/QHSgpGug7jHL8U03DwdpmW4erzXzwMiTQkDSNZO9yRTGg0tXPD9ovyh7R6n9nW+XSQRNz4CT7xmBkyVuADdP80Cd3a2iNW6gPpGx3q667Syi9x5UCgkMk6MN0/QGPRjprmeq9oGz7XPJwiZQPFFnfjQNjFIIUhJ5VXKE04SqgxL5/CxsZj2H7TdYJF43T4WAQ1aj2O/d5SrK/Bo4DtQV6G/6Il9003GSYHeqpeCw1h/FzEBS6U8TsMj6HSbsLmK7THDhsI+M5hz2nCy3ckZEFcv/VrgTNESfTlHO2b+15BGj+sMqfRrkGtGKykkBGWuTSBCh64C+6nTIG1gvLbPqqrEQNVEuMWqBKnWd1ou3iB0qil9xhrTtYiblJ3ACOQn1QkOq04ze7Pu8iwPciYie89zxCF4EQw6dcXKh3uGzC2ew2ajZh8QKBcvUIFpOW2msQ3OutY5dmGPneKfh91n9HOv2LnZgN12STWLH1GjFlzpBeemjbKfnPMT2FDIACmKWWR2oOPLNw5hDDdU6krrAEcf2Qlw/PGGKK3hOrP6QYJzqC0bKgZbgFtCWLmUBNHb+QZjUoq06Z6U5nrjTqb/me630EVELLAeYogjc8wcyYeSvaqP9grCUfsrBL10fVGB1NwqHXwkPFX5Uf4/YhfmKF/jxJUthOo7gOF8tWwhCjo9EVaTVrtDuIcvxTTcP0xztbv8rJHfQeJdjdKPg473ZFMaTS1foShy/yf9mLe0ta7ZNdai/gIPvGaGTJbp1Q08SxKxZvRIxT5RPZMHevrrtfKL3yiF+Ge0XwonDRAIcbJgrF6rmgbONc8kWUyQssOMvsB08Vik2Y7wlcpTThMqDEi2JWHyHuaZpJ+ggfwM+UPBDRqPY/93l/r+ICtmKxZH43/4DWwU2AZJwd6ql4LACarHcodYoywMAzNspV2leYqtMcNGwj1iTaOZ9qHb2VvQR6vsnLWM0VJ9OAc7Za8CQMUJ+kq5tquA7xftvOQEJa5M4EKE/9crKlUx63D+dt8sewMVFUT4xatEqdUmj/5dpmesOT8GClekT05UnYAI5KfVCl9+nrD9oqjibs9iovO9mrPEYXgRzDp2lB9X+ADfK46BprPiDta91y8QgWk5baXg2B45UCgwbZid9U3EjyHh5SnI/UsSGKSbY1SOlOKXGbiD5KTaMQ5dpM=" },
