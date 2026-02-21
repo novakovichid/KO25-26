@@ -337,8 +337,10 @@
 
     .scenario-tools {
       display: flex;
+      gap: 10px;
       justify-content: flex-end;
       align-items: center;
+      flex-wrap: wrap;
     }
 
     .scenario-toggle {
@@ -358,6 +360,53 @@
       accent-color: var(--accent);
       cursor: pointer;
       margin: 0;
+    }
+
+    .scenario-scale {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #1f2937;
+      user-select: none;
+    }
+
+    .scenario-scale-label {
+      margin-right: 2px;
+    }
+
+    .scenario-scale-value {
+      min-width: 44px;
+      text-align: center;
+      font-family: "JetBrains Mono", "Consolas", "Menlo", monospace;
+      font-size: 12px;
+      font-weight: 800;
+      color: #334155;
+      background: #e2e8f0;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 3px 6px;
+      line-height: 1.2;
+    }
+
+    .scenario-scale button {
+      min-width: 32px;
+      height: 30px;
+      border-radius: 8px;
+      border: 1px solid #94a3b8;
+      background: #ffffff;
+      color: #1e293b;
+      font-size: 16px;
+      font-weight: 800;
+      line-height: 1;
+      cursor: pointer;
+      padding: 0;
+    }
+
+    .scenario-scale button:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
     }
 
     .scenario-meta {
@@ -880,6 +929,12 @@
         <h2 class="block-title"><span class="block-num">3</span>Поле сценария</h2>
         <div class="scenario-wrap">
           <div class="scenario-tools">
+            <div class="scenario-scale" role="group" aria-label="Масштаб полей">
+              <span class="scenario-scale-label">Масштаб</span>
+              <button id="scenarioScaleDown" type="button" aria-label="Уменьшить масштаб">−</button>
+              <span id="scenarioScaleValue" class="scenario-scale-value">34px</span>
+              <button id="scenarioScaleUp" type="button" aria-label="Увеличить масштаб">+</button>
+            </div>
             <label class="scenario-toggle" for="scenarioAnimationToggle">
               <input id="scenarioAnimationToggle" type="checkbox" checked>
               Анимация робота
@@ -932,6 +987,11 @@
   <script>
     const KEYCAP_DIGITS = ["0️⃣", "1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣"];
     const COLOR_CSS_BY_CODE = { red: "color-red", yellow: "color-yellow", green: "color-green", purple: "color-purple" };
+    const DEFAULT_SCENARIO_UNIT = 34;
+    const SCENARIO_UNIT_STEP = 2;
+    const MIN_SCENARIO_UNIT = DEFAULT_SCENARIO_UNIT - 8;
+    const MAX_SCENARIO_UNIT = DEFAULT_SCENARIO_UNIT + 8;
+    let currentScenarioUnit = DEFAULT_SCENARIO_UNIT;
 
     const ROBOT_EXAMPLES = [
       { label: "Пример №1", code: ["🚶🚠", "🚶🚇", "🚶🚇"].join("\n") },
@@ -1380,6 +1440,7 @@
 
       const gridEl = document.createElement("div");
       gridEl.className = "scenario-grid";
+      gridEl.style.setProperty("--scenario-unit", `${currentScenarioUnit}px`);
       gridEl.style.gridTemplateColumns = `repeat(${width + 1}, var(--scenario-unit))`;
 
       const cornerEl = document.createElement("div");
@@ -1467,6 +1528,9 @@
       const scenarioMetaEl = document.getElementById("scenarioMeta");
       const scenarioBoardEl = document.getElementById("scenarioBoard");
       const scenarioAnimationToggleEl = document.getElementById("scenarioAnimationToggle");
+      const scenarioScaleDownEl = document.getElementById("scenarioScaleDown");
+      const scenarioScaleUpEl = document.getElementById("scenarioScaleUp");
+      const scenarioScaleValueEl = document.getElementById("scenarioScaleValue");
       const codePhrasePanelEl = document.getElementById("codePhrasePanel");
       const codePhraseInputEl = document.getElementById("codePhraseInput");
       const copyCodePhraseBtn = document.getElementById("copyCodePhraseBtn");
@@ -1503,6 +1567,20 @@
       function isAnimationEnabled() {
         if (!scenarioAnimationToggleEl) return true;
         return scenarioAnimationToggleEl.checked;
+      }
+
+      function updateScenarioScaleUi() {
+        if (scenarioScaleValueEl) scenarioScaleValueEl.textContent = `${currentScenarioUnit}px`;
+        if (scenarioScaleDownEl) scenarioScaleDownEl.disabled = currentScenarioUnit <= MIN_SCENARIO_UNIT;
+        if (scenarioScaleUpEl) scenarioScaleUpEl.disabled = currentScenarioUnit >= MAX_SCENARIO_UNIT;
+      }
+
+      function changeScenarioScale(delta) {
+        const next = Math.max(MIN_SCENARIO_UNIT, Math.min(MAX_SCENARIO_UNIT, currentScenarioUnit + delta));
+        if (next === currentScenarioUnit) return;
+        currentScenarioUnit = next;
+        updateScenarioScaleUi();
+        if (lastScenarioPayload) drawScenarioView(lastScenarioPayload, lastScenarioDomainResults);
       }
 
       function hideRobotCodePhrase() {
@@ -1644,6 +1722,20 @@
           }
         });
       }
+
+      if (scenarioScaleDownEl) {
+        scenarioScaleDownEl.addEventListener("click", () => {
+          changeScenarioScale(-SCENARIO_UNIT_STEP);
+        });
+      }
+
+      if (scenarioScaleUpEl) {
+        scenarioScaleUpEl.addEventListener("click", () => {
+          changeScenarioScale(SCENARIO_UNIT_STEP);
+        });
+      }
+
+      updateScenarioScaleUi();
 
       if (copyCodePhraseBtn) {
         copyCodePhraseBtn.addEventListener("click", async () => {
