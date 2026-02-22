@@ -64,6 +64,7 @@
         <aside class="panel">
           <h3>История шагов</h3>
           <div id="codeWordBox" class="codeword" hidden></div>
+          <button id="copyCodeWordBtn" type="button" class="mini-btn" hidden>Копировать слово</button>
           <div id="solveInfo" class="hint"></div>
           <div class="row-between">
             <div class="hint">Алгоритм</div>
@@ -98,6 +99,7 @@
     const algoDumpEl = document.getElementById("algoDump");
     const movesDumpEl = document.getElementById("movesDump");
     const codeWordBoxEl = document.getElementById("codeWordBox");
+    const copyCodeWordBtn = document.getElementById("copyCodeWordBtn");
 
     let n = 0;
     let initialBoard = [];
@@ -418,9 +420,11 @@
       redoBtn.disabled = historyIndex >= history.length;
       if (isAllZero(board) && revealCodeWord) {
         codeWordBoxEl.hidden = false;
+        copyCodeWordBtn.hidden = false;
         codeWordBoxEl.textContent = `Кодовое слово: ${revealCodeWord}`;
       } else {
         codeWordBoxEl.hidden = true;
+        copyCodeWordBtn.hidden = true;
         codeWordBoxEl.textContent = "";
       }
       updateSolverPanel();
@@ -533,11 +537,23 @@
       }
       setTimeout(() => { copyAlgoBtn.textContent = original; }, 900);
     });
+    copyCodeWordBtn.addEventListener("click", async () => {
+      if (!revealCodeWord || codeWordBoxEl.hidden) return;
+      const original = copyCodeWordBtn.textContent;
+      try {
+        await copyTextToClipboard(revealCodeWord);
+        copyCodeWordBtn.textContent = "Скопировано";
+      } catch (_) {
+        copyCodeWordBtn.textContent = "Ошибка";
+      }
+      setTimeout(() => { copyCodeWordBtn.textContent = original; }, 900);
+    });
 
     try {
       loadFromEmbedded();
       gameAreaEl.hidden = false;
       copyAlgoBtn.disabled = true;
+      copyCodeWordBtn.hidden = true;
       render();
     } catch (err) {
       appEl.innerHTML = `<div class="error">Ошибка загрузки задачи: ${String(err.message || err)}</div>`;
