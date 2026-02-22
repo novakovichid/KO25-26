@@ -24,20 +24,50 @@
 
       <section id="sectionContent" hidden>
         <h1 class="text-3xl font-black tracking-tight">Лавлейс</h1>
-        <p class="mt-4 text-slate-600">Доступ открыт. Переходим в нужную версию редактора.</p>
-        <a id="openEditorLink" href="./editor.html" class="mt-6 inline-flex items-center rounded-xl bg-teal-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-teal-700">Открыть редактор</a>
+        <div id="classicEntry" hidden>
+          <p class="mt-4 text-slate-600">Доступ открыт. Переходим в нужную версию редактора.</p>
+          <a id="openEditorLink" href="./editor.html" class="mt-6 inline-flex items-center rounded-xl bg-teal-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-teal-700">Открыть редактор</a>
+        </div>
+        <div id="robotMenu" hidden>
+          <p class="mt-4 text-slate-600">Выберите модуль.</p>
+          <div class="mt-6 grid gap-3">
+            <a href="#" class="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 font-semibold transition hover:border-teal-300 hover:bg-teal-50">
+              Черепашке дайте слово
+            </a>
+            <a href="#" class="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 font-semibold transition hover:border-teal-300 hover:bg-teal-50">
+              Блочное программирование
+            </a>
+            <a href="#" class="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 font-semibold transition hover:border-teal-300 hover:bg-teal-50">
+              Новый модуль Черепашки
+            </a>
+            <a href="./editor-robot.html" class="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 font-semibold transition hover:border-teal-300 hover:bg-teal-50">
+              Программируя улыбкой
+            </a>
+          </div>
+        </div>
+        <a href="../index.html" class="mt-6 inline-flex items-center rounded-xl bg-slate-700 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800">На главную</a>
       </section>
     </main>
   </div>
   <script>
     function resolveLovelaceTarget(profile) {
-      return profile === "ROBOT" ? "./editor-robot.html" : "./editor.html";
+      return profile === "CLASSIC" ? "./editor.html" : "./editor-robot.html";
     }
 
     function redirectToProfileEditor(profile) {
+      if (profile !== "CLASSIC") return;
       const target = resolveLovelaceTarget(profile);
       const next = new URLSearchParams(window.location.search).get("next") || "";
       if (!next) window.location.replace(target);
+    }
+
+    function applyProfileLayout(profile) {
+      const classicEntryEl = document.getElementById("classicEntry");
+      const robotMenuEl = document.getElementById("robotMenu");
+      if (!classicEntryEl || !robotMenuEl) return;
+      const isRobot = profile === "ROBOT";
+      classicEntryEl.hidden = isRobot;
+      robotMenuEl.hidden = !isRobot;
     }
 
     function applyOpenLink(profile) {
@@ -49,14 +79,17 @@
     if (window.SectionAuth) {
       window.SectionAuth.initIndex("LOVELACE", {
         onAlreadyUnlocked: ({ profile }) => {
+          applyProfileLayout(profile);
           applyOpenLink(profile);
           redirectToProfileEditor(profile);
         },
         onUnlockSuccess: ({ profile }) => {
+          applyProfileLayout(profile);
           applyOpenLink(profile);
           redirectToProfileEditor(profile);
         }
       });
+      applyProfileLayout(window.SectionAuth.getProfile("LOVELACE"));
       applyOpenLink(window.SectionAuth.getProfile("LOVELACE"));
     }
   </script>
