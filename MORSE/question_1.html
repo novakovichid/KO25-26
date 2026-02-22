@@ -32,6 +32,7 @@
     .panel h3 { margin:0; font-size:16px; }
     .hint { color:var(--muted); font-size:14px; }
     .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; font-size:12px; background:#f3f4f6; border:1px solid #e5e7eb; border-radius:8px; padding:8px; white-space:pre-wrap; word-break:break-word; max-height:340px; overflow:auto; }
+    .mono-algo { white-space:nowrap; word-break:normal; max-height:64px; }
     .error { background:#fee2e2; color:#991b1b; border:1px solid #fca5a5; border-radius:10px; padding:10px 12px; font-weight:600; }
     @media (max-width: 980px) { .layout { grid-template-columns: 1fr; } }
   </style>
@@ -60,6 +61,9 @@
         <aside class="panel">
           <h3>История шагов</h3>
           <div id="solveInfo" class="hint"></div>
+          <div class="hint">Алгоритм</div>
+          <div id="algoDump" class="mono mono-algo">-</div>
+          <div class="hint">Пошагово</div>
           <div id="movesDump" class="mono">-</div>
         </aside>
       </section>
@@ -83,6 +87,7 @@
     const colCoordsEl = document.getElementById("colCoords");
     const rowCoordsEl = document.getElementById("rowCoords");
     const solveInfoEl = document.getElementById("solveInfo");
+    const algoDumpEl = document.getElementById("algoDump");
     const movesDumpEl = document.getElementById("movesDump");
 
     let n = 0;
@@ -360,12 +365,14 @@
         ? `Сделано шагов: ${actual.length}.`
         : "Ходов пока нет.";
       if (actual.length === 0) {
+        algoDumpEl.textContent = "-";
         movesDumpEl.textContent = "-";
         return;
       }
       const strictCode = movesToStrictCode(actual);
       const lines = actual.map((m, i) => `${String(i + 1).padStart(3, " ")}. ${moveCode6(m)}`).join("\n");
-      movesDumpEl.textContent = `${strictCode}\n${lines}`;
+      algoDumpEl.textContent = strictCode || "-";
+      movesDumpEl.textContent = lines || "-";
     }
 
     function updatePanel() {
