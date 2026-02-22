@@ -31,6 +31,8 @@
     .panel { border:1px solid var(--border); border-radius:12px; background:#fcfcfd; padding:10px; display:grid; gap:8px; align-content:start; }
     .panel h3 { margin:0; font-size:16px; }
     .hint { color:var(--muted); font-size:14px; }
+    .row-between { display:flex; align-items:center; justify-content:space-between; gap:8px; }
+    .mini-btn { padding:4px 8px; border-radius:8px; font-size:12px; }
     .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; font-size:12px; background:#f3f4f6; border:1px solid #e5e7eb; border-radius:8px; padding:8px; white-space:pre-wrap; word-break:break-word; max-height:340px; overflow:auto; }
     .mono-algo { white-space:nowrap; word-break:normal; max-height:64px; }
     .codeword { border:1px dashed #86efac; border-radius:10px; padding:9px 12px; background:#f0fdf4; color:#166534; font-weight:700; }
@@ -63,7 +65,10 @@
           <h3>История шагов</h3>
           <div id="codeWordBox" class="codeword" hidden></div>
           <div id="solveInfo" class="hint"></div>
-          <div class="hint">Алгоритм</div>
+          <div class="row-between">
+            <div class="hint">Алгоритм</div>
+            <button id="copyAlgoBtn" type="button" class="mini-btn">Копировать</button>
+          </div>
           <div id="algoDump" class="mono mono-algo">-</div>
           <div class="hint">Пошагово</div>
           <div id="movesDump" class="mono">-</div>
@@ -89,6 +94,7 @@
     const colCoordsEl = document.getElementById("colCoords");
     const rowCoordsEl = document.getElementById("rowCoords");
     const solveInfoEl = document.getElementById("solveInfo");
+    const copyAlgoBtn = document.getElementById("copyAlgoBtn");
     const algoDumpEl = document.getElementById("algoDump");
     const movesDumpEl = document.getElementById("movesDump");
     const codeWordBoxEl = document.getElementById("codeWordBox");
@@ -114,6 +120,22 @@
       const out = new Uint8Array(bytes.length);
       for (let i = 0; i < bytes.length; i++) out[i] = bytes[i] ^ key[i % key.length] ^ ((i * 31) & 255);
       return out;
+    }
+
+    async function copyTextToClipboard(text) {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(text);
+        return;
+      }
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      ta.setAttribute("readonly", "");
+      ta.style.position = "fixed";
+      ta.style.top = "-9999px";
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand("copy");
+      ta.remove();
     }
 
     function copyBoard(src) {
@@ -378,11 +400,13 @@
         ? `Сделано шагов: ${actual.length}.`
         : "Ходов пока нет.";
       if (actual.length === 0) {
+        copyAlgoBtn.disabled = true;
         algoDumpEl.textContent = "-";
         movesDumpEl.textContent = "-";
         return;
       }
       const strictCode = movesToStrictCode(actual);
+      copyAlgoBtn.disabled = !strictCode;
       const lines = actual.map((m, i) => `${String(i + 1).padStart(3, " ")}. ${moveCode6(m)}`).join("\n");
       algoDumpEl.textContent = strictCode || "-";
       movesDumpEl.textContent = lines || "-";
@@ -497,10 +521,23 @@
       historyIndex++;
       render();
     });
+    copyAlgoBtn.addEventListener("click", async () => {
+      const text = algoDumpEl.textContent && algoDumpEl.textContent !== "-" ? algoDumpEl.textContent : "";
+      if (!text) return;
+      const original = copyAlgoBtn.textContent;
+      try {
+        await copyTextToClipboard(text);
+        copyAlgoBtn.textContent = "Скопировано";
+      } catch (_) {
+        copyAlgoBtn.textContent = "Ошибка";
+      }
+      setTimeout(() => { copyAlgoBtn.textContent = original; }, 900);
+    });
 
     try {
       loadFromEmbedded();
       gameAreaEl.hidden = false;
+      copyAlgoBtn.disabled = true;
       render();
     } catch (err) {
       appEl.innerHTML = `<div class="error">Ошибка загрузки задачи: ${String(err.message || err)}</div>`;
