@@ -35,6 +35,7 @@
     .mini-btn { padding:4px 8px; border-radius:8px; font-size:12px; }
     .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; font-size:12px; background:#f3f4f6; border:1px solid #e5e7eb; border-radius:8px; padding:8px; white-space:pre-wrap; word-break:break-word; max-height:340px; overflow:auto; }
     .mono-algo { white-space:nowrap; word-break:normal; max-height:64px; }
+    .mono-steps { line-height:1.35; height:262px; max-height:262px; }
     .error { background:#fee2e2; color:#991b1b; border:1px solid #fca5a5; border-radius:10px; padding:10px 12px; font-weight:600; }
     @media (max-width: 980px) { .layout { grid-template-columns: 1fr; } }
   </style>
@@ -69,7 +70,7 @@
           </div>
           <div id="algoDump" class="mono mono-algo">-</div>
           <div class="hint">Пошагово</div>
-          <div id="movesDump" class="mono">-</div>
+          <div id="movesDump" class="mono mono-steps">-</div>
         </aside>
       </section>
     </div>
