@@ -439,16 +439,25 @@
     .test-output-grid {
       display: grid;
       gap: 10px;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
     }
 
     .test-output-card {
-      border: 1px solid #e5e7eb;
+      border: 1px solid #dbeafe;
       border-radius: 10px;
-      background: #ffffff;
-      padding: 10px;
+      background: #f8fafc;
+      padding: 8px;
       display: grid;
-      gap: 8px;
+      gap: 6px;
+      min-height: 150px;
+      align-content: start;
+    }
+
+    .test-output-head {
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+      flex-wrap: wrap;
     }
 
     .test-output-card.ok {
@@ -470,6 +479,18 @@
       font-size: 12px;
       font-weight: 700;
       color: #475569;
+    }
+
+    .test-output-card.ok .test-output-meta {
+      color: #166534;
+    }
+
+    .test-output-card.error .test-output-meta {
+      color: #991b1b;
+    }
+
+    .test-output-card.warn .test-output-meta {
+      color: #92400e;
     }
 
     button {
@@ -1729,13 +1750,18 @@
         meta.className = "test-output-meta";
         meta.textContent = result.meta;
 
+        const head = document.createElement("div");
+        head.className = "test-output-head";
+        head.appendChild(title);
+        head.appendChild(meta);
+
         const out = document.createElement("textarea");
         out.className = "output-box";
         out.readOnly = true;
         out.value = result.value;
+        out.rows = 2;
 
-        card.appendChild(title);
-        card.appendChild(meta);
+        card.appendChild(head);
         card.appendChild(out);
         testOutputsEl.appendChild(card);
       }
