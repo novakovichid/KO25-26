@@ -34,13 +34,13 @@
           <a href="./old_phone/old_phone.jpg" download class="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 font-semibold transition hover:border-teal-300 hover:bg-teal-50">
             Старый телефон
           </a>
-          <a href="./activity_log/videos/" class="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 font-semibold transition hover:border-teal-300 hover:bg-teal-50">
+          <a href="./activity_log/index.html" class="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 font-semibold transition hover:border-teal-300 hover:bg-teal-50">
             Журнал активности
           </a>
-          <a href="./message_blogger_2/message.png" download class="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 font-semibold transition hover:border-teal-300 hover:bg-teal-50">
+          <button id="messageBlogger2Open" type="button" class="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-left font-semibold transition hover:border-teal-300 hover:bg-teal-50">
             Послание блогеру - 2
-          </a>
-          <a href="./message_blogger_3/files/" class="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 font-semibold transition hover:border-teal-300 hover:bg-teal-50">
+          </button>
+          <a href="./message_blogger_3/index.html" class="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 font-semibold transition hover:border-teal-300 hover:bg-teal-50">
             Послание блогеру - 3
           </a>
           <a id="corruptedLink" href="./corrupted_file_1/corrupted_file.jpg" download class="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 font-semibold transition hover:border-teal-300 hover:bg-teal-50">
@@ -50,6 +50,17 @@
         <a href="../index.html" class="mt-6 inline-flex items-center rounded-xl bg-teal-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-teal-700">На главную</a>
       </section>
     </main>
+  </div>
+  <div id="messageBlogger2Modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/70 p-4">
+    <div class="w-full max-w-4xl rounded-2xl border border-slate-200 bg-white p-4 shadow-2xl sm:p-5">
+      <div class="mb-3 flex items-center justify-between gap-3">
+        <h2 class="text-lg font-bold">Послание блогеру - 2</h2>
+        <button id="messageBlogger2Close" type="button" class="rounded-lg border border-slate-300 px-3 py-1.5 text-sm font-semibold transition hover:bg-slate-50">Закрыть</button>
+      </div>
+      <div class="flex justify-center rounded-xl border border-slate-200 bg-slate-50 p-3">
+        <img src="./message_blogger_2/message.png" alt="Послание блогеру - 2" class="h-auto max-h-[700px] w-auto max-w-full rounded-lg object-contain">
+      </div>
+    </div>
   </div>
   <script>
     function profileCode(profile) {
@@ -78,6 +89,34 @@
       }
     }
 
+    function initMessageBlogger2Modal() {
+      const openBtn = document.getElementById("messageBlogger2Open");
+      const modal = document.getElementById("messageBlogger2Modal");
+      const closeBtn = document.getElementById("messageBlogger2Close");
+      if (!openBtn || !modal || !closeBtn) return;
+
+      const close = () => {
+        modal.classList.add("hidden");
+        modal.classList.remove("flex");
+        document.body.classList.remove("overflow-hidden");
+      };
+
+      const open = () => {
+        modal.classList.remove("hidden");
+        modal.classList.add("flex");
+        document.body.classList.add("overflow-hidden");
+      };
+
+      openBtn.addEventListener("click", open);
+      closeBtn.addEventListener("click", close);
+      modal.addEventListener("click", (event) => {
+        if (event.target === modal) close();
+      });
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape" && !modal.classList.contains("hidden")) close();
+      });
+    }
+
     if (window.SectionAuth) {
       window.SectionAuth.initIndex("VIGENERE", {
         onAlreadyUnlocked: ({ profile }) => applyVigenereVariant(profile),
@@ -88,6 +127,7 @@
       });
       applyVigenereVariant(window.SectionAuth.getProfile("VIGENERE"));
     }
+    initMessageBlogger2Modal();
   </script>
 </body>
 </html>
