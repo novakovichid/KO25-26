@@ -1152,16 +1152,16 @@
   </main>
 
   <script>
-    const COMMAND_EMOJIS = ["🌞", "⭐", "🎲", "😀", "➕", "➖", "✖", "➗", "➰", "🤔", "🔂", "🔁", "😐"];
+    const COMMAND_IO_EMOJIS = ["🌞", "⭐", "🎲", "😀"];
+    const COMMAND_MATH_EMOJIS = ["➕", "➖", "✖", "➗"];
+    const COMMAND_FLOW_EMOJIS = ["➰", "🤔", "🔂", "🔁", "😐"];
     const VARIABLE_EMOJIS = [
-      "🐶", "🐱", "🐭", "🐹", "🐰", "🦊", "🐻", "🐼", "🐨", "🐯", "🦁", "🐮",
-      "🕐", "🕑", "🕒", "🕓", "🕔", "🕕", "🕖", "🕗", "🕘", "🕙", "🕚", "🕛",
-      "🚨"
+      "🐶", "🐱", "🐭", "🐹", "🐰", "🦊", "🐻", "🐼", "🐨", "🐯", "🦁", "🐮"
     ];
     const DIGIT_EMOJIS = ["🆚", "📌", "✌", "🤟", "🤞", "🖐", "🤘", "👌", "👍", "👊"];
     const DIGIT_TO_VALUE = new Map(DIGIT_EMOJIS.map((emoji, idx) => [emoji, String(idx)]));
 
-    const KEYBOARD_GROUPS = [COMMAND_EMOJIS, VARIABLE_EMOJIS, DIGIT_EMOJIS];
+    const KEYBOARD_GROUPS = [COMMAND_IO_EMOJIS, COMMAND_MATH_EMOJIS, COMMAND_FLOW_EMOJIS, VARIABLE_EMOJIS, DIGIT_EMOJIS];
 
     const EXAMPLES = [
       {
