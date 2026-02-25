@@ -2768,9 +2768,9 @@
         ? isTask4Solved(task4Cases, results)
         : false;
       if (errCount > 0) {
-        setStatus("error", `Готово: успех ${okCount}, предупреждения ${warnCount}, ошибки ${errCount}.`);
+        setStatus("error", `Готово: ${okCount} ${pluralRu(okCount, "успех", "успеха", "успехов")}, ${warnCount} ${pluralRu(warnCount, "предупреждение", "предупреждения", "предупреждений")}, ${errCount} ${pluralRu(errCount, "ошибка", "ошибки", "ошибок")}.`);
       } else if (warnCount > 0) {
-        setStatus("warn", `Готово: успех ${okCount}, предупреждения ${warnCount}.`);
+        setStatus("warn", `Готово: ${okCount} ${pluralRu(okCount, "успех", "успеха", "успехов")}, ${warnCount} ${pluralRu(warnCount, "предупреждение", "предупреждения", "предупреждений")}.`);
       } else if (task4Mode && !solvedByTask4) {
         const matched = countTask4Matches(task4Cases, results);
         setStatus("warn", `Готово: совпало с эталоном ${matched} из ${task4Cases.length} ${pluralRu(task4Cases.length, "теста", "тестов", "тестов")}.`);

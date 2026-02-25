@@ -810,9 +810,9 @@
         ? pluralRu(okCount, "сценарий", "сценария", "сценариев")
         : pluralRu(okCount, "тест", "теста", "тестов");
       if (errCount > 0) {
-        setStatus("error", `Готово: успех ${okCount}, предупреждения ${warnCount}, ошибки ${errCount}.`);
+        setStatus("error", `Готово: ${okCount} ${pluralRu(okCount, "успех", "успеха", "успехов")}, ${warnCount} ${pluralRu(warnCount, "предупреждение", "предупреждения", "предупреждений")}, ${errCount} ${pluralRu(errCount, "ошибка", "ошибки", "ошибок")}.`);
       } else if (warnCount > 0) {
-        setStatus("warn", `Готово: успех ${okCount}, предупреждения ${warnCount}.`);
+        setStatus("warn", `Готово: ${okCount} ${pluralRu(okCount, "успех", "успеха", "успехов")}, ${warnCount} ${pluralRu(warnCount, "предупреждение", "предупреждения", "предупреждений")}.`);
       } else {
         setStatus("ok", `Готово: все ${okCount} ${noun} выполнены успешно.`);
       }
