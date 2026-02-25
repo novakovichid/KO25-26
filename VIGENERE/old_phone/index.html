@@ -20,27 +20,23 @@
       <h1 class="text-2xl font-black tracking-tight">Старый телефон</h1>
       <div class="mt-6 grid gap-6 xl:grid-cols-[360px_minmax(0,1fr)]">
         <section class="rounded-2xl border border-slate-200 bg-slate-50 p-4 sm:p-5">
-          <h2 class="text-lg font-bold">Эмулятор телефона</h2>
-
-          <div class="mt-4 rounded-3xl border border-slate-300 bg-slate-900 p-4 text-slate-100 shadow-inner">
+          <div class="rounded-3xl border border-slate-300 bg-slate-900 p-4 text-slate-100 shadow-inner">
             <div class="rounded-2xl border border-lime-300/40 bg-lime-100 px-3 py-3 text-slate-900">
-              <div class="text-xs font-bold uppercase tracking-wide text-slate-500">Дисплей</div>
-              <div id="phoneDisplay" class="mt-1 min-h-8 break-all font-mono text-lg"> </div>
+              <div id="phoneDisplay" class="min-h-8 break-all font-mono text-lg"> </div>
             </div>
 
             <div class="mt-4 rounded-2xl border border-slate-700 bg-slate-800 p-3">
-              <div class="text-xs font-bold uppercase tracking-wide text-slate-400">Числовой код</div>
-              <div id="phoneCode" class="mt-1 min-h-6 break-all font-mono text-sm text-cyan-300"> </div>
+              <div id="phoneCode" class="min-h-6 break-all font-mono text-sm text-cyan-300"> </div>
             </div>
 
             <div class="mt-5 grid grid-cols-2 gap-3">
-              <button type="button" class="phone-btn rounded-2xl border border-slate-500 bg-slate-700 px-3 py-4 text-left shadow transition hover:bg-slate-600" data-key="1">
-                <div class="text-2xl font-black leading-none">1</div>
-                <div class="mt-1 font-mono text-xs tracking-widest text-slate-200">ABC</div>
+              <button type="button" class="phone-btn rounded-2xl border border-slate-500 bg-slate-700 px-2 py-3 text-center shadow transition hover:bg-slate-600" data-key="1">
+                <div class="text-[28px] font-black leading-none">1</div>
+                <div class="mt-0.5 font-mono text-sm tracking-[0.2em] text-slate-200">ABC</div>
               </button>
-              <button type="button" class="phone-btn rounded-2xl border border-slate-500 bg-slate-700 px-3 py-4 text-left shadow transition hover:bg-slate-600" data-key="2">
-                <div class="text-2xl font-black leading-none">2</div>
-                <div class="mt-1 font-mono text-xs tracking-widest text-slate-200">DEF</div>
+              <button type="button" class="phone-btn rounded-2xl border border-slate-500 bg-slate-700 px-2 py-3 text-center shadow transition hover:bg-slate-600" data-key="2">
+                <div class="text-[28px] font-black leading-none">2</div>
+                <div class="mt-0.5 font-mono text-sm tracking-[0.2em] text-slate-200">DEF</div>
               </button>
             </div>
 
@@ -51,8 +47,7 @@
         </section>
 
         <section class="rounded-2xl border border-slate-200 bg-slate-50 p-4 sm:p-5">
-          <h2 class="text-lg font-bold">Изображение телефона</h2>
-          <div class="mt-4 flex justify-center rounded-xl border border-slate-200 bg-white p-3">
+          <div class="flex justify-center rounded-xl border border-slate-200 bg-white p-3">
             <img
               src="./old_phone.jpg"
               alt="Старый телефон"
@@ -70,11 +65,6 @@
         "1": ["A", "B", "C"],
         "2": ["D", "E", "F"]
       };
-      const LETTER_TO_DIGIT = {
-        A: "1", B: "1", C: "1",
-        D: "2", E: "2", F: "2"
-      };
-
       // Программный переключатель таймаута мультинажатия: UI не показываем.
       const CONFIG = {
         timeoutEnabled: false,
@@ -88,6 +78,7 @@
       if (!displayEl || !codeEl || !buttons.length) return;
 
       let text = "";
+      let pressCode = "";
       let activeKey = "";
       let activeIndex = -1;
       let activeExpiresAt = 0;
@@ -95,7 +86,7 @@
 
       function render() {
         displayEl.textContent = text || " ";
-        codeEl.textContent = (text.split("").map((ch) => LETTER_TO_DIGIT[ch] || "").join("")) || " ";
+        codeEl.textContent = pressCode || " ";
       }
 
       function clearComposeState() {
@@ -126,6 +117,7 @@
         activeKey = key;
         activeIndex = 0;
         text += letters[activeIndex];
+        pressCode += key;
         restartTimeout();
       }
 
@@ -133,6 +125,7 @@
         if (!text) return;
         activeIndex = (activeIndex + 1) % letters.length;
         text = text.slice(0, -1) + letters[activeIndex];
+        pressCode += activeKey;
         restartTimeout();
       }
 
@@ -159,6 +152,7 @@
       if (clearBtn) {
         clearBtn.addEventListener("click", () => {
           text = "";
+          pressCode = "";
           clearComposeState();
           render();
         });
