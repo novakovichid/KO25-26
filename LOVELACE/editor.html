@@ -309,6 +309,13 @@
       align-items: center;
     }
 
+    .run-panel-top {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      gap: 8px;
+      align-items: center;
+    }
+
     .run-controls {
       gap: 6px;
     }
@@ -391,15 +398,18 @@
     .test-list {
       display: grid;
       gap: 10px;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
     }
 
     .test-item {
       border: 1px solid #dbeafe;
       background: #f8fafc;
       border-radius: 10px;
-      padding: 10px;
+      padding: 8px;
       display: grid;
-      gap: 8px;
+      gap: 6px;
+      min-height: 150px;
+      align-content: start;
     }
 
     .test-head {
@@ -413,6 +423,17 @@
       font-size: 13px;
       font-weight: 800;
       color: #334155;
+    }
+
+    .icon-btn {
+      min-width: 34px;
+      min-height: 34px;
+      padding: 4px 6px;
+      display: inline-grid;
+      place-items: center;
+      font-size: 16px;
+      line-height: 1;
+      border-radius: 8px;
     }
 
     .test-output-grid {
@@ -525,6 +546,16 @@
       background: var(--warn-bg);
       color: var(--warn-fg);
       border-color: #fcd34d;
+    }
+
+    .run-panel-top .status-box {
+      min-height: 34px;
+      padding: 6px 10px;
+      font-size: 13px;
+      line-height: 1.15;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .step-count {
@@ -715,17 +746,14 @@
       <section class="blocks-col">
       <section class="panel">
         <h2 class="block-title"><span class="block-num">3</span>Запуск</h2>
-        <div class="controls run-controls">
-          <button id="runBtn" class="primary">Запустить</button>
-          <button id="resetBtn">Сброс</button>
+        <div class="run-panel-top">
+          <div class="controls run-controls">
+            <button id="runBtn" class="primary">Запустить</button>
+            <button id="resetBtn">Сброс</button>
+          </div>
+          <div id="statusBox" class="status-box">Ожидание запуска.</div>
         </div>
-        <div id="statusBox" class="status-box">Ожидание запуска.</div>
         <div id="stepCount" class="step-count">Суммарные шаги: 0</div>
-      </section>
-
-      <section class="panel">
-        <h2 class="block-title"><span class="block-num">4</span>Выходные данные по тестам</h2>
-        <div id="testOutputs" class="test-output-grid"></div>
       </section>
 
       <section id="codePhrasePanel" class="panel" hidden>
@@ -735,6 +763,11 @@
         <div class="controls">
           <button id="copyCodePhraseBtn" type="button">Копировать</button>
         </div>
+      </section>
+
+      <section class="panel">
+        <h2 class="block-title"><span class="block-num">4</span>Выходные данные по тестам</h2>
+        <div id="testOutputs" class="test-output-grid"></div>
       </section>
 
       <section class="panel">
@@ -1616,7 +1649,10 @@
 
       const removeBtn = document.createElement("button");
       removeBtn.type = "button";
-      removeBtn.textContent = "Удалить";
+      removeBtn.textContent = "🗑️";
+      removeBtn.className = "icon-btn";
+      removeBtn.title = "Удалить тест";
+      removeBtn.setAttribute("aria-label", "Удалить тест");
       removeBtn.dataset.testRemove = "1";
       removeBtn.addEventListener("click", () => {
         if (isTask4Subtask()) return;
@@ -1635,6 +1671,7 @@
       input.autocapitalize = "off";
       input.dataset.testInput = "1";
       input.value = String(inputText || "");
+      input.rows = 2;
 
       wrap.appendChild(head);
       wrap.appendChild(input);

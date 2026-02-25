@@ -309,6 +309,13 @@
       align-items: center;
     }
 
+    .run-panel-top {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      gap: 8px;
+      align-items: center;
+    }
+
     .run-controls {
       gap: 6px;
     }
@@ -809,6 +816,16 @@
       border-color: #fcd34d;
     }
 
+    .run-panel-top .status-box {
+      min-height: 34px;
+      padding: 6px 10px;
+      font-size: 13px;
+      line-height: 1.15;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
     .step-count {
       font-weight: 700;
       color: #1f2937;
@@ -1024,17 +1041,14 @@
       <section class="blocks-col">
       <section class="panel">
         <h2 class="block-title"><span class="block-num">3</span>Запуск</h2>
-        <div class="controls run-controls">
-          <button id="runBtn" class="primary">Запустить</button>
-          <button id="resetBtn">Сброс</button>
+        <div class="run-panel-top">
+          <div class="controls run-controls">
+            <button id="runBtn" class="primary">Запустить</button>
+            <button id="resetBtn">Сброс</button>
+          </div>
+          <div id="statusBox" class="status-box">Ожидание запуска.</div>
         </div>
-        <div id="statusBox" class="status-box">Ожидание запуска.</div>
         <div id="stepCount" class="step-count">Суммарные шаги: 0</div>
-      </section>
-
-      <section class="panel" hidden>
-        <h2 class="block-title"><span class="block-num">4</span>Выходные данные</h2>
-        <div id="testOutputs" class="test-output-grid"></div>
       </section>
 
       <section id="codePhrasePanel" class="panel" hidden>
@@ -1044,6 +1058,11 @@
         <div class="controls">
           <button id="copyCodePhraseBtn" type="button">Копировать</button>
         </div>
+      </section>
+
+      <section class="panel" hidden>
+        <h2 class="block-title"><span class="block-num">4</span>Выходные данные</h2>
+        <div id="testOutputs" class="test-output-grid"></div>
       </section>
       </section>
     </section>
