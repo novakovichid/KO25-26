@@ -201,6 +201,8 @@
     let selectedSubtaskKey = "";
     let codeInputResizeObserver = null;
     let currentScenarioKey = "";
+    const KONAMI_BUTTON_SEQUENCE = ["up", "up", "down", "down", "left", "right", "left", "right", "2", "1"];
+    let konamiButtonBuffer = [];
 
     function hideCodePhrasePanel() {
       if (!codePhrasePanelEl) return;
@@ -214,36 +216,34 @@
       statusBoxEl.textContent = message;
     }
 
-    function normalizeKonamiCandidate(code) {
-      let text = String(code || "").normalize("NFKC").toUpperCase();
-      text = text.replace(/([0-9])\uFE0F?\u20E3/g, "$1");
-      text = text.replace(/\uFE0F|\u20E3/g, "");
-      text = text.replace(/\s+/g, "");
-      text = text
-        .split("✈").join("U")
-        .split("🚇").join("D")
-        .split("🚠").join("L")
-        .split("🚜").join("R")
-        .split("↑").join("U")
-        .split("⬆").join("U")
-        .split("↓").join("D")
-        .split("⬇").join("D")
-        .split("←").join("L")
-        .split("⬅").join("L")
-        .split("→").join("R")
-        .split("➡").join("R");
-      return text;
-    }
-
-    function isKonamiEasterEggProgram(code) {
-      const normalized = normalizeKonamiCandidate(code);
-      return normalized === "UUDDLRLRBA" || normalized === "UUDDLRLR21";
-    }
-
     function toggleKonamiDarkTheme() {
       const body = document.body;
       if (!body) return false;
       return body.classList.toggle("konami-dark");
+    }
+
+    function recordKonamiButtonStep(step) {
+      if (!step) return;
+      konamiButtonBuffer.push(step);
+      if (konamiButtonBuffer.length > KONAMI_BUTTON_SEQUENCE.length) {
+        konamiButtonBuffer = konamiButtonBuffer.slice(-KONAMI_BUTTON_SEQUENCE.length);
+      }
+      if (KONAMI_BUTTON_SEQUENCE.every((item, index) => konamiButtonBuffer[index] === item)) {
+        konamiButtonBuffer = [];
+        const enabled = toggleKonamiDarkTheme();
+        setStatus("ok", enabled ? "Пасхалка: тёмная тема включена." : "Пасхалка: тёмная тема выключена.");
+      }
+    }
+
+    function getEasterDigitStepFromEmoji(emoji) {
+      const src = String(emoji || "").normalize("NFKC");
+      const digit = src.replace(/\uFE0F|\u20E3/g, "");
+      if (digit.length === 1 && digit >= "0" && digit <= "9") return digit;
+      if (lineDigits.length === 10) {
+        const idx = lineDigits.indexOf(emoji);
+        if (idx >= 0) return String(idx);
+      }
+      return "";
     }
 
     function editorLineCount() {
@@ -643,14 +643,17 @@
       refreshCodeLineNumbers();
     }
 
-    function createNavButton(text, title, className, onClick) {
+    function createNavButton(text, title, className, onClick, easterStep = "") {
       const btn = document.createElement("button");
       btn.type = "button";
       btn.className = `nav-btn ${className}`;
       btn.textContent = text;
       btn.title = title;
       btn.addEventListener("mousedown", (event) => event.preventDefault());
-      btn.addEventListener("click", onClick);
+      btn.addEventListener("click", () => {
+        if (easterStep) recordKonamiButtonStep(easterStep);
+        onClick();
+      });
       return btn;
     }
 
@@ -678,7 +681,11 @@
           btn.textContent = emoji;
           btn.title = `Вставить ${emoji}`;
           btn.addEventListener("mousedown", (event) => event.preventDefault());
-          btn.addEventListener("click", () => insertEmoji(emoji));
+          btn.addEventListener("click", () => {
+            const digitStep = getEasterDigitStepFromEmoji(emoji);
+            if (digitStep) recordKonamiButtonStep(digitStep);
+            insertEmoji(emoji);
+          });
           gridEl.appendChild(btn);
         }
 
@@ -695,10 +702,10 @@
 
       const arrowsEl = document.createElement("div");
       arrowsEl.className = "nav-arrows";
-      arrowsEl.appendChild(createNavButton("↑", "Строка выше", "up", () => moveCaretVertical(-1)));
-      arrowsEl.appendChild(createNavButton("←", "Графема слева", "left", () => moveCaretHorizontal(-1)));
-      arrowsEl.appendChild(createNavButton("↓", "Строка ниже", "down", () => moveCaretVertical(1)));
-      arrowsEl.appendChild(createNavButton("→", "Графема справа", "right", () => moveCaretHorizontal(1)));
+      arrowsEl.appendChild(createNavButton("↑", "Строка выше", "up", () => moveCaretVertical(-1), "up"));
+      arrowsEl.appendChild(createNavButton("←", "Графема слева", "left", () => moveCaretHorizontal(-1), "left"));
+      arrowsEl.appendChild(createNavButton("↓", "Строка ниже", "down", () => moveCaretVertical(1), "down"));
+      arrowsEl.appendChild(createNavButton("→", "Графема справа", "right", () => moveCaretHorizontal(1), "right"));
 
       const actionsEl = document.createElement("div");
       actionsEl.className = "nav-actions";
@@ -720,12 +727,6 @@
       hideCodePhrasePanel();
       setStatus("", "Парсинг программы...");
       stepCountEl.textContent = "Суммарные шаги: 0";
-      if (isKonamiEasterEggProgram(codeInputEl.value)) {
-        const enabled = toggleKonamiDarkTheme();
-        setStatus("ok", enabled ? "Пасхалка: тёмная тема включена." : "Пасхалка: тёмная тема выключена.");
-        runBtn.disabled = false;
-        return;
-      }
 
       const tests = useFixedTests ? resolveFixedTestsForScenario() : getTestsFromUi();
       const hasAtLeastOneTest = tests.length > 0;

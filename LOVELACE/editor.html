@@ -1329,9 +1329,8 @@
     let selectedTaskKey = "";
     let selectedSubtaskKey = "";
     let codeInputResizeObserver = null;
-    const CLASSIC_KONAMI_NAV_SEQUENCE = ["up", "up", "down", "down", "left", "right", "left", "right", "backspace", "delete"];
+    const CLASSIC_KONAMI_NAV_SEQUENCE = ["up", "up", "down", "down", "left", "right", "left", "right", "2", "1"];
     let classicNavSequenceBuffer = [];
-    let classicNavKonamiArmed = false;
 
     function isTask4Subtask(subtaskKey = selectedSubtaskKey) {
       return String(subtaskKey || "") === TASK4_SUBTASK_KEY;
@@ -1616,14 +1615,20 @@
         classicNavSequenceBuffer = classicNavSequenceBuffer.slice(-CLASSIC_KONAMI_NAV_SEQUENCE.length);
       }
       if (CLASSIC_KONAMI_NAV_SEQUENCE.every((item, index) => classicNavSequenceBuffer[index] === item)) {
-        classicNavKonamiArmed = true;
-        setStatus("ok", "Пасхалка готова. Нажмите «Запустить».");
+        classicNavSequenceBuffer = [];
+        toggleClassicKonamiDarkTheme();
       }
     }
 
     function toggleClassicKonamiDarkTheme() {
       const enabled = document.body.classList.toggle("konami-dark");
       setStatus("ok", enabled ? "Пасхалка: тёмная тема включена." : "Пасхалка: тёмная тема выключена.");
+    }
+
+    function getClassicEasterDigitStep(emoji) {
+      const idx = DIGIT_EMOJIS.indexOf(emoji);
+      if (idx < 0) return "";
+      return String(idx);
     }
 
     function formatLineOnlyError(err) {
@@ -2455,6 +2460,8 @@
             event.preventDefault();
           });
           btn.addEventListener("click", () => {
+            const digitStep = getClassicEasterDigitStep(emoji);
+            if (digitStep) recordClassicNavKonamiStep(digitStep);
             insertEmoji(emoji);
           });
           gridEl.appendChild(btn);
@@ -2481,8 +2488,8 @@
       const actionsEl = document.createElement("div");
       actionsEl.className = "nav-actions";
       actionsEl.appendChild(createNavButton("Enter", "Вставить перенос строки", "enter", () => insertCodeText("\n")));
-      actionsEl.appendChild(createNavButton("Backspace", "Удалить символ слева", "backspace", () => backspaceInCodeInput(), "backspace"));
-      actionsEl.appendChild(createNavButton("Delete", "Удалить символ справа", "delete", () => deleteInCodeInput(), "delete"));
+      actionsEl.appendChild(createNavButton("Backspace", "Удалить символ слева", "backspace", () => backspaceInCodeInput()));
+      actionsEl.appendChild(createNavButton("Delete", "Удалить символ справа", "delete", () => deleteInCodeInput()));
 
       navEl.appendChild(navTitleEl);
       navEl.appendChild(arrowsEl);
@@ -2498,13 +2505,6 @@
       hideCodePhrasePanel();
       setStatus("", "Парсинг программы...");
       stepCountEl.textContent = "Суммарные шаги: 0";
-      if (classicNavKonamiArmed) {
-        classicNavKonamiArmed = false;
-        classicNavSequenceBuffer = [];
-        runBtn.disabled = false;
-        toggleClassicKonamiDarkTheme();
-        return;
-      }
       const runNonce = createRunNonce();
       const task4Mode = isTask4Subtask();
       const task4Cases = task4Mode ? getTask4Cases() : [];
