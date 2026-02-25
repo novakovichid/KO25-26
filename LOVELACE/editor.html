@@ -793,17 +793,32 @@
     /* Desktop M */
     @media (min-width: 1041px) and (max-width: 1279px) {
       .blocks {
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: minmax(0, 1fr) minmax(300px, 38%);
       }
       .blocks > .blocks-col:first-child {
         grid-column: 1 / -1;
       }
-      .blocks > .blocks-col:nth-child(2),
+      .blocks > .blocks-col:nth-child(2) {
+        grid-column: 1;
+        grid-row: 2;
+      }
       .blocks > .blocks-col:nth-child(3) {
-        grid-column: auto;
+        display: contents;
+      }
+      .blocks > .blocks-col:nth-child(3) > .panel:first-child {
+        grid-column: 2;
+        grid-row: 2;
+      }
+      .blocks > .blocks-col:nth-child(3) > #codePhrasePanel {
+        grid-column: 1 / -1;
+        grid-row: 3;
+      }
+      .blocks > .blocks-col:nth-child(3) > .panel:last-child {
+        grid-column: 1 / -1;
+        grid-row: 4;
       }
       .editor-workspace {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(220px, 36%) minmax(0, 1fr);
       }
       .run-panel-top {
         grid-template-columns: 1fr;
@@ -811,10 +826,6 @@
       }
       .run-panel-top .status-box {
         white-space: normal;
-      }
-      .test-output-grid,
-      .test-list {
-        grid-template-columns: 1fr;
       }
     }
   </style>
