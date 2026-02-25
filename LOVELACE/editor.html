@@ -43,16 +43,16 @@
       background: radial-gradient(circle at 20% 0%, #ffffff, var(--bg));
       color: var(--text);
       font-family: "Segoe UI", "Noto Sans", sans-serif;
-      padding: 20px;
+      padding: 8px;
     }
 
     .app {
-      width: min(1320px, 100%);
+      width: min(1800px, 100%);
       margin: 0 auto;
       background: var(--panel);
       border: 1px solid var(--border);
       border-radius: 18px;
-      padding: 16px;
+      padding: 12px;
       box-shadow: 0 14px 30px rgba(17, 24, 39, 0.09);
       display: grid;
       gap: 12px;
@@ -92,6 +92,15 @@
     .blocks {
       display: grid;
       gap: 12px;
+      grid-template-columns: minmax(250px, 18%) minmax(520px, 1fr) minmax(320px, 28%);
+      align-items: start;
+    }
+
+    .blocks-col {
+      min-width: 0;
+      display: grid;
+      gap: 12px;
+      align-content: start;
     }
 
     .panel {
@@ -120,6 +129,7 @@
     }
 
     .block-num {
+      display: none;
       width: 24px;
       height: 24px;
       border-radius: 999px;
@@ -607,6 +617,10 @@
       .editor-workspace {
         grid-template-columns: 1fr;
       }
+
+      .blocks {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
@@ -618,6 +632,7 @@
     </header>
 
     <section class="blocks">
+      <aside class="blocks-col">
       <section class="panel">
         <h2 class="block-title"><span class="block-num">0</span>Примеры и Задания</h2>
         <div class="switchers">
@@ -647,7 +662,9 @@
           </section>
         </div>
       </section>
+      </aside>
 
+      <section class="blocks-col">
       <section class="panel">
         <h2 class="block-title"><span class="block-num">1</span>Редактор кода</h2>
         <div class="editor-workspace">
@@ -664,16 +681,9 @@
           </div>
         </div>
       </section>
-
-      <section class="panel">
-        <h2 class="block-title"><span class="block-num">2</span>Тесты</h2>
-        <div class="tests-toolbar">
-          <button id="addTestBtn" type="button">Добавить тест</button>
-          <button id="resetTestsBtn" type="button">Сбросить тесты</button>
-        </div>
-        <div id="testList" class="test-list"></div>
       </section>
 
+      <section class="blocks-col">
       <section class="panel">
         <h2 class="block-title"><span class="block-num">3</span>Запуск</h2>
         <div class="controls">
@@ -696,6 +706,16 @@
         <div class="controls">
           <button id="copyCodePhraseBtn" type="button">Копировать</button>
         </div>
+      </section>
+
+      <section class="panel">
+        <h2 class="block-title"><span class="block-num">2</span>Тесты</h2>
+        <div class="tests-toolbar">
+          <button id="addTestBtn" type="button">Добавить тест</button>
+          <button id="resetTestsBtn" type="button">Сбросить тесты</button>
+        </div>
+        <div id="testList" class="test-list"></div>
+      </section>
       </section>
     </section>
 
