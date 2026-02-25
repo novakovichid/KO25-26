@@ -309,6 +309,18 @@
       align-items: center;
     }
 
+    .run-controls {
+      gap: 6px;
+    }
+
+    .run-controls > button {
+      padding: 6px 10px;
+      min-height: 34px;
+      font-size: 13px;
+      border-radius: 8px;
+      line-height: 1.15;
+    }
+
     .examples {
       display: flex;
       flex-wrap: wrap;
@@ -1012,7 +1024,7 @@
       <section class="blocks-col">
       <section class="panel">
         <h2 class="block-title"><span class="block-num">3</span>Запуск</h2>
-        <div class="controls">
+        <div class="controls run-controls">
           <button id="runBtn" class="primary">Запустить</button>
           <button id="resetBtn">Сброс</button>
         </div>
