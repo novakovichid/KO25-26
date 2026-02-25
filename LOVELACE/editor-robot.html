@@ -485,7 +485,7 @@
 
     .editor-workspace {
       display: grid;
-      grid-template-columns: minmax(220px, 30%) minmax(0, 1fr);
+      grid-template-columns: minmax(260px, 42%) minmax(0, 58%);
       gap: 12px;
       align-items: start;
     }
@@ -1118,16 +1118,16 @@
 
     .emoji-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(40px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(36px, 1fr));
       gap: 6px;
     }
 
     .emoji-btn {
       font-family: var(--emoji-font);
-      font-size: 22px;
+      font-size: 20px;
       line-height: 1;
-      padding: 8px 6px;
-      min-height: 40px;
+      padding: 6px 4px;
+      min-height: 36px;
       display: grid;
       place-items: center;
     }
@@ -1217,10 +1217,10 @@
     /* Desktop XL */
     @media (min-width: 1600px) {
       .blocks {
-        grid-template-columns: minmax(250px, 18%) minmax(560px, 1fr) minmax(340px, 26%);
+        grid-template-columns: minmax(240px, 16%) minmax(420px, 0.78fr) minmax(620px, 1.22fr);
       }
       .editor-workspace {
-        grid-template-columns: minmax(240px, 28%) minmax(0, 1fr);
+        grid-template-columns: minmax(260px, 44%) minmax(0, 56%);
       }
     }
 
