@@ -1250,13 +1250,44 @@
     /* Desktop M */
     @media (min-width: 1041px) and (max-width: 1279px) {
       .blocks {
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: minmax(0, 0.86fr) minmax(0, 1.14fr);
       }
       .blocks > .blocks-col:first-child {
         grid-column: 1 / -1;
       }
       .editor-workspace {
         grid-template-columns: 1fr;
+      }
+      .keyboard-pane {
+        gap: 6px;
+      }
+      .keyboard-left {
+        gap: 8px;
+      }
+      .emoji-group {
+        padding: 8px;
+      }
+      .emoji-grid {
+        grid-template-columns: repeat(auto-fit, minmax(36px, 1fr));
+        gap: 5px;
+      }
+      .emoji-btn {
+        font-size: 20px;
+        min-height: 36px;
+        padding: 6px 4px;
+      }
+      .editor-nav {
+        padding: 8px;
+        gap: 6px;
+      }
+      .nav-arrows,
+      .nav-actions {
+        gap: 5px;
+      }
+      .nav-btn {
+        min-height: 38px;
+        padding: 5px 6px;
+        font-size: 12px;
       }
       .run-panel-top {
         grid-template-columns: 1fr;
