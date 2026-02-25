@@ -14,6 +14,9 @@
       background: rgb(240 253 250);
       color: rgb(15 118 110);
     }
+    .preview-zoomable {
+      cursor: zoom-in;
+    }
   </style>
 </head>
 <body class="min-h-screen bg-slate-100 text-slate-900">
@@ -38,7 +41,7 @@
             <div id="currentFileName" class="font-mono text-xs text-slate-500 sm:text-sm">letter_1.png</div>
           </div>
           <div class="flex min-h-[260px] items-center justify-center rounded-xl border border-slate-200 bg-white p-3">
-            <img id="letterPreview" src="./files/letter_1.png" alt="Послание блогеру 3" class="h-auto max-h-[700px] w-auto max-w-full rounded-lg object-contain">
+            <img id="letterPreview" src="./files/letter_1.png" alt="Послание блогеру 3" class="preview-zoomable h-auto max-h-[700px] w-auto max-w-full rounded-lg object-contain">
           </div>
         </section>
       </div>
@@ -46,11 +49,18 @@
       <a href="../index.html" class="mt-8 inline-flex items-center rounded-xl bg-teal-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-teal-700">Назад в меню Виженера</a>
     </section>
   </main>
+  <div id="imageModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/90 p-4">
+    <button id="imageModalClose" type="button" class="absolute right-4 top-4 rounded-lg border border-slate-500 bg-slate-900/70 px-3 py-1.5 text-sm font-semibold text-white transition hover:bg-slate-800">Закрыть</button>
+    <img id="imageModalPreview" src="./files/letter_1.png" alt="Послание блогеру 3" class="h-auto max-h-[95vh] w-auto max-w-[95vw] object-contain">
+  </div>
   <script>
     (function () {
       const img = document.getElementById("letterPreview");
       const nameEl = document.getElementById("currentFileName");
       const buttons = Array.from(document.querySelectorAll(".file-item"));
+      const modal = document.getElementById("imageModal");
+      const modalImg = document.getElementById("imageModalPreview");
+      const modalClose = document.getElementById("imageModalClose");
       if (!img || !nameEl || !buttons.length) return;
 
       function setActive(active) {
@@ -64,8 +74,39 @@
           img.src = src;
           img.alt = btn.textContent.trim();
           nameEl.textContent = btn.textContent.trim();
+          if (modalImg) {
+            modalImg.src = src;
+            modalImg.alt = btn.textContent.trim();
+          }
           setActive(btn);
         });
+      });
+
+      function closeModal() {
+        if (!modal) return;
+        modal.classList.add("hidden");
+        modal.classList.remove("flex");
+        document.body.classList.remove("overflow-hidden");
+      }
+
+      function openModal() {
+        if (!modal || !modalImg) return;
+        modalImg.src = img.src;
+        modalImg.alt = img.alt;
+        modal.classList.remove("hidden");
+        modal.classList.add("flex");
+        document.body.classList.add("overflow-hidden");
+      }
+
+      img.addEventListener("click", openModal);
+      if (modalClose) modalClose.addEventListener("click", closeModal);
+      if (modal) {
+        modal.addEventListener("click", (event) => {
+          if (event.target === modal) closeModal();
+        });
+      }
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") closeModal();
       });
 
       setActive(buttons[0]);
