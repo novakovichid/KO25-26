@@ -809,12 +809,14 @@
       const noun = useFixedTests
         ? pluralRu(okCount, "сценарий", "сценария", "сценариев")
         : pluralRu(okCount, "тест", "теста", "тестов");
+      const allDonePrefix = okCount === 1 ? "Готово:" : "Готово: все";
+      const allDoneVerb = okCount === 1 ? "выполнен" : "выполнены";
       if (errCount > 0) {
         setStatus("error", `Готово: ${okCount} ${pluralRu(okCount, "успех", "успеха", "успехов")}, ${warnCount} ${pluralRu(warnCount, "предупреждение", "предупреждения", "предупреждений")}, ${errCount} ${pluralRu(errCount, "ошибка", "ошибки", "ошибок")}.`);
       } else if (warnCount > 0) {
         setStatus("warn", `Готово: ${okCount} ${pluralRu(okCount, "успех", "успеха", "успехов")}, ${warnCount} ${pluralRu(warnCount, "предупреждение", "предупреждения", "предупреждений")}.`);
       } else {
-        setStatus("ok", `Готово: все ${okCount} ${noun} выполнены успешно.`);
+        setStatus("ok", `${allDonePrefix} ${okCount} ${noun} ${allDoneVerb} успешно.`);
       }
 
       if (onRunComplete) {

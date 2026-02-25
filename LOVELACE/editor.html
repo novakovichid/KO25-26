@@ -2767,6 +2767,8 @@
       const solvedByTask4 = task4Mode
         ? isTask4Solved(task4Cases, results)
         : false;
+      const allDonePrefix = okCount === 1 ? "Готово:" : "Готово: все";
+      const allDoneVerb = okCount === 1 ? "выполнен" : "выполнены";
       if (errCount > 0) {
         setStatus("error", `Готово: ${okCount} ${pluralRu(okCount, "успех", "успеха", "успехов")}, ${warnCount} ${pluralRu(warnCount, "предупреждение", "предупреждения", "предупреждений")}, ${errCount} ${pluralRu(errCount, "ошибка", "ошибки", "ошибок")}.`);
       } else if (warnCount > 0) {
@@ -2775,9 +2777,9 @@
         const matched = countTask4Matches(task4Cases, results);
         setStatus("warn", `Готово: совпало с эталоном ${matched} из ${task4Cases.length} ${pluralRu(task4Cases.length, "теста", "тестов", "тестов")}.`);
       } else if (hasUnlockRule && !solvedByRule) {
-        setStatus("warn", `Готово: все ${okCount} ${pluralRu(okCount, "тест", "теста", "тестов")} выполнены, но эталон не совпал.`);
+        setStatus("warn", `${allDonePrefix} ${okCount} ${pluralRu(okCount, "тест", "теста", "тестов")} ${allDoneVerb}, но эталон не совпал.`);
       } else {
-        setStatus("ok", `Готово: все ${okCount} ${pluralRu(okCount, "тест", "теста", "тестов")} выполнены успешно.`);
+        setStatus("ok", `${allDonePrefix} ${okCount} ${pluralRu(okCount, "тест", "теста", "тестов")} ${allDoneVerb} успешно.`);
       }
 
       if (task4Mode && solvedByTask4) {
