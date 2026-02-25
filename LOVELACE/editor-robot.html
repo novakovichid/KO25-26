@@ -207,6 +207,21 @@
       box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
     }
 
+    .editor-workspace {
+      display: grid;
+      grid-template-columns: minmax(220px, 30%) minmax(0, 1fr);
+      gap: 12px;
+      align-items: start;
+    }
+
+    .editor-pane,
+    .keyboard-pane {
+      min-width: 0;
+      display: grid;
+      gap: 8px;
+      align-content: start;
+    }
+
     .code-lines {
       width: 84px;
       min-width: 84px;
@@ -870,6 +885,10 @@
       .keyboard-layout {
         grid-template-columns: 1fr;
       }
+
+      .editor-workspace {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
@@ -913,13 +932,19 @@
 
       <section class="panel">
         <h2 class="block-title"><span class="block-num">1</span>Редактор кода</h2>
-        <label for="codeInput">Код</label>
-        <div class="code-editor">
-          <textarea id="codeLineNumbers" class="emoji-field code-lines" readonly tabindex="-1" aria-hidden="true">📌</textarea>
-          <textarea id="codeInput" class="emoji-field code-input" spellcheck="false" autocomplete="off" autocapitalize="off"></textarea>
+        <div class="editor-workspace">
+          <div class="editor-pane">
+            <label for="codeInput">Код</label>
+            <div class="code-editor">
+              <textarea id="codeLineNumbers" class="emoji-field code-lines" readonly tabindex="-1" aria-hidden="true">📌</textarea>
+              <textarea id="codeInput" class="emoji-field code-input" spellcheck="false" autocomplete="off" autocapitalize="off"></textarea>
+            </div>
+          </div>
+          <div class="keyboard-pane">
+            <div class="mini-title">Клавиатура</div>
+            <div id="emojiKeyboard" class="keyboard"></div>
+          </div>
         </div>
-        <div class="mini-title" style="margin-top: 12px;">Клавиатура</div>
-        <div id="emojiKeyboard" class="keyboard"></div>
       </section>
 
       <section class="panel">
