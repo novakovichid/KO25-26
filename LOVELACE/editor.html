@@ -411,6 +411,19 @@
       align-content: start;
     }
 
+    .test-item-output {
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      background: #fff;
+      padding: 6px;
+      display: grid;
+      gap: 6px;
+    }
+
+    .test-item-output[hidden] {
+      display: none !important;
+    }
+
     .test-head {
       display: flex;
       justify-content: space-between;
@@ -482,6 +495,33 @@
 
     .test-output-card.ok .test-output-meta {
       color: #166534;
+    }
+
+    .test-item-output.ok {
+      border-color: #86efac;
+      background: #f0fdf4;
+    }
+
+    .test-item-output.error {
+      border-color: #fca5a5;
+      background: #fef2f2;
+    }
+
+    .test-item-output.warn {
+      border-color: #fcd34d;
+      background: #fffbeb;
+    }
+
+    .test-item-output.ok .test-output-meta {
+      color: #166534;
+    }
+
+    .test-item-output.error .test-output-meta {
+      color: #991b1b;
+    }
+
+    .test-item-output.warn .test-output-meta {
+      color: #92400e;
     }
 
     .test-output-card.error .test-output-meta {
@@ -785,7 +825,7 @@
         </div>
       </section>
 
-      <section class="panel">
+      <section class="panel" hidden>
         <h2 class="block-title"><span class="block-num">4</span>Выходные данные по тестам</h2>
         <div id="testOutputs" class="test-output-grid"></div>
       </section>
@@ -1654,6 +1694,15 @@
       setStatus("", "Ожидание запуска.");
       stepCountEl.textContent = "Суммарные шаги: 0";
       testOutputsEl.textContent = "";
+      const inlineOutputs = Array.from(testListEl.querySelectorAll("[data-inline-output]"));
+      for (const box of inlineOutputs) {
+        box.hidden = true;
+        box.className = "test-item-output";
+        const meta = box.querySelector("[data-inline-output-meta]");
+        const value = box.querySelector("[data-inline-output-value]");
+        if (meta) meta.textContent = "";
+        if (value) value.value = "";
+      }
     }
 
     function createTestItem(inputText = "") {
@@ -1693,8 +1742,35 @@
       input.value = String(inputText || "");
       input.rows = 2;
 
+      const inlineOutput = document.createElement("section");
+      inlineOutput.className = "test-item-output";
+      inlineOutput.hidden = true;
+      inlineOutput.dataset.inlineOutput = "1";
+
+      const inlineHead = document.createElement("div");
+      inlineHead.className = "test-output-head";
+      const inlineTitle = document.createElement("div");
+      inlineTitle.className = "test-label";
+      inlineTitle.textContent = "Результат";
+      inlineTitle.dataset.inlineOutputTitle = "1";
+      const inlineMeta = document.createElement("div");
+      inlineMeta.className = "test-output-meta";
+      inlineMeta.dataset.inlineOutputMeta = "1";
+      inlineHead.appendChild(inlineTitle);
+      inlineHead.appendChild(inlineMeta);
+
+      const inlineValue = document.createElement("textarea");
+      inlineValue.className = "output-box";
+      inlineValue.readOnly = true;
+      inlineValue.rows = 2;
+      inlineValue.dataset.inlineOutputValue = "1";
+
+      inlineOutput.appendChild(inlineHead);
+      inlineOutput.appendChild(inlineValue);
+
       wrap.appendChild(head);
       wrap.appendChild(input);
+      wrap.appendChild(inlineOutput);
       return wrap;
     }
 
@@ -1736,8 +1812,24 @@
 
     function renderOutputs(results) {
       testOutputsEl.textContent = "";
+      const testItems = Array.from(testListEl.querySelectorAll(".test-item"));
       for (let i = 0; i < results.length; i++) {
         const result = results[i];
+        const item = testItems[i];
+        if (item) {
+          const inlineOutput = item.querySelector("[data-inline-output]");
+          const inlineTitle = item.querySelector("[data-inline-output-title]");
+          const inlineMeta = item.querySelector("[data-inline-output-meta]");
+          const inlineValue = item.querySelector("[data-inline-output-value]");
+          if (inlineOutput && inlineMeta && inlineValue) {
+            inlineOutput.hidden = false;
+            inlineOutput.className = `test-item-output ${result.kind}`;
+            if (inlineTitle) inlineTitle.textContent = `Тест ${i + 1}`;
+            inlineMeta.textContent = result.meta;
+            inlineValue.value = result.value;
+          }
+        }
+
         const card = document.createElement("section");
         card.className = `test-output-card ${result.kind}`;
 
