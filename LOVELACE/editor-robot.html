@@ -825,13 +825,14 @@
     }
 
     .run-panel-top .status-box {
-      min-height: 36px;
+      min-height: 44px;
       padding: 6px 10px;
       font-size: 13px;
       line-height: 1.3;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      white-space: normal;
+      overflow: visible;
+      text-overflow: clip;
+      align-self: stretch;
     }
 
     .step-count {
