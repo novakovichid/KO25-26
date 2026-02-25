@@ -219,6 +219,16 @@
       statusBoxEl.textContent = message;
     }
 
+    function pluralRu(count, one, few, many) {
+      const n = Math.abs(Number(count) || 0);
+      const mod100 = n % 100;
+      const mod10 = n % 10;
+      if (mod100 >= 11 && mod100 <= 14) return many;
+      if (mod10 === 1) return one;
+      if (mod10 >= 2 && mod10 <= 4) return few;
+      return many;
+    }
+
     function toggleKonamiDarkTheme() {
       const body = document.body;
       if (!body) return false;
@@ -796,7 +806,9 @@
 
       renderOutputs(results);
       stepCountEl.textContent = `Суммарные шаги: ${totalSteps}`;
-      const noun = useFixedTests ? "сценарий(ев)" : "тест(а/ов)";
+      const noun = useFixedTests
+        ? pluralRu(okCount, "сценарий", "сценария", "сценариев")
+        : pluralRu(okCount, "тест", "теста", "тестов");
       if (errCount > 0) {
         setStatus("error", `Готово: успех ${okCount}, предупреждения ${warnCount}, ошибки ${errCount}.`);
       } else if (warnCount > 0) {

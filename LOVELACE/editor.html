@@ -1755,6 +1755,16 @@
       statusBoxEl.textContent = message;
     }
 
+    function pluralRu(count, one, few, many) {
+      const n = Math.abs(Number(count) || 0);
+      const mod100 = n % 100;
+      const mod10 = n % 10;
+      if (mod100 >= 11 && mod100 <= 14) return many;
+      if (mod10 === 1) return one;
+      if (mod10 >= 2 && mod10 <= 4) return few;
+      return many;
+    }
+
     function recordClassicNavKonamiStep(step) {
       if (!step) return;
       classicNavSequenceBuffer.push(step);
@@ -2763,11 +2773,11 @@
         setStatus("warn", `Готово: успех ${okCount}, предупреждения ${warnCount}.`);
       } else if (task4Mode && !solvedByTask4) {
         const matched = countTask4Matches(task4Cases, results);
-        setStatus("warn", `Готово: совпало с эталоном ${matched} из ${task4Cases.length} тест(а/ов).`);
+        setStatus("warn", `Готово: совпало с эталоном ${matched} из ${task4Cases.length} ${pluralRu(task4Cases.length, "теста", "тестов", "тестов")}.`);
       } else if (hasUnlockRule && !solvedByRule) {
-        setStatus("warn", `Готово: все ${okCount} тест(а/ов) выполнены, но эталон не совпал.`);
+        setStatus("warn", `Готово: все ${okCount} ${pluralRu(okCount, "тест", "теста", "тестов")} выполнены, но эталон не совпал.`);
       } else {
-        setStatus("ok", `Готово: все ${okCount} тест(а/ов) выполнены успешно.`);
+        setStatus("ok", `Готово: все ${okCount} ${pluralRu(okCount, "тест", "теста", "тестов")} выполнены успешно.`);
       }
 
       if (task4Mode && solvedByTask4) {
