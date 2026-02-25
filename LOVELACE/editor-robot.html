@@ -704,11 +704,10 @@
       padding: 10px;
       min-height: 150px;
       overflow: hidden;
-      display: flex;
-      flex-wrap: wrap;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
       gap: 10px;
       align-items: start;
-      align-content: flex-start;
     }
 
     .scenario-card {
@@ -718,9 +717,9 @@
       padding: 8px;
       display: grid;
       gap: 8px;
-      min-width: fit-content;
-      width: fit-content;
-      flex: 0 0 auto;
+      min-width: 0;
+      width: 100%;
+      align-content: start;
     }
 
     .scenario-card-meta {
@@ -734,7 +733,7 @@
       min-height: 70px;
       overflow: hidden;
       padding-bottom: 2px;
-      width: fit-content;
+      width: 100%;
       max-width: 100%;
     }
 
