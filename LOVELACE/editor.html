@@ -46,6 +46,63 @@
       padding: 8px;
     }
 
+    body.konami-dark {
+      --bg: #0b1220;
+      --panel: #111827;
+      --text: #e5e7eb;
+      --muted: #94a3b8;
+      --border: #334155;
+      --accent: #60a5fa;
+      --accent-strong: #3b82f6;
+      --danger-bg: #3b1212;
+      --danger-fg: #fecaca;
+      --ok-bg: #0f2d1f;
+      --ok-fg: #bbf7d0;
+      --warn-bg: #3a2a0b;
+      --warn-fg: #fde68a;
+      background: radial-gradient(circle at 20% 0%, #1f2937, var(--bg));
+      color-scheme: dark;
+    }
+
+    body.konami-dark .app {
+      background: #0f172a;
+      box-shadow: 0 18px 36px rgba(2, 6, 23, 0.45);
+    }
+
+    body.konami-dark .panel {
+      background: #111827;
+    }
+
+    body.konami-dark .title {
+      color: #bfdbfe;
+      border-bottom-color: #1d4ed8;
+    }
+
+    body.konami-dark h2,
+    body.konami-dark .block-title {
+      color: #bfdbfe;
+      border-bottom-color: #1e3a8a;
+    }
+
+    body.konami-dark .back-link {
+      color: #dbeafe;
+      background: #1d4ed8;
+      border-color: #3b82f6;
+    }
+
+    body.konami-dark .back-link:hover {
+      background: #2563eb;
+      border-color: #60a5fa;
+    }
+
+    body.konami-dark #codePhrasePanel {
+      background: linear-gradient(180deg, #3b2a08, #2a1e07);
+      border-color: #f59e0b;
+      box-shadow:
+        0 0 0 2px rgba(245, 158, 11, 0.22),
+        0 12px 28px rgba(0, 0, 0, 0.35);
+    }
+
     .app {
       width: min(1800px, 100%);
       margin: 0 auto;
@@ -1564,8 +1621,9 @@
       }
     }
 
-    function showClassicKonamiPopup() {
-      window.alert("Пасхалка: Konami-код в навигации принят (BA заменены на Backspace/Delete).");
+    function toggleClassicKonamiDarkTheme() {
+      const enabled = document.body.classList.toggle("konami-dark");
+      setStatus("ok", enabled ? "Пасхалка: тёмная тема включена." : "Пасхалка: тёмная тема выключена.");
     }
 
     function formatLineOnlyError(err) {
@@ -2443,9 +2501,8 @@
       if (classicNavKonamiArmed) {
         classicNavKonamiArmed = false;
         classicNavSequenceBuffer = [];
-        setStatus("ok", "Пасхалка активирована.");
         runBtn.disabled = false;
-        showClassicKonamiPopup();
+        toggleClassicKonamiDarkTheme();
         return;
       }
       const runNonce = createRunNonce();

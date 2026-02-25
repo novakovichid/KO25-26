@@ -240,8 +240,10 @@
       return normalized === "UUDDLRLRBA" || normalized === "UUDDLRLR21";
     }
 
-    function showKonamiEasterEggPopup() {
-      window.alert("Пасхалка: Konami code принят.");
+    function toggleKonamiDarkTheme() {
+      const body = document.body;
+      if (!body) return false;
+      return body.classList.toggle("konami-dark");
     }
 
     function editorLineCount() {
@@ -719,9 +721,9 @@
       setStatus("", "Парсинг программы...");
       stepCountEl.textContent = "Суммарные шаги: 0";
       if (isKonamiEasterEggProgram(codeInputEl.value)) {
-        setStatus("ok", "Пасхалка активирована.");
+        const enabled = toggleKonamiDarkTheme();
+        setStatus("ok", enabled ? "Пасхалка: тёмная тема включена." : "Пасхалка: тёмная тема выключена.");
         runBtn.disabled = false;
-        showKonamiEasterEggPopup();
         return;
       }
 
