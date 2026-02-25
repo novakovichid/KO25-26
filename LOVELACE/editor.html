@@ -1272,6 +1272,9 @@
     let selectedTaskKey = "";
     let selectedSubtaskKey = "";
     let codeInputResizeObserver = null;
+    const CLASSIC_KONAMI_NAV_SEQUENCE = ["up", "up", "down", "down", "left", "right", "left", "right", "backspace", "delete"];
+    let classicNavSequenceBuffer = [];
+    let classicNavKonamiArmed = false;
 
     function isTask4Subtask(subtaskKey = selectedSubtaskKey) {
       return String(subtaskKey || "") === TASK4_SUBTASK_KEY;
@@ -1547,6 +1550,22 @@
     function setStatus(kind, message) {
       statusBoxEl.className = `status-box ${kind}`;
       statusBoxEl.textContent = message;
+    }
+
+    function recordClassicNavKonamiStep(step) {
+      if (!step) return;
+      classicNavSequenceBuffer.push(step);
+      if (classicNavSequenceBuffer.length > CLASSIC_KONAMI_NAV_SEQUENCE.length) {
+        classicNavSequenceBuffer = classicNavSequenceBuffer.slice(-CLASSIC_KONAMI_NAV_SEQUENCE.length);
+      }
+      if (CLASSIC_KONAMI_NAV_SEQUENCE.every((item, index) => classicNavSequenceBuffer[index] === item)) {
+        classicNavKonamiArmed = true;
+        setStatus("ok", "Пасхалка готова. Нажмите «Запустить».");
+      }
+    }
+
+    function showClassicKonamiPopup() {
+      window.alert("Пасхалка: Konami-код в навигации принят (BA заменены на Backspace/Delete).");
     }
 
     function formatLineOnlyError(err) {
@@ -2335,7 +2354,7 @@
       refreshCodeLineNumbers();
     }
 
-    function createNavButton(text, title, className, onClick) {
+    function createNavButton(text, title, className, onClick, easterStep = "") {
       const btn = document.createElement("button");
       btn.type = "button";
       btn.className = `nav-btn ${className}`;
@@ -2344,7 +2363,10 @@
       btn.addEventListener("mousedown", (event) => {
         event.preventDefault();
       });
-      btn.addEventListener("click", onClick);
+      btn.addEventListener("click", () => {
+        if (easterStep) recordClassicNavKonamiStep(easterStep);
+        onClick();
+      });
       return btn;
     }
 
@@ -2393,16 +2415,16 @@
 
       const arrowsEl = document.createElement("div");
       arrowsEl.className = "nav-arrows";
-      arrowsEl.appendChild(createNavButton("↑", "Стрелка вверх", "up", () => moveCaretVertical(-1)));
-      arrowsEl.appendChild(createNavButton("←", "Стрелка влево", "left", () => moveCaretHorizontal(-1)));
-      arrowsEl.appendChild(createNavButton("↓", "Стрелка вниз", "down", () => moveCaretVertical(1)));
-      arrowsEl.appendChild(createNavButton("→", "Стрелка вправо", "right", () => moveCaretHorizontal(1)));
+      arrowsEl.appendChild(createNavButton("↑", "Стрелка вверх", "up", () => moveCaretVertical(-1), "up"));
+      arrowsEl.appendChild(createNavButton("←", "Стрелка влево", "left", () => moveCaretHorizontal(-1), "left"));
+      arrowsEl.appendChild(createNavButton("↓", "Стрелка вниз", "down", () => moveCaretVertical(1), "down"));
+      arrowsEl.appendChild(createNavButton("→", "Стрелка вправо", "right", () => moveCaretHorizontal(1), "right"));
 
       const actionsEl = document.createElement("div");
       actionsEl.className = "nav-actions";
       actionsEl.appendChild(createNavButton("Enter", "Вставить перенос строки", "enter", () => insertCodeText("\n")));
-      actionsEl.appendChild(createNavButton("Backspace", "Удалить символ слева", "backspace", () => backspaceInCodeInput()));
-      actionsEl.appendChild(createNavButton("Delete", "Удалить символ справа", "delete", () => deleteInCodeInput()));
+      actionsEl.appendChild(createNavButton("Backspace", "Удалить символ слева", "backspace", () => backspaceInCodeInput(), "backspace"));
+      actionsEl.appendChild(createNavButton("Delete", "Удалить символ справа", "delete", () => deleteInCodeInput(), "delete"));
 
       navEl.appendChild(navTitleEl);
       navEl.appendChild(arrowsEl);
@@ -2418,6 +2440,14 @@
       hideCodePhrasePanel();
       setStatus("", "Парсинг программы...");
       stepCountEl.textContent = "Суммарные шаги: 0";
+      if (classicNavKonamiArmed) {
+        classicNavKonamiArmed = false;
+        classicNavSequenceBuffer = [];
+        setStatus("ok", "Пасхалка активирована.");
+        runBtn.disabled = false;
+        showClassicKonamiPopup();
+        return;
+      }
       const runNonce = createRunNonce();
       const task4Mode = isTask4Subtask();
       const task4Cases = task4Mode ? getTask4Cases() : [];

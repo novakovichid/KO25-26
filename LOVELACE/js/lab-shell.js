@@ -214,6 +214,36 @@
       statusBoxEl.textContent = message;
     }
 
+    function normalizeKonamiCandidate(code) {
+      let text = String(code || "").normalize("NFKC").toUpperCase();
+      text = text.replace(/([0-9])\uFE0F?\u20E3/g, "$1");
+      text = text.replace(/\uFE0F|\u20E3/g, "");
+      text = text.replace(/\s+/g, "");
+      text = text
+        .split("✈").join("U")
+        .split("🚇").join("D")
+        .split("🚠").join("L")
+        .split("🚜").join("R")
+        .split("↑").join("U")
+        .split("⬆").join("U")
+        .split("↓").join("D")
+        .split("⬇").join("D")
+        .split("←").join("L")
+        .split("⬅").join("L")
+        .split("→").join("R")
+        .split("➡").join("R");
+      return text;
+    }
+
+    function isKonamiEasterEggProgram(code) {
+      const normalized = normalizeKonamiCandidate(code);
+      return normalized === "UUDDLRLRBA" || normalized === "UUDDLRLR21";
+    }
+
+    function showKonamiEasterEggPopup() {
+      window.alert("Пасхалка: Konami code принят.");
+    }
+
     function editorLineCount() {
       const source = String(codeInputEl.value || "").replace(/\r\n?/g, "\n");
       return source.split("\n").length;
@@ -688,6 +718,12 @@
       hideCodePhrasePanel();
       setStatus("", "Парсинг программы...");
       stepCountEl.textContent = "Суммарные шаги: 0";
+      if (isKonamiEasterEggProgram(codeInputEl.value)) {
+        setStatus("ok", "Пасхалка активирована.");
+        runBtn.disabled = false;
+        showKonamiEasterEggPopup();
+        return;
+      }
 
       const tests = useFixedTests ? resolveFixedTestsForScenario() : getTestsFromUi();
       const hasAtLeastOneTest = tests.length > 0;
