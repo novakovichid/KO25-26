@@ -149,6 +149,17 @@
       grid-template-columns: 1fr 1fr;
     }
 
+    .switchers-main {
+      min-width: 0;
+    }
+
+    .switchers-row {
+      grid-column: 1 / -1;
+      min-width: 0;
+      border-top: 1px solid #e5e7eb;
+      padding-top: 10px;
+    }
+
     .mini-title {
       font-size: 12px;
       font-weight: 800;
@@ -210,6 +221,7 @@
       border-radius: 10px;
       overflow: hidden;
       background: #fff;
+      min-height: clamp(360px, 58vh, 760px);
     }
 
     .code-editor:focus-within {
@@ -235,6 +247,7 @@
     .code-lines {
       width: 84px;
       min-width: 84px;
+      min-height: clamp(360px, 58vh, 760px);
       border: none;
       border-right: 1px solid #e5e7eb;
       border-radius: 0;
@@ -257,7 +270,7 @@
     }
 
     .code-input {
-      min-height: 320px;
+      min-height: clamp(360px, 58vh, 760px);
       border: none;
       border-radius: 0;
       background: transparent;
@@ -918,7 +931,7 @@
       <section class="panel">
         <h2 class="block-title"><span class="block-num">0</span>Примеры и Задания</h2>
         <div class="switchers">
-          <section>
+          <section class="switchers-main">
             <div class="mini-title">Примеры</div>
             <div class="examples">
               <button id="example1Btn" type="button" aria-pressed="false">Пример №1</button>
@@ -928,7 +941,7 @@
               <button id="example5Btn" type="button" aria-pressed="false">Пример №5</button>
             </div>
           </section>
-          <section>
+          <section class="switchers-main">
             <div class="mini-title">Задания</div>
             <div id="taskButtons" class="task-grid">
               <button type="button" data-task="1" aria-pressed="false">Задание 1</button>
@@ -936,11 +949,14 @@
               <button type="button" data-task="3" aria-pressed="false">Задание 3</button>
               <button type="button" data-task="4" aria-pressed="false">Задание 4</button>
             </div>
+          </section>
+          <section class="switchers-row">
+            <div class="mini-title">Подзадачи</div>
             <div id="taskSubtasks" class="subtask-grid" hidden></div>
-            <section id="taskTextWrap" class="task-text-wrap" hidden>
-              <div class="task-text-label">Текст задания</div>
-              <div id="taskText" class="task-text"></div>
-            </section>
+          </section>
+          <section id="taskTextWrap" class="task-text-wrap switchers-row" hidden>
+            <div class="task-text-label">Текст задания</div>
+            <div id="taskText" class="task-text"></div>
           </section>
         </div>
       </section>
