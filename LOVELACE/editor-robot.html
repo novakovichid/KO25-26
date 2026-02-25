@@ -104,6 +104,10 @@
       align-content: start;
     }
 
+    .blocks > .blocks-col:first-child {
+      gap: 8px;
+    }
+
     .panel {
       border: 1px solid var(--border);
       border-radius: 14px;
@@ -111,6 +115,11 @@
       padding: 12px;
       display: grid;
       gap: 10px;
+    }
+
+    .blocks > .blocks-col:first-child > .panel {
+      padding: 10px;
+      gap: 8px;
     }
 
     .panel[hidden] {
@@ -145,7 +154,7 @@
 
     .switchers {
       display: grid;
-      gap: 10px;
+      gap: 8px;
       grid-template-columns: 1fr 1fr;
     }
 
@@ -157,7 +166,7 @@
       grid-column: 1 / -1;
       min-width: 0;
       border-top: 1px solid #e5e7eb;
-      padding-top: 10px;
+      padding-top: 8px;
     }
 
     .mini-title {
@@ -330,7 +339,7 @@
     .examples {
       display: flex;
       flex-wrap: wrap;
-      gap: 8px;
+      gap: 6px;
       align-items: center;
     }
 
@@ -338,12 +347,12 @@
     .subtask-grid {
       display: flex;
       flex-wrap: wrap;
-      gap: 8px;
+      gap: 6px;
       align-items: center;
     }
 
     .subtask-grid {
-      margin-top: 8px;
+      margin-top: 6px;
       min-height: 40px;
     }
 
@@ -356,9 +365,9 @@
     }
 
     .task-text-wrap {
-      margin-top: 8px;
+      margin-top: 6px;
       display: grid;
-      gap: 6px;
+      gap: 4px;
     }
 
     .task-text-label {
@@ -384,7 +393,7 @@
     }
 
     .task-text p + p {
-      margin-top: 6px;
+      margin-top: 4px;
     }
 
     .scenario-wrap {
