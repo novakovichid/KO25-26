@@ -524,6 +524,14 @@
       color: #92400e;
     }
 
+    .inline-output-label {
+      font-size: 11px;
+      font-weight: 800;
+      color: #475569;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
     .test-output-card.error .test-output-meta {
       color: #991b1b;
     }
@@ -1808,6 +1816,10 @@
       inlineOutput.hidden = true;
       inlineOutput.dataset.inlineOutput = "1";
 
+      const inlineOutputLabel = document.createElement("div");
+      inlineOutputLabel.className = "inline-output-label";
+      inlineOutputLabel.textContent = "Выходные данные";
+
       const inlineHead = document.createElement("div");
       inlineHead.className = "test-output-head";
       const inlineTitle = document.createElement("div");
@@ -1826,6 +1838,7 @@
       inlineValue.rows = 2;
       inlineValue.dataset.inlineOutputValue = "1";
 
+      inlineOutput.appendChild(inlineOutputLabel);
       inlineOutput.appendChild(inlineHead);
       inlineOutput.appendChild(inlineValue);
 
