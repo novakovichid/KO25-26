@@ -8,32 +8,84 @@
   <script>window.SectionAuth && window.SectionAuth.guardPage("VIGENERE");</script>
   <title>Журнал активности</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .video-item[aria-current="true"] {
+      border-color: rgb(20 184 166);
+      background: rgb(240 253 250);
+      color: rgb(15 118 110);
+    }
+  </style>
 </head>
 <body class="min-h-screen bg-slate-100 text-slate-900">
-  <main class="mx-auto flex min-h-screen w-full max-w-3xl items-center px-4 py-10 sm:px-6">
+  <main class="mx-auto flex min-h-screen w-full max-w-5xl items-center px-4 py-10 sm:px-6">
     <section class="w-full rounded-3xl border border-slate-200 bg-white p-8 shadow-xl">
       <h1 class="text-2xl font-black tracking-tight">Журнал активности</h1>
-      <p class="mt-3 text-slate-600">Каталог видео и прямые ссылки на скачивание.</p>
+      <p class="mt-3 text-slate-600">Просмотр фрагментов в встроенном плеере.</p>
 
-      <div class="mt-6 grid gap-3">
-        <a href="./videos/" class="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 font-semibold transition hover:border-teal-300 hover:bg-teal-50">
-          Открыть каталог видео
-        </a>
-      </div>
+      <div class="mt-6 grid gap-6 lg:grid-cols-[260px_minmax(0,1fr)]">
+        <aside>
+          <h2 class="text-sm font-bold uppercase tracking-wide text-slate-500">Видео</h2>
+          <div id="videoMenu" class="mt-3 grid gap-2">
+            <button type="button" class="video-item w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-left font-mono text-sm transition hover:border-teal-300 hover:bg-teal-50" data-src="./videos/fragment_1.mp4">fragment_1.mp4</button>
+            <button type="button" class="video-item w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-left font-mono text-sm transition hover:border-teal-300 hover:bg-teal-50" data-src="./videos/fragment_2.mp4">fragment_2.mp4</button>
+            <button type="button" class="video-item w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-left font-mono text-sm transition hover:border-teal-300 hover:bg-teal-50" data-src="./videos/fragment_3.mp4">fragment_3.mp4</button>
+            <button type="button" class="video-item w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-left font-mono text-sm transition hover:border-teal-300 hover:bg-teal-50" data-src="./videos/fragment_4.mp4">fragment_4.mp4</button>
+            <button type="button" class="video-item w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-left font-mono text-sm transition hover:border-teal-300 hover:bg-teal-50" data-src="./videos/fragment_5.mp4">fragment_5.mp4</button>
+            <button type="button" class="video-item w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-left font-mono text-sm transition hover:border-teal-300 hover:bg-teal-50" data-src="./videos/fragment_6.mp4">fragment_6.mp4</button>
+            <button type="button" class="video-item w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-left font-mono text-sm transition hover:border-teal-300 hover:bg-teal-50" data-src="./videos/fragment_7.mp4">fragment_7.mp4</button>
+          </div>
+        </aside>
 
-      <h2 class="mt-8 text-lg font-bold">Файлы</h2>
-      <div class="mt-3 grid gap-2">
-        <a class="rounded-xl border border-slate-200 px-4 py-2 font-mono text-sm hover:bg-slate-50" href="./videos/fragment_1.mp4" download>fragment_1.mp4</a>
-        <a class="rounded-xl border border-slate-200 px-4 py-2 font-mono text-sm hover:bg-slate-50" href="./videos/fragment_2.mp4" download>fragment_2.mp4</a>
-        <a class="rounded-xl border border-slate-200 px-4 py-2 font-mono text-sm hover:bg-slate-50" href="./videos/fragment_3.mp4" download>fragment_3.mp4</a>
-        <a class="rounded-xl border border-slate-200 px-4 py-2 font-mono text-sm hover:bg-slate-50" href="./videos/fragment_4.mp4" download>fragment_4.mp4</a>
-        <a class="rounded-xl border border-slate-200 px-4 py-2 font-mono text-sm hover:bg-slate-50" href="./videos/fragment_5.mp4" download>fragment_5.mp4</a>
-        <a class="rounded-xl border border-slate-200 px-4 py-2 font-mono text-sm hover:bg-slate-50" href="./videos/fragment_6.mp4" download>fragment_6.mp4</a>
-        <a class="rounded-xl border border-slate-200 px-4 py-2 font-mono text-sm hover:bg-slate-50" href="./videos/fragment_7.mp4" download>fragment_7.mp4</a>
+        <section class="rounded-2xl border border-slate-200 bg-slate-50 p-4 sm:p-5">
+          <div class="mb-3 flex items-center justify-between gap-3">
+            <h2 class="text-lg font-bold">Плеер</h2>
+            <div id="currentVideoName" class="font-mono text-xs text-slate-500 sm:text-sm">fragment_1.mp4</div>
+          </div>
+          <video
+            id="activityPlayer"
+            class="w-full rounded-xl bg-black"
+            controls
+            preload="metadata"
+            playsinline
+          >
+            <source src="./videos/fragment_1.mp4" type="video/mp4">
+            Ваш браузер не поддерживает видео.
+          </video>
+        </section>
       </div>
 
       <a href="../index.html" class="mt-8 inline-flex items-center rounded-xl bg-teal-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-teal-700">Назад в меню Виженера</a>
     </section>
   </main>
+  <script>
+    (function () {
+      const player = document.getElementById("activityPlayer");
+      const source = player ? player.querySelector("source") : null;
+      const currentName = document.getElementById("currentVideoName");
+      const buttons = Array.from(document.querySelectorAll(".video-item"));
+      if (!player || !source || !currentName || !buttons.length) return;
+
+      function setActive(button) {
+        buttons.forEach((btn) => {
+          btn.setAttribute("aria-current", btn === button ? "true" : "false");
+        });
+      }
+
+      function switchVideo(button) {
+        const src = button.dataset.src;
+        if (!src) return;
+        source.src = src;
+        player.load();
+        player.play().catch(() => {});
+        currentName.textContent = button.textContent.trim();
+        setActive(button);
+      }
+
+      buttons.forEach((button) => {
+        button.addEventListener("click", () => switchVideo(button));
+      });
+      setActive(buttons[0]);
+    })();
+  </script>
 </body>
 </html>
