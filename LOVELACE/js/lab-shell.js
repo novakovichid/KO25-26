@@ -189,6 +189,9 @@
     const subtaskPresets = (config.subtaskPresets && typeof config.subtaskPresets === "object") ? config.subtaskPresets : {};
     const subtaskTexts = (config.subtaskTexts && typeof config.subtaskTexts === "object") ? config.subtaskTexts : {};
     const keyboardGroups = Array.isArray(config.keyboardGroups) ? config.keyboardGroups : [];
+    const navTitleText = typeof config.navTitle === "string" && config.navTitle.trim()
+      ? config.navTitle.trim()
+      : "Навигация";
     const lineDigits = Array.isArray(config.lineDigits) && config.lineDigits.length === 10 ? config.lineDigits.slice() : [];
     const testInputPlaceholder = typeof config.testInputPlaceholder === "string" ? config.testInputPlaceholder : "";
     const hardStepLimit = Number.isInteger(config.hardStepLimit) && config.hardStepLimit > 0 ? config.hardStepLimit : DEFAULT_HARD_STEP_LIMIT;
@@ -698,7 +701,7 @@
 
       const navTitleEl = document.createElement("p");
       navTitleEl.className = "nav-title";
-      navTitleEl.textContent = "Навигация";
+      navTitleEl.textContent = navTitleText;
 
       const arrowsEl = document.createElement("div");
       arrowsEl.className = "nav-arrows";
