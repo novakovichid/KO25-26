@@ -237,6 +237,36 @@
       border-color: #93c5fd;
     }
 
+    body.konami-dark .scenario-toggle,
+    body.konami-dark .scenario-scale,
+    body.konami-dark .scenario-scale-label,
+    body.konami-dark .legend-item,
+    body.konami-dark .scenario-card-meta {
+      color: #cbd5e1;
+    }
+
+    body.konami-dark .scenario-scale-value {
+      background: #334155;
+      border-color: #475569;
+      color: #e2e8f0;
+    }
+
+    body.konami-dark .scenario-axis {
+      border-color: #475569;
+      background: #1f2937;
+      color: #cbd5e1;
+    }
+
+    body.konami-dark .scenario-axis.corner {
+      background: #334155;
+      border-color: #64748b;
+      color: #e2e8f0;
+    }
+
+    body.konami-dark .scenario-temp {
+      color: #cbd5e1;
+    }
+
     body.konami-dark .mini-title,
     body.konami-dark label,
     body.konami-dark .scenario-meta,
@@ -704,10 +734,11 @@
       padding: 10px;
       min-height: 150px;
       overflow: hidden;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      display: flex;
+      flex-wrap: wrap;
       gap: 10px;
       align-items: start;
+      align-content: flex-start;
     }
 
     .scenario-card {
@@ -717,8 +748,9 @@
       padding: 8px;
       display: grid;
       gap: 8px;
-      min-width: 0;
-      width: 100%;
+      min-width: fit-content;
+      width: fit-content;
+      flex: 0 0 auto;
       align-content: start;
     }
 
@@ -733,7 +765,7 @@
       min-height: 70px;
       overflow: hidden;
       padding-bottom: 2px;
-      width: 100%;
+      width: fit-content;
       max-width: 100%;
     }
 
@@ -1135,10 +1167,14 @@
 
     .nav-btn {
       min-height: 42px;
-      padding: 7px 8px;
-      display: grid;
-      place-items: center;
+      padding: 6px 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       text-align: center;
+      line-height: 1.1;
+      font-family: "Segoe UI", "Noto Sans", sans-serif;
+      white-space: normal;
       font-weight: 800;
       border-radius: 10px;
       user-select: none;
@@ -1293,6 +1329,30 @@
         </div>
       </section>
 
+      </section>
+
+      <section class="blocks-col">
+      <section class="panel">
+        <h2 class="block-title"><span class="block-num">3</span>Запуск</h2>
+        <div class="run-panel-top">
+          <div class="controls run-controls">
+            <button id="runBtn" class="primary">Запустить</button>
+            <button id="resetBtn">Сброс</button>
+          </div>
+          <div id="statusBox" class="status-box">Ожидание запуска.</div>
+        </div>
+        <div id="stepCount" class="step-count" hidden>Суммарные шаги: 0</div>
+      </section>
+
+      <section id="codePhrasePanel" class="panel" hidden>
+        <h2 class="block-title"><span class="block-num">5</span>Кодовая фраза</h2>
+        <label for="codePhraseInput">Кодовая фраза</label>
+        <input id="codePhraseInput" class="text-input" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Кодовая фраза" readonly>
+        <div class="controls">
+          <button id="copyCodePhraseBtn" type="button">Копировать</button>
+        </div>
+      </section>
+
       <section class="panel">
         <h2 class="block-title"><span class="block-num">2</span>Поле сценария</h2>
         <div class="scenario-wrap">
@@ -1317,29 +1377,6 @@
             <span class="legend-item"><span class="legend-chip">F</span>Финиш</span>
             <span class="legend-item"><span class="legend-chip red">●</span>Контрольная клетка</span>
           </div>
-        </div>
-      </section>
-      </section>
-
-      <section class="blocks-col">
-      <section class="panel">
-        <h2 class="block-title"><span class="block-num">3</span>Запуск</h2>
-        <div class="run-panel-top">
-          <div class="controls run-controls">
-            <button id="runBtn" class="primary">Запустить</button>
-            <button id="resetBtn">Сброс</button>
-          </div>
-          <div id="statusBox" class="status-box">Ожидание запуска.</div>
-        </div>
-        <div id="stepCount" class="step-count" hidden>Суммарные шаги: 0</div>
-      </section>
-
-      <section id="codePhrasePanel" class="panel" hidden>
-        <h2 class="block-title"><span class="block-num">5</span>Кодовая фраза</h2>
-        <label for="codePhraseInput">Кодовая фраза</label>
-        <input id="codePhraseInput" class="text-input" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Кодовая фраза" readonly>
-        <div class="controls">
-          <button id="copyCodePhraseBtn" type="button">Копировать</button>
         </div>
       </section>
 
@@ -1470,7 +1507,8 @@
     const ROBOT_KEYBOARD_GROUPS = [
       ["🚶", "🎨", "🤔", "🔁", "🔂", "😐"],
       ["✈️", "🚇", "🚠", "🚜", "🧱", "🛤", "🏁", "🎯", "🌡", "🌹", "🌻", "🍀", "🍇"],
-      ["🟰", "🚫", "🔥", "🧊", "🔥🟰", "🧊🟰", "0️⃣", "1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣"]
+      ["🟰", "🚫", "🔥", "🧊", "🔥🟰", "🧊🟰"],
+      ["0️⃣", "1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣"]
     ];
 
     const ROBOT_SCENARIO_BLOBS = Object.freeze({
@@ -1917,6 +1955,7 @@
       const scenarioScaleDownEl = document.getElementById("scenarioScaleDown");
       const scenarioScaleUpEl = document.getElementById("scenarioScaleUp");
       const scenarioScaleValueEl = document.getElementById("scenarioScaleValue");
+      const resetBtnEl = document.getElementById("resetBtn");
       const codePhrasePanelEl = document.getElementById("codePhrasePanel");
       const codePhraseInputEl = document.getElementById("codePhraseInput");
       const copyCodePhraseBtn = document.getElementById("copyCodePhraseBtn");
@@ -2169,6 +2208,17 @@
           else hideRobotCodePhrase();
         }
       });
+
+      if (resetBtnEl) {
+        resetBtnEl.addEventListener("click", () => {
+          const scenarioKey = lastScenarioPayload && typeof lastScenarioPayload.scenarioKey === "string"
+            ? lastScenarioPayload.scenarioKey
+            : "";
+          if (isTaskOneScenarioKey(scenarioKey)) task1ControlMarksRevealed = false;
+          hideRobotCodePhrase();
+          if (lastScenarioPayload) drawScenarioView(lastScenarioPayload, null);
+        });
+      }
     }
   </script>
 </body>
