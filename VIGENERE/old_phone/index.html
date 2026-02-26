@@ -32,11 +32,11 @@
             <div class="mt-5 grid grid-cols-2 gap-3">
               <button type="button" class="phone-btn rounded-2xl border border-slate-500 bg-slate-700 px-2 py-3 text-center shadow transition hover:bg-slate-600" data-key="1">
                 <div class="text-[28px] font-black leading-none">1</div>
-                <div class="mt-0.5 font-mono text-sm tracking-[0.2em] text-slate-200">ABC</div>
+                <div class="mt-0.5 font-mono text-sm tracking-[0.2em] text-slate-200">АБВГ</div>
               </button>
               <button type="button" class="phone-btn rounded-2xl border border-slate-500 bg-slate-700 px-2 py-3 text-center shadow transition hover:bg-slate-600" data-key="2">
                 <div class="text-[28px] font-black leading-none">2</div>
-                <div class="mt-0.5 font-mono text-sm tracking-[0.2em] text-slate-200">DEF</div>
+                <div class="mt-0.5 font-mono text-sm tracking-[0.2em] text-slate-200">ДЕЖЗ</div>
               </button>
             </div>
 
@@ -62,12 +62,12 @@
   <script>
     (function () {
       const KEYMAP = {
-        "1": ["A", "B", "C"],
-        "2": ["D", "E", "F"]
+        "1": ["А", "Б", "В", "Г"],
+        "2": ["Д", "Е", "Ж", "З"]
       };
       const LETTER_TO_PRESS_CODE = {
-        A: "1", B: "11", C: "111",
-        D: "2", E: "22", F: "222"
+        "А": "1", "Б": "11", "В": "111", "Г": "1111",
+        "Д": "2", "Е": "22", "Ж": "222", "З": "2222"
       };
       // Программный переключатель таймаута мультинажатия: UI не показываем.
       const CONFIG = {
