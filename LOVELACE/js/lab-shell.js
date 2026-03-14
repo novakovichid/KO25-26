@@ -202,6 +202,7 @@
     let selectedExampleIndex = -1;
     let selectedTaskKey = "";
     let selectedSubtaskKey = "";
+    const sessionSubtaskCodes = {};
     let codeInputResizeObserver = null;
     let currentScenarioKey = "";
     const KONAMI_BUTTON_SEQUENCE = ["up", "up", "down", "down", "left", "right", "left", "right", "2", "1"];
@@ -376,6 +377,18 @@
       testOutputsEl.textContent = "";
     }
 
+    function syncResetCodeBtn() {
+      const resetCodeBtn = document.getElementById("resetCodeBtn");
+      if (!resetCodeBtn) return;
+      if (!selectedSubtaskKey || selectedExampleIndex >= 0) {
+        resetCodeBtn.hidden = true;
+        return;
+      }
+      const preset = subtaskPresets[selectedSubtaskKey];
+      const hasPreset = preset && typeof preset.code === "string" && preset.code.length > 0;
+      resetCodeBtn.hidden = !hasPreset;
+    }
+
     function createTestItem(inputText = "") {
       if (!testListEl) return null;
       const wrap = document.createElement("section");
@@ -478,15 +491,21 @@
     }
 
     function applySubtaskPreset(subtaskKey) {
-      const preset = subtaskPresets[subtaskKey];
-      if (!preset || typeof preset !== "object") return;
-      codeInputEl.value = String(preset.code || "");
+      if (typeof sessionSubtaskCodes[subtaskKey] === "string") {
+        codeInputEl.value = sessionSubtaskCodes[subtaskKey];
+      } else {
+        const preset = subtaskPresets[subtaskKey];
+        if (!preset || typeof preset !== "object") return;
+        codeInputEl.value = String(preset.code || "");
+      }
       refreshCodeLineNumbers();
       if (!useFixedTests) {
-        const tests = Array.isArray(preset.tests) && preset.tests.length ? preset.tests : [""];
+        const preset = subtaskPresets[subtaskKey];
+        const tests = (preset && Array.isArray(preset.tests) && preset.tests.length) ? preset.tests : [""];
         setTestsToUi(tests);
       }
       resetResultPanels();
+      syncResetCodeBtn();
     }
 
     function selectSubtask(subtaskKey) {
@@ -505,6 +524,7 @@
       taskSubtasksEl.hidden = true;
       setTaskText("");
       emitScenarioChange();
+      syncResetCodeBtn();
     }
 
     function renderSubtasks(taskKey) {
@@ -893,7 +913,12 @@
       el.addEventListener("keyup", () => updateFocusTarget(el));
     }
 
-    codeInputEl.addEventListener("input", refreshCodeLineNumbers);
+    codeInputEl.addEventListener("input", () => {
+      refreshCodeLineNumbers();
+      if (selectedSubtaskKey && selectedExampleIndex < 0) {
+        sessionSubtaskCodes[selectedSubtaskKey] = codeInputEl.value;
+      }
+    });
     codeInputEl.addEventListener("scroll", syncCodeLineNumbersScroll);
 
     if (typeof ResizeObserver === "function") {
@@ -908,6 +933,15 @@
     });
 
     resetBtn.addEventListener("click", resetResultPanels);
+
+    const resetCodeBtn = document.getElementById("resetCodeBtn");
+    if (resetCodeBtn) {
+      resetCodeBtn.addEventListener("click", () => {
+        if (!selectedSubtaskKey || selectedExampleIndex >= 0) return;
+        delete sessionSubtaskCodes[selectedSubtaskKey];
+        applySubtaskPreset(selectedSubtaskKey);
+      });
+    }
 
     if (useFixedTests) {
       if (testsPanelEl) testsPanelEl.hidden = true;

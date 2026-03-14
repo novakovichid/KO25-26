@@ -535,6 +535,29 @@
       box-shadow: none;
     }
 
+    .code-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+
+    .reset-code-btn {
+      padding: 2px 8px;
+      font-size: 11px;
+      height: 24px;
+      background: var(--danger-bg);
+      color: var(--danger-fg);
+      border-color: var(--danger-fg);
+      opacity: 0.8;
+    }
+
+    .reset-code-btn:hover {
+      background: var(--danger-fg);
+      color: #fff;
+      opacity: 1;
+    }
+
     .stdin-input {
       min-height: 84px;
       font-family: "Noto Sans", "Segoe UI", "Noto Color Emoji", "Twemoji Mozilla", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
@@ -1347,7 +1370,10 @@
         <h2 class="block-title"><span class="block-num">1</span>Редактор кода</h2>
         <div class="editor-workspace">
           <div class="editor-pane">
-            <label for="codeInput">Код</label>
+            <div class="code-header">
+              <label for="codeInput">Код</label>
+              <button id="resetCodeBtn" class="reset-code-btn" hidden>Сбросить код</button>
+            </div>
             <div class="code-editor">
               <textarea id="codeLineNumbers" class="emoji-field code-lines" readonly tabindex="-1" aria-hidden="true">📌</textarea>
               <textarea id="codeInput" class="emoji-field code-input" spellcheck="false" autocomplete="off" autocapitalize="off"></textarea>

@@ -504,6 +504,29 @@
       box-shadow: none;
     }
 
+    .code-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+
+    .reset-code-btn {
+      padding: 2px 8px;
+      font-size: 11px;
+      height: 24px;
+      background: var(--danger-bg);
+      color: var(--danger-fg);
+      border-color: var(--danger-fg);
+      opacity: 0.8;
+    }
+
+    .reset-code-btn:hover {
+      background: var(--danger-fg);
+      color: #fff;
+      opacity: 1;
+    }
+
     .stdin-input {
       min-height: 60px;
       font-family: "Noto Sans", "Segoe UI", "Noto Color Emoji", "Twemoji Mozilla", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
@@ -1093,7 +1116,10 @@
         <h2 class="block-title"><span class="block-num">1</span>Редактор кода</h2>
         <div class="editor-workspace">
           <div class="editor-pane">
-            <label for="codeInput">Код</label>
+            <div class="code-header">
+              <label for="codeInput">Код</label>
+              <button id="resetCodeBtn" class="reset-code-btn" hidden>Сбросить код</button>
+            </div>
             <div class="code-editor">
               <textarea id="codeLineNumbers" class="emoji-field code-lines" readonly tabindex="-1" aria-hidden="true">📌</textarea>
               <textarea id="codeInput" class="emoji-field code-input" spellcheck="false" autocomplete="off" autocapitalize="off"></textarea>
@@ -1400,6 +1426,8 @@
         tests: []
       }
     });
+
+    const sessionSubtaskCodes = {};
     const SUBTASK_TEXTS = Object.freeze({
       "1.1": Object.freeze([
         "Проверить выходные данные для значения 11."
@@ -1460,6 +1488,7 @@
     const statusBoxEl = document.getElementById("statusBox");
     const stepCountEl = document.getElementById("stepCount");
     const emojiKeyboardEl = document.getElementById("emojiKeyboard");
+    const resetCodeBtnEl = document.getElementById("resetCodeBtn");
     const codePhrasePanelEl = document.getElementById("codePhrasePanel");
     const codePhraseInputEl = document.getElementById("codePhraseInput");
     const copyCodePhraseBtn = document.getElementById("copyCodePhraseBtn");
@@ -1820,6 +1849,17 @@
       }
     }
 
+    function syncResetCodeBtn() {
+      if (!resetCodeBtnEl) return;
+      if (!selectedSubtaskKey || selectedExampleIndex >= 0) {
+        resetCodeBtnEl.hidden = true;
+        return;
+      }
+      const preset = SUBTASK_PRESETS[selectedSubtaskKey];
+      const hasPreset = preset && typeof preset.code === "string" && preset.code.length > 0;
+      resetCodeBtnEl.hidden = !hasPreset;
+    }
+
     function setTaskText(subtaskKey) {
       if (!taskTextWrapEl || !taskTextEl) return;
       const raw = SUBTASK_TEXTS[subtaskKey];
@@ -1841,21 +1881,28 @@
     }
 
     function applySubtaskPreset(subtaskKey) {
-      const preset = SUBTASK_PRESETS[subtaskKey];
-      if (!preset || typeof preset !== "object") return;
-      codeInputEl.value = String(preset.code || "");
+      if (typeof sessionSubtaskCodes[subtaskKey] === "string") {
+        codeInputEl.value = sessionSubtaskCodes[subtaskKey];
+      } else {
+        const preset = SUBTASK_PRESETS[subtaskKey];
+        if (!preset || typeof preset !== "object") return;
+        codeInputEl.value = String(preset.code || "");
+      }
       refreshCodeLineNumbers();
-      let tests = Array.isArray(preset.tests) && preset.tests.length ? preset.tests : [""];
+      const preset = SUBTASK_PRESETS[subtaskKey];
+      let tests = (preset && Array.isArray(preset.tests) && preset.tests.length) ? preset.tests : [""];
       if (isTask4Subtask(subtaskKey)) {
         const visibleInputs = getTask4VisibleInputs();
         tests = visibleInputs.length ? visibleInputs : [""];
       }
       setTestsToUi(tests);
       resetResultPanels();
+      syncResetCodeBtn();
     }
 
     function selectSubtask(subtaskKey) {
       selectedSubtaskKey = subtaskKey;
+      selectedExampleIndex = -1;
       syncSubtaskButtons();
       setTaskText(subtaskKey);
       setScenarioKey(`task:${subtaskKey}`);
@@ -1868,6 +1915,7 @@
       taskSubtasksEl.hidden = true;
       setTaskText("");
       syncTask4TestsUi();
+      syncResetCodeBtn();
     }
 
     function renderSubtasks(taskKey) {
@@ -2819,7 +2867,12 @@
       el.addEventListener("click", () => updateFocusTarget(el));
       el.addEventListener("keyup", () => updateFocusTarget(el));
     }
-    codeInputEl.addEventListener("input", refreshCodeLineNumbers);
+    codeInputEl.addEventListener("input", () => {
+      refreshCodeLineNumbers();
+      if (selectedSubtaskKey && selectedExampleIndex < 0) {
+        sessionSubtaskCodes[selectedSubtaskKey] = codeInputEl.value;
+      }
+    });
     codeInputEl.addEventListener("scroll", syncCodeLineNumbersScroll);
     if (typeof ResizeObserver === "function") {
       codeInputResizeObserver = new ResizeObserver(() => {
@@ -2834,6 +2887,13 @@
       handleRun();
     });
     resetBtn.addEventListener("click", handleReset);
+    if (resetCodeBtnEl) {
+      resetCodeBtnEl.addEventListener("click", () => {
+        if (!selectedSubtaskKey || selectedExampleIndex >= 0) return;
+        delete sessionSubtaskCodes[selectedSubtaskKey];
+        applySubtaskPreset(selectedSubtaskKey);
+      });
+    }
     for (let i = 0; i < exampleButtons.length; i++) {
       exampleButtons[i].addEventListener("click", () => applyExample(i));
     }
